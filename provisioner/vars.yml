@@ -1,0 +1,6 @@
+---
+project_name: domicilian
+project_repo_url: git@github.com:skhurana39/domicilian-web.git
+project_repo_remote: origin
+repo_version: master
+pg_gis: True
