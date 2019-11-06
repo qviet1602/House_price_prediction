@@ -10,13 +10,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="version" content="{{ site_info.RELEASE_VERSION }}">
     <meta name="description" content="{% block meta_description %}{% endblock meta_description %}">
-    
+
     {% if site_info.IS_RAVEN_INSTALLED %}
         <script>Raven.config('{% sentry_public_dsn %}').install()</script>
     {% endif %}
 
     {% block css %}
       {% render_bundle 'main' 'css' %}
+      <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/map.css" />
     {% endblock css %}
     {% block head_extras %}{% endblock %}
   </head>
