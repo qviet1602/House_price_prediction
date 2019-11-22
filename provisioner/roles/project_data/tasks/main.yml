@@ -29,7 +29,10 @@
     pkg: gettext
     state: present
 
-- include: webpack.yml
+- name: collect static
+  django_manage: command=collectstatic app_path={{ project_path }} virtualenv={{ venv_path }}
+  become: false
+  tags: ['deploy']
 
 
 - name: Run database migrations

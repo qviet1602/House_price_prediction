@@ -13,10 +13,6 @@ django-redis==4.10.0
 hiredis==1.0.0
 
 
-# Logging
-# -------------------------------------
-newrelic==4.20.0.120
-
 # Basic Auth Protection
 # -------------------------------------
 django-auth-wall==0.2.0

@@ -39,8 +39,6 @@ def init(vagrant=False):
     """Prepare a local machine for development."""
 
     install_requirements()
-    local("npm install")
-    local("npm run build")
     add_pre_commit()
     if not os.getenv("CI", "False").lower() == "true":
         local("createdb %(project_name)s" % env)  # create postgres database
@@ -115,10 +113,6 @@ def createapp(appname):
     path = join(env.apps_dir, appname)
     local("mkdir %s" % path)
     manage("startapp %s %s" % (appname, path))
-
-
-def watch():
-    local("node %s" % env.webpack_server_path)
 
 
 #  Enviroments & Deployments
