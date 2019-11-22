@@ -7,7 +7,7 @@ Help people find affordable homes efficiently.
 
 ## Getting up and running
 
-Minimum requirements: **pip, fabric, python3.7, node, npm, redis & [PostgreSQL 11][install-postgres] with postgis-2.4**, setup is tested on Mac OSX only.
+Minimum requirements: **pip, fabric, python3.7, redis & [PostgreSQL 11][install-postgres] with postgis-2.4**, setup is tested on Mac OSX only.
 
 ```
 brew install postgres python3
@@ -27,8 +27,6 @@ Useful commands:
 - `fab serve` - start [django server](http://localhost:8000/)
 - `fab deploy_docs` - deploy docs to server
 - `fab test` - run the test locally with ipdb
-- `npm run watch` - start webpack for watching and compling static files and auto-reloading server.
-- `npm run build` - build production staticfiles
 
 **NOTE:** Checkout `fabfile.py` for all the options available and what/how they do it.
 

@@ -35,6 +35,8 @@ INSTALLED_APPS = (
     "corsheaders",  # https://github.com/ottoyiu/django-cors-headers/
     "raven.contrib.django.raven_compat",
     "mail_templated",  # https://github.com/artemrizhov/django-mail-templated
+
+    "domicilian.visualization",
 )
 
 # INSTALLED APPS CONFIGURATION
@@ -98,6 +100,7 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.SessionAuthentication",
     ),
     "EXCEPTION_HANDLER": "domicilian.base.exceptions.exception_handler",
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
 }
 
 # https://django-rest-swagger.readthedocs.io/en/latest/settings/
@@ -286,7 +289,6 @@ STATIC_ROOT = str(ROOT_DIR.path(".staticfiles"))
 STATIC_URL = "/static/"
 
 # A list of locations of additional static files
-# Specify the static directory in fabfile also.
 STATICFILES_DIRS = (str(APPS_DIR.path("static")),)
 
 # List of finder classes that know how to find static files in
@@ -434,18 +436,4 @@ RAVEN_CONFIG = {
 SITE_INFO = {
     "RELEASE_VERSION": RELEASE_VERSION,
     "IS_RAVEN_INSTALLED": True if RAVEN_CONFIG.get("dsn") else False,
-}
-
-# Webpack Support (https://github.com/owais/django-webpack-loader)
-# =============================================================================
-INSTALLED_APPS += ("webpack_loader",)
-WEBPACK_LOADER = {
-    "DEFAULT": {
-        "CACHE": True,
-        "BUNDLE_DIR_NAME": "dist/",  # It will add static path before and it must end with slash
-        "STATS_FILE": str(ROOT_DIR.path("webpack-stats.json")),
-        "POLL_INTERVAL": 0.1,
-        "TIMEOUT": None,
-        "IGNORE": [r".+\.hot-update.js", r".+\.map"],
-    }
 }
