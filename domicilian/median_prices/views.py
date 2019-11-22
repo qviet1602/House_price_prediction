@@ -1,6 +1,3 @@
-from .models import MedianPrice
-from .serializers import MedianPriceSerializer
-
 from rest_framework.decorators import api_view
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.response import Response
