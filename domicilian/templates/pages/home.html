@@ -1,8 +1,22 @@
 {% extends 'pages/base.html' %}
-{% load i18n %}
-{% block title %}{% trans 'Home' %} • {{ block.super }}{% endblock title %}
-{% block body_classes %}{{ block.super}} page-home {% endblock body_classes %}
 
 {% block content %}
-    <div id="app">{% trans 'Homepage coming soon!!' %}</div>
+    <div id="select">
+        <label class="container" for="purchases">Purchases
+            <input type="radio" id="purchases" name="type" value="purchases">
+            <span class="checkmark"></span>
+        </label>
+        <label class="container" for="rentals">Rentals
+            <input type="radio" id="rentals" name="type" value="rentals" checked>
+            <span class="checkmark"></span>
+        </label>
+    </div>
+    <svg class="map"></svg>
 {% endblock content %}
+
+{% block js %}
+    <script src="{{ STATIC_URL }}js/lib/d3.v5.min.js"></script>
+    <script src="{{ STATIC_URL }}js/lib/d3-scale-chromatic.v1.min.js"></script>
+    <script src="{{ STATIC_URL }}js/lib/topojson.v2.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}js/map.js"></script>
+{% endblock js %}
