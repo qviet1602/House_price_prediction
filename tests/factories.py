@@ -23,3 +23,14 @@ def create_user(**kwargs):
     user.set_password(kwargs.get("password", "test"))
     user.save()
     return user
+
+
+def create_state(**kwargs):
+    return G(apps.get_model("visualization", 'State'), **kwargs)
+
+
+def create_state_median_prices(**kwargs):
+    if not kwargs.get("state"):
+        state = create_state()
+        kwargs["state_code"] = state
+    return G(apps.get_model("visualization", 'StateMedianPrice'), **kwargs)
