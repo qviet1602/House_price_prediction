@@ -91,9 +91,9 @@ class CityHomeSaleInventory(models.Model):
 
 class CityMedianPrice(models.Model):
     city = models.ForeignKey(City, models.DO_NOTHING)
+    home_type = models.ForeignKey('HomeType', models.DO_NOTHING)
     year_month = models.CharField(max_length=7)
     list_price = models.IntegerField(blank=True, null=True)
-    sale_price = models.IntegerField(blank=True, null=True)
     created_date = models.DateTimeField()
     modified_date = models.DateTimeField()
 
@@ -154,9 +154,9 @@ class CountyHomeSaleInventory(models.Model):
 
 class CountyMedianPrice(models.Model):
     county = models.ForeignKey(County, models.DO_NOTHING)
+    home_type = models.ForeignKey('HomeType', models.DO_NOTHING)
     year_month = models.CharField(max_length=7)
     list_price = models.IntegerField(blank=True, null=True)
-    sale_price = models.IntegerField(blank=True, null=True)
     created_date = models.DateTimeField()
     modified_date = models.DateTimeField()
 
@@ -275,9 +275,9 @@ class Neighborhood(models.Model):
 
 class NeighborhoodMedianPrice(models.Model):
     neighborhood = models.ForeignKey(Neighborhood, models.DO_NOTHING)
+    home_type = models.ForeignKey(HomeType, models.DO_NOTHING)
     year_month = models.CharField(max_length=7)
     list_price = models.IntegerField(blank=True, null=True)
-    sale_price = models.IntegerField(blank=True, null=True)
     created_date = models.DateTimeField()
     modified_date = models.DateTimeField()
 
@@ -339,9 +339,9 @@ class StateHomeSaleInventory(models.Model):
 
 class StateMedianPrice(models.Model):
     state = models.ForeignKey(State, models.DO_NOTHING)
+    home_type = models.ForeignKey(HomeType, models.DO_NOTHING)
     year_month = models.CharField(max_length=7)
     list_price = models.IntegerField(blank=True, null=True)
-    sale_price = models.IntegerField(blank=True, null=True)
     created_date = models.DateTimeField()
     modified_date = models.DateTimeField()
 
@@ -427,6 +427,7 @@ class ZipHomeSaleInventory(models.Model):
 
 class ZipMedianPrice(models.Model):
     zipcode = models.ForeignKey('Zipcode', models.DO_NOTHING)
+    home_type = models.ForeignKey(HomeType, models.DO_NOTHING)
     year_month = models.CharField(max_length=7)
     list_price = models.IntegerField(blank=True, null=True)
     sale_price = models.IntegerField(blank=True, null=True)

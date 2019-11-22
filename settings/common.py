@@ -34,6 +34,8 @@ INSTALLED_APPS = (
     "corsheaders",  # https://github.com/ottoyiu/django-cors-headers/
     "raven.contrib.django.raven_compat",
     "mail_templated",  # https://github.com/artemrizhov/django-mail-templated
+
+    "domicilian.visualization",
 )
 
 # INSTALLED APPS CONFIGURATION
@@ -97,6 +99,7 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.SessionAuthentication",
     ),
     "EXCEPTION_HANDLER": "domicilian.base.exceptions.exception_handler",
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
 }
 
 # https://django-rest-swagger.readthedocs.io/en/latest/settings/
