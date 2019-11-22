@@ -16,6 +16,9 @@
     <link href="{% static 'css/normalize.css' %}" rel="stylesheet">
     <link href="{% static 'css/main.css' %}" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/map.css" /> {% endblock css %} {% block head_extras %}{% endblock %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/font-awesome.min.css' %}"/>
+      <link rel="stylesheet" type="text/css" href="{% static 'css/slicknav.min.css'%}" />
+      <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}" />
 </head>
 
 <body class="{% block body_classes %}{% endblock body_classes %} ">
@@ -24,8 +27,28 @@
     <![endif]-->
 
     {% block header %}
-    <h1>domicilian</h1>
-    {% endblock header %} {% block content %}
+        <!-- Header Section -->
+        <header class="header-section">
+                <a href="index.html" class="site-logo">
+                        <img src="{{ STATIC_URL }}images/logo.png" alt="">
+                </a>
+                <nav class="header-nav">
+                        <ul class="main-menu">
+                                <li><a href="index.html" class="active">Home</a></li>
+                                <li><a href="trends.html">Trends</a>
+                                    <ul class="sub-menu">
+                                                <li><a href="trends_by_state.html">By State</a></li>
+                                                <li><a href="trends_by_county.html">By County</a></li>
+                                                <li><a href="trends_by_zipcode.html">By Zipcode</a></li>
+                                        </ul>
+                                </li>
+                                <li><a href="#">Graphical Visualization</a></li>
+                                <li><a href="#">User Clicks</a></li>
+                        </ul>
+                </nav>
+        </header>
+    {% endblock header %} 
+    {% block content %}
     <p>Coming soon!</p>
     {% endblock content %} {% block footer %} {% endblock footer %}
 
@@ -33,7 +56,11 @@
     ================================================== -->
     {# Placed at the end of the document so the pages load faster #} {% block js %}
     <!-- place project specific Javascript in this file -->
+    <script src="{% static 'js/lib/jquery-3.2.1.min.js' %}"></script>
     <script src="{% static 'js/main.js' %}"></script>
+    <script src="{% static 'js/lib/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/lib/jquery.slicknav.min.js' %}"></script>
+    <script src="{% static 'js/lib/jquery.magnific-popup.min.js' %}"></script>
     {% endblock js %}
 </body>
 
