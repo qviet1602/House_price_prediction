@@ -13,7 +13,7 @@ singleton_router = SingletonRouter(trailing_slash=False)
 # Register all the django rest framework viewsets below.
 default_router.register("auth", AuthViewSet, basename="auth")
 singleton_router.register("me", CurrentUserViewSet, basename="me")
-default_router.register("visualizations", StateMedianPricesViewSet, basename="visualizations")
+default_router.register("state_median_prices", StateMedianPricesViewSet, basename="state_median_prices")
 
 # Combine urls from both default and singleton routers and expose as
 # 'urlpatterns' which django can pick up from this module.
