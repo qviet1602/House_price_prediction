@@ -9,7 +9,7 @@ from django.db import models
 
 
 class AnnualIncome(models.Model):
-    zipcode = models.ForeignKey('Zipcode', models.DO_NOTHING)
+    zipcode = models.ForeignKey("Zipcode", models.DO_NOTHING)
     avg_annual_income = models.IntegerField()
     median_annual_income = models.IntegerField()
     created_date = models.DateTimeField()
@@ -17,7 +17,7 @@ class AnnualIncome(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'annual_income'
+        db_table = "annual_income"
 
 
 class AuthGroup(models.Model):
@@ -25,32 +25,32 @@ class AuthGroup(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'auth_group'
+        db_table = "auth_group"
 
 
 class AuthGroupPermissions(models.Model):
     group = models.ForeignKey(AuthGroup, models.DO_NOTHING)
-    permission = models.ForeignKey('AuthPermission', models.DO_NOTHING)
+    permission = models.ForeignKey("AuthPermission", models.DO_NOTHING)
 
     class Meta:
         managed = False
-        db_table = 'auth_group_permissions'
-        unique_together = (('group', 'permission'),)
+        db_table = "auth_group_permissions"
+        unique_together = (("group", "permission"),)
 
 
 class AuthPermission(models.Model):
     name = models.CharField(max_length=255)
-    content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING)
+    content_type = models.ForeignKey("DjangoContentType", models.DO_NOTHING)
     codename = models.CharField(max_length=100)
 
     class Meta:
         managed = False
-        db_table = 'auth_permission'
-        unique_together = (('content_type', 'codename'),)
+        db_table = "auth_permission"
+        unique_together = (("content_type", "codename"),)
 
 
 class Business(models.Model):
-    zipcode = models.ForeignKey('Zipcode', models.DO_NOTHING)
+    zipcode = models.ForeignKey("Zipcode", models.DO_NOTHING)
     address = models.CharField(max_length=150, blank=True, null=True)
     rating = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
     categories = models.CharField(max_length=400, blank=True, null=True)
@@ -61,20 +61,20 @@ class Business(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'business'
+        db_table = "business"
 
 
 class City(models.Model):
     name = models.CharField(max_length=150)
-    state = models.ForeignKey('State', models.DO_NOTHING)
-    county = models.ForeignKey('County', models.DO_NOTHING)
+    state = models.ForeignKey("State", models.DO_NOTHING)
+    county = models.ForeignKey("County", models.DO_NOTHING)
     created_date = models.DateTimeField()
     modified_date = models.DateTimeField()
 
     class Meta:
         managed = False
-        db_table = 'city'
-        unique_together = (('name', 'county', 'state'),)
+        db_table = "city"
+        unique_together = (("name", "county", "state"),)
 
 
 class CityHomeSaleInventory(models.Model):
@@ -86,12 +86,12 @@ class CityHomeSaleInventory(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'city_home_sale_inventory'
+        db_table = "city_home_sale_inventory"
 
 
 class CityMedianPrice(models.Model):
     city = models.ForeignKey(City, models.DO_NOTHING)
-    home_type = models.ForeignKey('HomeType', models.DO_NOTHING)
+    home_type = models.ForeignKey("HomeType", models.DO_NOTHING)
     year_month = models.CharField(max_length=7)
     list_price = models.IntegerField(blank=True, null=True)
     created_date = models.DateTimeField()
@@ -99,7 +99,7 @@ class CityMedianPrice(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'city_median_price'
+        db_table = "city_median_price"
 
 
 class CitySaleCount(models.Model):
@@ -111,12 +111,12 @@ class CitySaleCount(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'city_sale_count'
+        db_table = "city_sale_count"
 
 
 class CityTimeseries(models.Model):
     city = models.ForeignKey(City, models.DO_NOTHING)
-    home_type = models.ForeignKey('HomeType', models.DO_NOTHING)
+    home_type = models.ForeignKey("HomeType", models.DO_NOTHING)
     year_month = models.CharField(max_length=7)
     zillow_id = models.IntegerField()
     index_value = models.IntegerField(blank=True, null=True)
@@ -125,19 +125,19 @@ class CityTimeseries(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'city_timeseries'
+        db_table = "city_timeseries"
 
 
 class County(models.Model):
     name = models.CharField(max_length=150)
-    state = models.ForeignKey('State', models.DO_NOTHING)
+    state = models.ForeignKey("State", models.DO_NOTHING)
     created_date = models.DateTimeField()
     modified_date = models.DateTimeField()
 
     class Meta:
         managed = False
-        db_table = 'county'
-        unique_together = (('name', 'state'),)
+        db_table = "county"
+        unique_together = (("name", "state"),)
 
 
 class CountyHomeSaleInventory(models.Model):
@@ -149,12 +149,12 @@ class CountyHomeSaleInventory(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'county_home_sale_inventory'
+        db_table = "county_home_sale_inventory"
 
 
 class CountyMedianPrice(models.Model):
     county = models.ForeignKey(County, models.DO_NOTHING)
-    home_type = models.ForeignKey('HomeType', models.DO_NOTHING)
+    home_type = models.ForeignKey("HomeType", models.DO_NOTHING)
     year_month = models.CharField(max_length=7)
     list_price = models.IntegerField(blank=True, null=True)
     created_date = models.DateTimeField()
@@ -162,7 +162,7 @@ class CountyMedianPrice(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'county_median_price'
+        db_table = "county_median_price"
 
 
 class CountySaleCount(models.Model):
@@ -174,12 +174,12 @@ class CountySaleCount(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'county_sale_count'
+        db_table = "county_sale_count"
 
 
 class CountyTimeseries(models.Model):
     county = models.ForeignKey(County, models.DO_NOTHING)
-    home_type = models.ForeignKey('HomeType', models.DO_NOTHING)
+    home_type = models.ForeignKey("HomeType", models.DO_NOTHING)
     year_month = models.CharField(max_length=7)
     index_value = models.IntegerField(blank=True, null=True)
     zillow_id = models.IntegerField()
@@ -188,19 +188,23 @@ class CountyTimeseries(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'county_timeseries'
+        db_table = "county_timeseries"
 
 
 class CrimeData(models.Model):
-    zipcode = models.ForeignKey('Zipcode', models.DO_NOTHING)
-    violent_crime = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
-    property_crime = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+    zipcode = models.ForeignKey("Zipcode", models.DO_NOTHING)
+    violent_crime = models.DecimalField(
+        max_digits=5, decimal_places=2, blank=True, null=True
+    )
+    property_crime = models.DecimalField(
+        max_digits=5, decimal_places=2, blank=True, null=True
+    )
     created_date = models.DateTimeField()
     modified_date = models.DateTimeField()
 
     class Meta:
         managed = False
-        db_table = 'crime_data'
+        db_table = "crime_data"
 
 
 class DjangoAdminLog(models.Model):
@@ -209,12 +213,14 @@ class DjangoAdminLog(models.Model):
     object_repr = models.CharField(max_length=200)
     action_flag = models.SmallIntegerField()
     change_message = models.TextField()
-    content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, blank=True, null=True)
-    user = models.ForeignKey('UsersUser', models.DO_NOTHING)
+    content_type = models.ForeignKey(
+        "DjangoContentType", models.DO_NOTHING, blank=True, null=True
+    )
+    user = models.ForeignKey("UsersUser", models.DO_NOTHING)
 
     class Meta:
         managed = False
-        db_table = 'django_admin_log'
+        db_table = "django_admin_log"
 
 
 class DjangoContentType(models.Model):
@@ -223,8 +229,8 @@ class DjangoContentType(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'django_content_type'
-        unique_together = (('app_label', 'model'),)
+        db_table = "django_content_type"
+        unique_together = (("app_label", "model"),)
 
 
 class DjangoMigrations(models.Model):
@@ -234,7 +240,7 @@ class DjangoMigrations(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'django_migrations'
+        db_table = "django_migrations"
 
 
 class DjangoSession(models.Model):
@@ -244,7 +250,7 @@ class DjangoSession(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'django_session'
+        db_table = "django_session"
 
 
 class HomeType(models.Model):
@@ -254,14 +260,14 @@ class HomeType(models.Model):
     modified_date = models.DateTimeField()
 
     class Meta:
-        managed = False
-        db_table = 'home_type'
-        unique_together = (('type', 'feature'),)
+        managed = True
+        db_table = "home_type"
+        unique_together = (("type", "feature"),)
 
 
 class Neighborhood(models.Model):
     name = models.CharField(max_length=150)
-    state = models.ForeignKey('State', models.DO_NOTHING)
+    state = models.ForeignKey("State", models.DO_NOTHING)
     county = models.ForeignKey(County, models.DO_NOTHING)
     city = models.ForeignKey(City, models.DO_NOTHING)
     created_date = models.DateTimeField()
@@ -269,8 +275,8 @@ class Neighborhood(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'neighborhood'
-        unique_together = (('name', 'state', 'county', 'city'),)
+        db_table = "neighborhood"
+        unique_together = (("name", "state", "county", "city"),)
 
 
 class NeighborhoodMedianPrice(models.Model):
@@ -283,7 +289,7 @@ class NeighborhoodMedianPrice(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'neighborhood_median_price'
+        db_table = "neighborhood_median_price"
 
 
 class NeighborhoodTimeseries(models.Model):
@@ -297,21 +303,23 @@ class NeighborhoodTimeseries(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'neighborhood_timeseries'
+        db_table = "neighborhood_timeseries"
 
 
 class SchoolData(models.Model):
-    zipcode = models.ForeignKey('Zipcode', models.DO_NOTHING)
+    zipcode = models.ForeignKey("Zipcode", models.DO_NOTHING)
     school_name = models.CharField(max_length=150, blank=True, null=True)
     address = models.CharField(max_length=150, blank=True, null=True)
     schooldigger_rating = models.IntegerField(blank=True, null=True)
-    average_standard_score = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+    average_standard_score = models.DecimalField(
+        max_digits=5, decimal_places=2, blank=True, null=True
+    )
     created_date = models.DateTimeField()
     modified_date = models.DateTimeField()
 
     class Meta:
         managed = False
-        db_table = 'school_data'
+        db_table = "school_data"
 
 
 class State(models.Model):
@@ -321,8 +329,8 @@ class State(models.Model):
     modified_date = models.DateTimeField()
 
     class Meta:
-        managed = False
-        db_table = 'state'
+        managed = True
+        db_table = "state"
 
 
 class StateHomeSaleInventory(models.Model):
@@ -334,7 +342,7 @@ class StateHomeSaleInventory(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'state_home_sale_inventory'
+        db_table = "state_home_sale_inventory"
 
 
 class StateMedianPrice(models.Model):
@@ -346,8 +354,8 @@ class StateMedianPrice(models.Model):
     modified_date = models.DateTimeField()
 
     class Meta:
-        managed = False
-        db_table = 'state_median_price'
+        managed = True
+        db_table = "state_median_price"
 
 
 class StateSaleCount(models.Model):
@@ -359,7 +367,7 @@ class StateSaleCount(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'state_sale_count'
+        db_table = "state_sale_count"
 
 
 class StateTimeseries(models.Model):
@@ -373,7 +381,7 @@ class StateTimeseries(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'state_timeseries'
+        db_table = "state_timeseries"
 
 
 class UsersUser(models.Model):
@@ -390,7 +398,7 @@ class UsersUser(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'users_user'
+        db_table = "users_user"
 
 
 class UsersUserGroups(models.Model):
@@ -399,8 +407,8 @@ class UsersUserGroups(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'users_user_groups'
-        unique_together = (('user', 'group'),)
+        db_table = "users_user_groups"
+        unique_together = (("user", "group"),)
 
 
 class UsersUserUserPermissions(models.Model):
@@ -409,12 +417,12 @@ class UsersUserUserPermissions(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'users_user_user_permissions'
-        unique_together = (('user', 'permission'),)
+        db_table = "users_user_user_permissions"
+        unique_together = (("user", "permission"),)
 
 
 class ZipHomeSaleInventory(models.Model):
-    zipcode = models.ForeignKey('Zipcode', models.DO_NOTHING)
+    zipcode = models.ForeignKey("Zipcode", models.DO_NOTHING)
     year_month = models.CharField(max_length=7)
     total = models.IntegerField()
     created_date = models.DateTimeField()
@@ -422,11 +430,11 @@ class ZipHomeSaleInventory(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'zip_home_sale_inventory'
+        db_table = "zip_home_sale_inventory"
 
 
 class ZipMedianPrice(models.Model):
-    zipcode = models.ForeignKey('Zipcode', models.DO_NOTHING)
+    zipcode = models.ForeignKey("Zipcode", models.DO_NOTHING)
     home_type = models.ForeignKey(HomeType, models.DO_NOTHING)
     year_month = models.CharField(max_length=7)
     list_price = models.IntegerField(blank=True, null=True)
@@ -436,11 +444,11 @@ class ZipMedianPrice(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'zip_median_price'
+        db_table = "zip_median_price"
 
 
 class ZipTimeseries(models.Model):
-    zipcode = models.ForeignKey('Zipcode', models.DO_NOTHING)
+    zipcode = models.ForeignKey("Zipcode", models.DO_NOTHING)
     home_type = models.ForeignKey(HomeType, models.DO_NOTHING)
     year_month = models.CharField(max_length=7)
     zillow_id = models.IntegerField()
@@ -450,7 +458,7 @@ class ZipTimeseries(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'zip_timeseries'
+        db_table = "zip_timeseries"
 
 
 class Zipcode(models.Model):
@@ -463,5 +471,5 @@ class Zipcode(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'zipcode'
-        unique_together = (('zip_code', 'state', 'county', 'city'),)
+        db_table = "zipcode"
+        unique_together = (("zip_code", "state", "county", "city"),)
