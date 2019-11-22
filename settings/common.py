@@ -28,6 +28,7 @@ INSTALLED_APPS = (
     # "django.contrib.humanize",  # Useful template tags
     "domicilian.base",
     "domicilian.users",
+    "domicilian.median_prices",
     "rest_framework",  # http://www.django-rest-framework.org/
     "rest_framework_swagger",
     "versatileimagefield",  # https://github.com/WGBH/django-versatileimagefield/
@@ -238,7 +239,7 @@ SERVER_EMAIL = env("SERVER_EMAIL", default=DEFAULT_FROM_EMAIL)
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#databases
 DATABASES = {
-    "default": env.db("DATABASE_URL", default="postgres://localhost/domicilian")
+    "default": env.db("DATABASE_URL", default="postgres://cse6242:cse6242@127.0.0.1:5432/housing_data")
 }
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
 DATABASES["default"]["CONN_MAX_AGE"] = 10
