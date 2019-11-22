@@ -69,13 +69,6 @@ DEBUG_TOOLBAR_CONFIG = {
 }
 
 
-DATABASES = {
-    "default": env.db("DATABASE_URL", default="postgres://cse6242:cse6242@127.0.0.1:5432/housing_data")
-}
-DATABASES["default"]["ATOMIC_REQUESTS"] = True
-DATABASES["default"]["CONN_MAX_AGE"] = 10
-DATABASES["default"]["ENGINE"] = "django.contrib.gis.db.backends.postgis"
-
 # This will expose all browsable api urls. For dev the default value is true
 API_DEBUG = env.bool("API_DEBUG", default=True)
 
