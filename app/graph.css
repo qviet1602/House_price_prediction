@@ -1,0 +1,31 @@
+.graphical-exploration {
+  display: block;
+  position: fixed;
+  left: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.active {
+  stroke-width: 4;
+}
+
+/* .selected {
+  fill: rgb(84, 172, 94);
+} */
+
+.hidden {
+  /* visibility: hidden; */
+  display: none;
+}
+
+.clear-all,
+.clear-all-label,
+.menu-item,
+.menu-item-label,
+.state-node,
+/* .state-node-label, */
+.right-click-menu-item,
+.right-click-menu-item-label {
+  cursor: pointer;
+}
