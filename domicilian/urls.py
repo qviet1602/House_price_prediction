@@ -28,6 +28,7 @@ urlpatterns = [
         "about/", TemplateView.as_view(template_name="pages/about.html"), name="about"
     ),
     path("map/", TemplateView.as_view(template_name="pages/map.html"), name="map"),
+    path("visualize/", TemplateView.as_view(template_name="pages/graph.html"), name="visualize"),
     path("api/purchase_median_prices/", list_purchase_median_prices),
     path("api/rental_median_prices/", list_rental_median_prices)
     # Your stuff: custom urls go here

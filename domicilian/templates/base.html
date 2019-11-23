@@ -8,14 +8,20 @@
     <title>{% block title %}domicilian{% endblock title %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="version" content="{{ site_info.RELEASE_VERSION }}">
-    <meta name="description" content="{% block meta_description %}{% endblock meta_description %}"> {% if site_info.IS_RAVEN_INSTALLED %}
-    <script>
-        Raven.config('{% sentry_public_dsn %}').install()
+    <meta name="description" content="{% block meta_description %}{% endblock meta_description %}">
+    {% if site_info.IS_RAVEN_INSTALLED %}
+        <script>
+                Raven.config('{% sentry_public_dsn %}').install()
     </script>
-    {% endif %} {% block css %}
-    <link href="{% static 'css/normalize.css' %}" rel="stylesheet">
-    <link href="{% static 'css/main.css' %}" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/map.css" /> {% endblock css %} {% block head_extras %}{% endblock %}
+    {% endif %}
+    {% block css %}
+        <link href="{% static 'css/normalize.css' %}" rel="stylesheet">
+        <link href="{% static 'css/main.css' %}" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/map.css" />
+        <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/graph.css" />
+    {% endblock css %}
+    {% block head_extras %}
+    {% endblock %}
     <link rel="stylesheet" type="text/css" href="{% static 'css/font-awesome.min.css' %}"/>
       <link rel="stylesheet" type="text/css" href="{% static 'css/slicknav.min.css'%}" />
       <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}" />
@@ -47,7 +53,7 @@
                         </ul>
                 </nav>
         </header>
-    {% endblock header %} 
+    {% endblock header %}
     {% block content %}
     <p>Coming soon!</p>
     {% endblock content %} {% block footer %} {% endblock footer %}

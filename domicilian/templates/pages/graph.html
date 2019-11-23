@@ -1,0 +1,15 @@
+{% extends 'pages/base.html' %}
+
+{% block header %}
+{% endblock header %}
+
+{% block content %}
+    <svg class="graphical-exploration"></svg>
+{% endblock content %}
+
+{% block js %}
+    <script src="{{ STATIC_URL }}js/lib/d3.v5.min.js"></script>
+    <script src="{{ STATIC_URL }}js/lib/d3-scale-chromatic.v1.min.js"></script>
+    <script src="{{ STATIC_URL }}js/lib/topojson.v2.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}js/graph.js"></script>
+{% endblock js %}
