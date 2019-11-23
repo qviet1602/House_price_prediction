@@ -1,48 +1,67 @@
-{% load webpack_static from webpack_loader %}
-{% load render_bundle from webpack_loader %}{% load raven %}
-{% load static i18n %}<!DOCTYPE html>
-{% get_current_language as LANGUAGE_CODE %}
+{% load raven %} {% load static i18n %}
+<!DOCTYPE html> {% get_current_language as LANGUAGE_CODE %}
 <html lang="{{ LANGUAGE_CODE }}">
-  <head>
+
+<head>
     <meta charset="utf-8">
     <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.png' %}">
     <title>{% block title %}domicilian{% endblock title %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="version" content="{{ site_info.RELEASE_VERSION }}">
-    <meta name="description" content="{% block meta_description %}{% endblock meta_description %}">
+    <meta name="description" content="{% block meta_description %}{% endblock meta_description %}"> {% if site_info.IS_RAVEN_INSTALLED %}
+    <script>
+        Raven.config('{% sentry_public_dsn %}').install()
+    </script>
+    {% endif %} {% block css %}
+    <link href="{% static 'css/normalize.css' %}" rel="stylesheet">
+    <link href="{% static 'css/main.css' %}" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/map.css" /> {% endblock css %} {% block head_extras %}{% endblock %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/font-awesome.min.css' %}"/>
+      <link rel="stylesheet" type="text/css" href="{% static 'css/slicknav.min.css'%}" />
+      <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}" />
+</head>
 
-    {% if site_info.IS_RAVEN_INSTALLED %}
-        <script>Raven.config('{% sentry_public_dsn %}').install()</script>
-    {% endif %}
-
-    {% block css %}
-      {% render_bundle 'main' 'css' %}
-      <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/map.css" />
-    {% endblock css %}
-    {% block head_extras %}{% endblock %}
-  </head>
-
-  <body class="{% block body_classes %}{% endblock body_classes %} ">
+<body class="{% block body_classes %}{% endblock body_classes %} ">
     <!--[if lt IE 8]>
     <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
 
     {% block header %}
-      <h1>domicilian</h1>
-    {% endblock header %}
-
+        <!-- Header Section -->
+        <header class="header-section">
+                <a href="index.html" class="site-logo">
+                        <img src="{{ STATIC_URL }}images/logo.png" alt="">
+                </a>
+                <nav class="header-nav">
+                        <ul class="main-menu">
+                                <li><a href="index.html" class="active">Home</a></li>
+                                <li><a href="trends.html">Trends</a>
+                                    <ul class="sub-menu">
+                                                <li><a href="trends_by_state.html">By State</a></li>
+                                                <li><a href="trends_by_county.html">By County</a></li>
+                                                <li><a href="trends_by_zipcode.html">By Zipcode</a></li>
+                                        </ul>
+                                </li>
+                                <li><a href="#">Graphical Visualization</a></li>
+                                <li><a href="#">User Clicks</a></li>
+                        </ul>
+                </nav>
+        </header>
+    {% endblock header %} 
     {% block content %}
-      <p>Coming soon!</p>
-    {% endblock content %}
-
-    {% block footer %} {% endblock footer %}
+    <p>Coming soon!</p>
+    {% endblock content %} {% block footer %} {% endblock footer %}
 
     <!-- Le javascript
     ================================================== -->
-    {# Placed at the end of the document so the pages load faster #}
-    {% block js %}
-      <!-- place project specific Javascript in this file -->
-      {% render_bundle 'main' 'js' %}
+    {# Placed at the end of the document so the pages load faster #} {% block js %}
+    <!-- place project specific Javascript in this file -->
+    <script src="{% static 'js/lib/jquery-3.2.1.min.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+    <script src="{% static 'js/lib/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/lib/jquery.slicknav.min.js' %}"></script>
+    <script src="{% static 'js/lib/jquery.magnific-popup.min.js' %}"></script>
     {% endblock js %}
-  </body>
+</body>
+
 </html>

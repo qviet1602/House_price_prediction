@@ -15,6 +15,7 @@ from django.urls import include, path, re_path
 from . import api_urls
 from .base import views as base_views
 from .base.api import schemas as api_schemas
+from .median_prices.views import *
 
 admin.site.site_title = admin.site.site_header = "domicilian Administration"
 handler500 = base_views.server_error
@@ -26,7 +27,9 @@ urlpatterns = [
     path(
         "about/", TemplateView.as_view(template_name="pages/about.html"), name="about"
     ),
-    path("map/", TemplateView.as_view(template_name="pages/map.html"), name="map")
+    path("map/", TemplateView.as_view(template_name="pages/map.html"), name="map"),
+    path("api/purchase_median_prices/", list_purchase_median_prices),
+    path("api/rental_median_prices/", list_rental_median_prices)
     # Your stuff: custom urls go here
 ]
 

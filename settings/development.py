@@ -68,6 +68,7 @@ DEBUG_TOOLBAR_CONFIG = {
     "SHOW_TEMPLATE_CONTEXT": True,
 }
 
+
 # This will expose all browsable api urls. For dev the default value is true
 API_DEBUG = env.bool("API_DEBUG", default=True)
 
@@ -76,4 +77,3 @@ API_DEBUG = env.bool("API_DEBUG", default=True)
 
 # Media configuration to support deployment of media files while is debug=True or development.
 MEDIA_URL = env("MEDIA_URL", default="/media/")
-WEBPACK_LOADER["DEFAULT"]["CACHE"] = False  # noqa: F405
