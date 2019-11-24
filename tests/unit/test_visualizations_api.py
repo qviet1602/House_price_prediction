@@ -23,3 +23,25 @@ def test_state_median_prices_api(client, mocker):
     assert len(results) == 5
     expected_keys = ('id', 'year_month', 'list_price', 'created_date', 'modified_date', 'state', 'home_type')
     assert set(expected_keys).issubset(results[0].keys())
+
+
+def test_crime_rate_api(client):
+    f.create_crime_data()
+    url = reverse("crime_rate-list")
+    response = client.json.get(url)
+    assert response.status_code == 200
+    results = response.data["results"]
+    assert len(results) == 1
+    expected_keys = ('county', 'state', 'avg_crime_rate')
+    assert set(expected_keys).issubset(results[0].keys())
+
+
+def test_affordable_api(client):
+    f.create_annual_income()
+    url = reverse("affordable_counties-list")
+    response = client.json.get(url)
+    assert response.status_code == 200
+    results = response.data["results"]
+    assert len(results) == 1
+    expected_keys = ('county', 'state', 'avg_annual_income')
+    assert set(expected_keys).issubset(results[0].keys())
