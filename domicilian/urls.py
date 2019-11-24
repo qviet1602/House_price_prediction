@@ -16,6 +16,7 @@ from . import api_urls
 from .base import views as base_views
 from .base.api import schemas as api_schemas
 from .median_prices.views import *
+from .visualization.views import *
 
 admin.site.site_title = admin.site.site_header = "domicilian Administration"
 handler500 = base_views.server_error
@@ -29,8 +30,16 @@ urlpatterns = [
     ),
     path("map/", TemplateView.as_view(template_name="pages/map.html"), name="map"),
     path("visualize/", TemplateView.as_view(template_name="pages/graph.html"), name="visualize"),
+    path("trends_by_state_purchase/", TemplateView.as_view(template_name="pages/trends_by_state_purchase.html"), name="trends_by_state_purchase"),
+    path("trends_by_state_rental/", TemplateView.as_view(template_name="pages/trends_by_state_rental.html"), name="trends_by_state_rental"),
+    path("trends_by_county_purchase/", TemplateView.as_view(template_name="pages/trends_by_county_purchase.html"), name="trends_by_county_purchase"),
     path("api/purchase_median_prices/", list_purchase_median_prices),
-    path("api/rental_median_prices/", list_rental_median_prices)
+    path("api/rental_median_prices/", list_rental_median_prices),
+    path("api/list_states/", list_states),
+    path("api/list_counties_purchase/", list_counties_purchase),
+    path("api/county_data_purchase/", get_county_data_purchase),
+    path("api/state_data_purchase/", get_state_data_purchase),
+    path("api/state_data_rental/", get_state_data_rental)
     # Your stuff: custom urls go here
 ]
 

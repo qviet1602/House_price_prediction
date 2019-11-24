@@ -19,6 +19,7 @@
         <link href="{% static 'css/main.css' %}" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/map.css" />
         <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/graph.css" />
+        <link rel="stylesheet" type="text/css" href="{% static 'css/trends.css' %}" /> 
     {% endblock css %}
     {% block head_extras %}
     {% endblock %}
@@ -40,16 +41,26 @@
                 </a>
                 <nav class="header-nav">
                         <ul class="main-menu">
-                                <li><a href="index.html" class="active">Home</a></li>
-                                <li><a href="trends.html">Trends</a>
-                                    <ul class="sub-menu">
-                                                <li><a href="trends_by_state.html">By State</a></li>
-                                                <li><a href="trends_by_county.html">By County</a></li>
-                                                <li><a href="trends_by_zipcode.html">By Zipcode</a></li>
+                                <li><a href="/home" class="active">Home</a></li>
+				<li><a href="/trends_by_state_purchase/">Trends (By State)</a>
+                                        <ul class="sub-menu">
+                                                <li><a href="/trends_by_state_purchase/">Trends by State (Purchase)</a></li>
+                                                <li><a href="/trends_by_state_rental/">Trends by State (Rental)</a></li>
+                                        </ul>
+                                </li>
+                                <li><a href="/trends_by_county_purchase/">Trends (By County)</a>
+                                        <ul class="sub-menu">
+                                                <li><a href="/trends_by_county_purchase/">Trends by County (Purchase)</a></li>
+                                                <li><a href="/trends_by_county_rental/">Trends by County (Rental)</a></li>
+                                        </ul>
+                                </li>
+                                <li><a href="/trends_by_zip_purchase">Trends (By Zip)</a>
+                                        <ul class="sub-menu">
+                                                <li><a href="/trends_by_zip_purchase/">Trends by Zip (Purchase)</a></li>
+                                                <li><a href="/trends_by_zip_rental/">Trends by Zip (Rental)</a></li>
                                         </ul>
                                 </li>
                                 <li><a href="#">Graphical Visualization</a></li>
-                                <li><a href="#">User Clicks</a></li>
                         </ul>
                 </nav>
         </header>
