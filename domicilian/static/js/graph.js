@@ -28,7 +28,6 @@ svg.append('circle')
   .attr('cy', 0 + 10)
   .call(d3.drag()
     .on('drag', function() {
-      console.log(d3.event.y)
       if (d3.event.y > 10 && d3.event.y < height - 10) {
         d3.select(this).attr('cy', d3.event.y)
         d3.select('.menu').attr('transform', 'translate(0, ' + -d3.event.y + ')').attr('y-translation', d3.event.y);
@@ -73,6 +72,7 @@ function createMenu() {
     .attr('font-size', '17px')
     .attr('fill', 'white')
     .attr('text-anchor', 'middle')
+    .attr('font-weight', 'bold')
     .text('Clear and Start Over')
 
   // State name menu items
@@ -102,6 +102,7 @@ function createMenu() {
     .attr('font-size', '17px')
     .attr('fill', 'white')
     .attr('text-anchor', 'middle')
+    .attr('font-weight', 'bold')
     .text(function (d) { return d })
 
   // Menu item drag start function
@@ -128,21 +129,28 @@ function createMenu() {
 }
 
 // Create state node with text
-function createStateNode(stateName) {
+function createStateNode(stateName, x, y) {
   // Create node and label for state if one does not already exist
   if (!createdNodes[stateName] && totalNodes < 3) {
     var state = svg.append('g')
       .attr('class', 'state ' + genClassName(stateName));
 
-    console.log('d3.event: ', d3.event.x, d3.event.y);
     var yTranslation = d3.select('.menu').attr('y-translation');
+
+    if (!x) {
+      x = d3.event.x;
+    }
+
+    if (!y) {
+      y = d3.event.y;
+    }
 
     // Create state node
     state.data([stateName]).append('circle')
       .attr('class', 'state-node ' + genClassName(stateName) + '-node')
       .attr('r', '20px')
-      .attr('cx', d3.event.x)
-      .attr('cy', d3.event.y - yTranslation)
+      .attr('cx', x)
+      .attr('cy', y - yTranslation)
       .attr('fill', nodeColors[totalNodes])
       .attr('stroke', 'black')
       .attr('stroke-width', '2')
@@ -159,10 +167,11 @@ function createStateNode(stateName) {
     // Create label for state node
     state.append('text')
       .attr('class', 'state-node-label ' + genClassName(stateName) + '-label')
-      .attr('y', d3.event.y - 30 - yTranslation)
-      .attr('x', d3.event.x)
+      .attr('y', y - 30 - yTranslation)
+      .attr('x', x)
       .attr('font-size', '17px')
       .attr('text-anchor', 'middle')
+      .attr('font-weight', 'bold')
       .text(stateName)
 
     // Count number of active state nodes and ensure user cannot add state more than once
@@ -203,7 +212,13 @@ function dragSimilarStates() {
     // Dummy states for testing
     // TODO: Replace this with real data
     var similarStates = ['Washington', 'California'];
-    // TODO: Implement this
+
+    for (var i = 0; i < similarStates.length; i++) {
+      createStateNode(similarStates[i], d3.event.x + i * 100, d3.event.y + i * 100);
+      d3.select('.' + genClassName(similarStates[i]) + '-menu-item').attr('fill', nodeColors[i]);
+    }
+
+    removeRightClickMenu();
   }
 }
 
@@ -280,7 +295,8 @@ function createCountyNodes(stateName, countyList) {
     .append('line')
     .attr('class', function (d) { return genClassName(stateName) + '-county-line ' + genClassName(d) + '-county-line' })
     .attr('stroke', 'black')
-    .attr('stroke-width', 1)
+    .attr('stroke-width', 2)
+    .attr('stroke-opacity', 0.5)
     .attr('x1', stateNode.attr('cx'))
     .attr('y1', parseInt(stateNode.attr('cy')))
     .attr('x2', function (_, i) { return parseInt(stateNode.attr('cx')) - 100 + i * 50 })
@@ -339,6 +355,7 @@ function createCountyNodes(stateName, countyList) {
     .attr('y', parseInt(stateNode.attr('cy')) + 70)
     .attr('font-size', '15px')
     .attr('text-anchor', 'middle')
+    .attr('font-weight', 'bold')
     .text(function (d) { return d });
 
   // Remove the right click menu if everything is successful
@@ -399,8 +416,12 @@ function createRightClickMenu(stateName) {
   var rightClickMenu = svg.append('g')
     .attr('class', 'right-click-menu')
 
+  // Remove "Drag Similar States" option if > 1 state already exists
+  options = totalNodes > 1 ? menuOptions.slice(1) : menuOptions;
+  functions = totalNodes > 1 ? menuFunctions.slice(1) : menuFunctions;
+
   rightClickMenu.selectAll('.right-click-menu-item')
-    .data(menuOptions)
+    .data(options)
     .enter().append('rect')
     .attr('class', 'right-click-menu-item')
     .attr('height', rightClickMenuItemHeight)
@@ -410,10 +431,10 @@ function createRightClickMenu(stateName) {
     .attr('fill', 'rgb(81, 116 ,187)')
     .attr('stroke', 'rgb(57, 83, 137)')
     .attr('stroke-width', 2)
-    .on('click', function (_, i) { return menuFunctions[i](stateName) })
+    .on('click', function (_, i) { return functions[i](stateName) })
 
   rightClickMenu.selectAll('.right-click-menu-item-label')
-    .data(menuOptions)
+    .data(options)
     .enter().append('text')
     .attr('class', 'right-click-menu-item-label')
     .attr('y', function (d, i) { return d3.event.y + i * 40 + 25 })
