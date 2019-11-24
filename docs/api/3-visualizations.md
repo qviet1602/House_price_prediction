@@ -460,3 +460,175 @@ __Response__:
     ]
 }
 ```
+
+## Get Affordable Counties
+
+```
+GET /api/affordable_counties?zipcode__state__name=California
+```
+
+__NOTE__:
+
+ - This API accepts query param of `zipcode__state__name` to get most affordable counties in a specific state
+
+__Response__:
+
+```json
+{
+    "count": 58,
+    "next": "http://localhost:8000/api/affordable_counties?page=2&zipcode__state__name=California",
+    "previous": null,
+    "results": [
+        {
+            "county": "Kings County",
+            "state": "California",
+            "avg_annual_income": 13799.57142857143
+        },
+        {
+            "county": "Imperial County",
+            "state": "California",
+            "avg_annual_income": 14421.07142857143
+        },
+        {
+            "county": "Tulare County",
+            "state": "California",
+            "avg_annual_income": 17621.433333333334
+        },
+        {
+            "county": "Del Norte County",
+            "state": "California",
+            "avg_annual_income": 18556.0
+        },
+        {
+            "county": "Merced County",
+            "state": "California",
+            "avg_annual_income": 18795.368421052633
+        },
+        {
+            "county": "Alpine County",
+            "state": "California",
+            "avg_annual_income": 19246.5
+        },
+        {
+            "county": "Butte County",
+            "state": "California",
+            "avg_annual_income": 19798.75
+        },
+        {
+            "county": "Stanislaus County",
+            "state": "California",
+            "avg_annual_income": 20368.541666666668
+        },
+        {
+            "county": "Fresno County",
+            "state": "California",
+            "avg_annual_income": 20387.29090909091
+        },
+        {
+            "county": "Siskiyou County",
+            "state": "California",
+            "avg_annual_income": 20690.238095238095
+        },
+        {
+            "county": "Glenn County",
+            "state": "California",
+            "avg_annual_income": 20932.166666666668
+        },
+        {
+            "county": "Modoc County",
+            "state": "California",
+            "avg_annual_income": 21405.545454545456
+        },
+        {
+            "county": "Lake County",
+            "state": "California",
+            "avg_annual_income": 21415.785714285714
+        },
+        {
+            "county": "Kern County",
+            "state": "California",
+            "avg_annual_income": 21639.977777777778
+        },
+        {
+            "county": "Inyo County",
+            "state": "California",
+            "avg_annual_income": 21759.272727272728
+        },
+        {
+            "county": "Tehama County",
+            "state": "California",
+            "avg_annual_income": 21972.416666666668
+        },
+        {
+            "county": "San Bernardino County",
+            "state": "California",
+            "avg_annual_income": 22417.14457831325
+        },
+        {
+            "county": "Trinity County",
+            "state": "California",
+            "avg_annual_income": 22456.69230769231
+        },
+        {
+            "county": "Mendocino County",
+            "state": "California",
+            "avg_annual_income": 23183.958333333332
+        },
+        {
+            "county": "Humboldt County",
+            "state": "California",
+            "avg_annual_income": 23283.2
+        },
+        {
+            "county": "Shasta County",
+            "state": "California",
+            "avg_annual_income": 23530.416666666668
+        },
+        {
+            "county": "Colusa County",
+            "state": "California",
+            "avg_annual_income": 23758.625
+        },
+        {
+            "county": "Mono County",
+            "state": "California",
+            "avg_annual_income": 24266.714285714286
+        },
+        {
+            "county": "Yuba County",
+            "state": "California",
+            "avg_annual_income": 24296.875
+        },
+        {
+            "county": "Riverside County",
+            "state": "California",
+            "avg_annual_income": 24985.565217391304
+        },
+        {
+            "county": "Lassen County",
+            "state": "California",
+            "avg_annual_income": 25129.384615384613
+        },
+        {
+            "county": "Plumas County",
+            "state": "California",
+            "avg_annual_income": 25288.785714285714
+        },
+        {
+            "county": "San Joaquin County",
+            "state": "California",
+            "avg_annual_income": 25357.533333333333
+        },
+        {
+            "county": "Madera County",
+            "state": "California",
+            "avg_annual_income": 25939.833333333332
+        },
+        {
+            "county": "Tuolumne County",
+            "state": "California",
+            "avg_annual_income": 25950.555555555555
+        }
+    ]
+}
+```

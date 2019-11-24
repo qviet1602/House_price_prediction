@@ -20,3 +20,13 @@ class CrimeRateSerializer(serializers.Serializer):
     class Meta:
         model = CrimeData
         fields = ("county", "avg_crime_rate", "state")
+
+
+class AffordableCountiesSerializer(serializers.Serializer):
+    county = serializers.CharField(source="zipcode__county__name")
+    state = serializers.CharField(source="zipcode__state__name")
+    avg_annual_income = serializers.FloatField()
+
+    class Meta:
+        model = CrimeData
+        fields = ("county", "avg_annual_income", "state")

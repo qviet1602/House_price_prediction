@@ -35,3 +35,22 @@ class CrimeRateViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         )
         qs = qs.order_by("avg_crime_rate")
         return qs
+
+
+class AffordableCountiesViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    serializer_class = serializers.AffordableCountiesSerializer
+    permission_classes = (AllowAny,)
+    authentication_classes = ()
+    filter_backends = (filters.DjangoFilterBackend,)
+    filterset_fields = ("zipcode__state__name",)
+    queryset = models.AnnualIncome.objects.all()
+
+    def get_queryset(self):
+        qs = self.queryset
+        qs = qs.values("zipcode__county__name")
+        qs = qs.annotate(
+            avg_annual_income=Avg("avg_annual_income"),
+            zipcode__state__name=F("zipcode__state__name"),
+        )
+        qs = qs.order_by("avg_annual_income")
+        return qs
