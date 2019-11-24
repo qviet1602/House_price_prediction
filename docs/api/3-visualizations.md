@@ -1,6 +1,7 @@
 # Visualizations
 
 ## Get State Median Prices
+
 ```
 GET /api/state_median_prices (requires authentication)
 ```
@@ -282,6 +283,179 @@ __Response__:
             "modified_date": "2019-11-18T13:25:40.547528Z",
             "state": 1,
             "home_type": 10
+        }
+    ]
+}
+```
+
+
+## Get safe counties
+
+```
+GET /api/crime_rate?zipcode__state__name=North+Dakota
+```
+
+__NOTE__:
+
+ - This API accepts query param of `zipcode__state__name` to get most safe counties in a specific state
+
+__Response__:
+
+```json
+{
+    "count": 50,
+    "next": "http://localhost:8000/api/crime_rate?page=2&zipcode__state__name=North+Dakota",
+    "previous": null,
+    "results": [
+        {
+            "county": "Steele County",
+            "state": "North Dakota",
+            "avg_crime_rate": 7.533333333333333
+        },
+        {
+            "county": "Oliver County",
+            "state": "North Dakota",
+            "avg_crime_rate": 10.2
+        },
+        {
+            "county": "Cass County",
+            "state": "North Dakota",
+            "avg_crime_rate": 13.868421052631579
+        },
+        {
+            "county": "Richland County",
+            "state": "North Dakota",
+            "avg_crime_rate": 13.908333333333333
+        },
+        {
+            "county": "Cavalier County",
+            "state": "North Dakota",
+            "avg_crime_rate": 14.075
+        },
+        {
+            "county": "Morton County",
+            "state": "North Dakota",
+            "avg_crime_rate": 14.32
+        },
+        {
+            "county": "Mercer County",
+            "state": "North Dakota",
+            "avg_crime_rate": 14.36
+        },
+        {
+            "county": "Barnes County",
+            "state": "North Dakota",
+            "avg_crime_rate": 14.876923076923077
+        },
+        {
+            "county": "Traill County",
+            "state": "North Dakota",
+            "avg_crime_rate": 14.9
+        },
+        {
+            "county": "McLean County",
+            "state": "North Dakota",
+            "avg_crime_rate": 14.981818181818182
+        },
+        {
+            "county": "Bowman County",
+            "state": "North Dakota",
+            "avg_crime_rate": 15.15
+        },
+        {
+            "county": "Adams County",
+            "state": "North Dakota",
+            "avg_crime_rate": 15.3
+        },
+        {
+            "county": "Lamoure County",
+            "state": "North Dakota",
+            "avg_crime_rate": 15.5
+        },
+        {
+            "county": "Stark County",
+            "state": "North Dakota",
+            "avg_crime_rate": 16.357142857142858
+        },
+        {
+            "county": "Sargent County",
+            "state": "North Dakota",
+            "avg_crime_rate": 16.975
+        },
+        {
+            "county": "Stutsman County",
+            "state": "North Dakota",
+            "avg_crime_rate": 17.23
+        },
+        {
+            "county": "Ward County",
+            "state": "North Dakota",
+            "avg_crime_rate": 17.307692307692307
+        },
+        {
+            "county": "Burke County",
+            "state": "North Dakota",
+            "avg_crime_rate": 17.38
+        },
+        {
+            "county": "Grand Forks County",
+            "state": "North Dakota",
+            "avg_crime_rate": 17.408333333333335
+        },
+        {
+            "county": "Williams County",
+            "state": "North Dakota",
+            "avg_crime_rate": 17.6625
+        },
+        {
+            "county": "Kidder County",
+            "state": "North Dakota",
+            "avg_crime_rate": 17.7
+        },
+        {
+            "county": "Hettinger County",
+            "state": "North Dakota",
+            "avg_crime_rate": 17.866666666666667
+        },
+        {
+            "county": "McHenry County",
+            "state": "North Dakota",
+            "avg_crime_rate": 17.95
+        },
+        {
+            "county": "Pembina County",
+            "state": "North Dakota",
+            "avg_crime_rate": 17.97142857142857
+        },
+        {
+            "county": "Foster County",
+            "state": "North Dakota",
+            "avg_crime_rate": 18.4
+        },
+        {
+            "county": "Dickey County",
+            "state": "North Dakota",
+            "avg_crime_rate": 18.55
+        },
+        {
+            "county": "Renville County",
+            "state": "North Dakota",
+            "avg_crime_rate": 18.7
+        },
+        {
+            "county": "Logan County",
+            "state": "North Dakota",
+            "avg_crime_rate": 18.95
+        },
+        {
+            "county": "Wells County",
+            "state": "North Dakota",
+            "avg_crime_rate": 19.1
+        },
+        {
+            "county": "Burleigh County",
+            "state": "North Dakota",
+            "avg_crime_rate": 19.21818181818182
         }
     ]
 }

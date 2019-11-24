@@ -7,7 +7,6 @@ import environ
 from corsheaders.defaults import default_headers
 from django.utils.translation import ugettext_lazy as _
 
-
 ROOT_DIR = environ.Path(__file__) - 2  # (/a/b/myfile.py - 2 = /a/)
 APPS_DIR = ROOT_DIR.path("domicilian")
 
@@ -35,7 +34,7 @@ INSTALLED_APPS = (
     "corsheaders",  # https://github.com/ottoyiu/django-cors-headers/
     "raven.contrib.django.raven_compat",
     "mail_templated",  # https://github.com/artemrizhov/django-mail-templated
-
+    "django_filters",
     "domicilian.visualization",
 )
 
@@ -75,7 +74,6 @@ API_DEBUG = env.bool("API_DEBUG", default=False)
 REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "domicilian.base.api.pagination.PageNumberPagination",
     "PAGE_SIZE": 30,
-
     # Default renderer classes for Rest framework
     "DEFAULT_RENDERER_CLASSES": [
         "rest_framework.renderers.JSONRenderer",
@@ -100,7 +98,7 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.SessionAuthentication",
     ),
     "EXCEPTION_HANDLER": "domicilian.base.exceptions.exception_handler",
-    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
+    "DEFAULT_SCHEMA_CLASS": "rest_framework.schemas.coreapi.AutoSchema",
 }
 
 # https://django-rest-swagger.readthedocs.io/en/latest/settings/
@@ -139,10 +137,7 @@ SITE_ID = "current"
 
 # see user.services.send_password_reset
 # password-confirm path should have placeholder for token
-FRONTEND_URLS = {
-    "home": "/",
-    "password-confirm": "/reset-password/{token}/",
-}
+FRONTEND_URLS = {"home": "/", "password-confirm": "/reset-password/{token}/"}
 
 # MIDDLEWARE CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -228,9 +223,7 @@ DJANGO_ADMIN_URL = env.str("DJANGO_ADMIN_URL", default="admin")
 EMAIL_BACKEND = env(
     "DJANGO_EMAIL_BACKEND", default="django.core.mail.backends.smtp.EmailBackend"
 )
-DEFAULT_FROM_EMAIL = env(
-    "DEFAULT_FROM_EMAIL", default="skhurana39@gatech.edu"
-)
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="skhurana39@gatech.edu")
 EMAIL_SUBJECT_PREFIX = env("EMAIL_SUBJECT_PREFIX", default="[domicilian] ")
 EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=True)
 SERVER_EMAIL = env("SERVER_EMAIL", default=DEFAULT_FROM_EMAIL)
@@ -239,7 +232,9 @@ SERVER_EMAIL = env("SERVER_EMAIL", default=DEFAULT_FROM_EMAIL)
 # ------------------------------------------------------------------------------
 # See: https://docs.djangoproject.com/en/dev/ref/settings/#databases
 DATABASES = {
-    "default": env.db("DATABASE_URL", default="postgres://cse6242:cse6242@127.0.0.1:5432/housing_data")
+    "default": env.db(
+        "DATABASE_URL", default="postgres://cse6242:cse6242@127.0.0.1:5432/housing_data"
+    )
 }
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
 DATABASES["default"]["CONN_MAX_AGE"] = 10
@@ -335,7 +330,9 @@ CELERY_BROKER_URL = env("REDIS_URL", default="redis://localhost:6379/0")
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
-CELERY_TIMEZONE = env("CELERY_TIMEZONE", default=TIME_ZONE)  # Use Django's timezone by default
+CELERY_TIMEZONE = env(
+    "CELERY_TIMEZONE", default=TIME_ZONE
+)  # Use Django's timezone by default
 
 # LOGGING CONFIGURATION
 # ------------------------------------------------------------------------------
@@ -380,7 +377,7 @@ LOGGING = {
         "mail_admins": {
             "level": "ERROR",
             "filters": ["require_debug_false"],
-            "class": "django.utils.log.AdminEmailHandler"
+            "class": "django.utils.log.AdminEmailHandler",
         },
         "sentry": {
             "level": "ERROR",
@@ -390,11 +387,7 @@ LOGGING = {
         },
     },
     "loggers": {
-        "django": {
-            "handlers": ["null"],
-            "propagate": False,
-            "level": "INFO",
-        },
+        "django": {"handlers": ["null"], "propagate": False, "level": "INFO"},
         "django.request": {
             "handlers": ["mail_admins", "console"],
             "level": "ERROR",
@@ -408,7 +401,7 @@ LOGGING = {
         "domicilian": {"handlers": ["console"], "level": "INFO", "propagate": False},
         # Catch All Logger -- Captures any other logging
         "": {"handlers": ["console", "sentry"], "level": "ERROR", "propagate": True},
-    }
+    },
 }
 
 
