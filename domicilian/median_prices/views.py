@@ -1,6 +1,5 @@
 from rest_framework.decorators import api_view
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework.response import Response
 from rest_framework.decorators import authentication_classes
 from rest_framework.decorators import permission_classes
 from django.db import connection
