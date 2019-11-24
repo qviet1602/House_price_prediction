@@ -87,6 +87,7 @@ def list_counties_purchase(request):
                            "'873', '2362', '1324', '2681', '1368', '487', '480', '692', '269', '528', '3282', '253', '3279', '107', '950', '3274', " \
                            "'1963', '1067', '3272', '2803', '2813', '743', '1454', '3022')"
         counties_query = "select distinct county_id from county_timeseries where zillow_id in " + zillow_id_string + " and index_value is not null and (year_month like '%-12' or year_month = '2019-09')"
+        #counties_query = "select distinct county_id from county_timeseries where index_value is not null and (year_month like '%-12' or year_month = '2019-09') and home_type_id in (1, 2, 3, 4, 5, 6, 9)"
         with connection.cursor() as cursor:
             cursor.execute(counties_query)
             county_rows = cursor.fetchall()
@@ -231,7 +232,6 @@ def get_state_data_rental(request):
 
         return JsonResponse(data, safe=False)
 
-
 @api_view(['GET'])
 @csrf_exempt
 @authentication_classes([])
@@ -250,6 +250,39 @@ def get_county_data_purchase(request):
 
             with connection.cursor() as cursor:
                 cursor.execute(last_year_query, [county_id, '%-12', '2019-09', 'purchase', each_home_type])
+                last_year_rows = cursor.fetchall()
+            last_year_data = []
+
+            for each_row in last_year_rows:
+                each_data_dict = {}
+                each_data_dict['list_price'] = each_row[1]
+                each_data_dict['year'] =  each_row[0][0:4]
+                last_year_data.append(each_data_dict)
+
+            home_data_dict = {}
+            home_data_dict[each_home_type] = last_year_data
+            data.append(home_data_dict)
+
+        return JsonResponse(data, safe=False)
+
+@api_view(['GET'])
+@csrf_exempt
+@authentication_classes([])
+@permission_classes([])
+def get_county_data_rental(request):
+    if request.method == 'GET':
+        county_id = request.GET.get('county_id', 1)
+
+        home_types = ["condoCoOp", "oneBedroom", "twoBedroom", "threeBedroom", "fourBedroom", "fivePlusBedroom",
+                      "singleFamilyResidenceRental"]
+        data = []
+        for each_home_type in home_types:
+            last_year_query = "select year_month, list_price from county_median_price where county_id = %s " \
+                              "and (year_month like %s or year_month = %s) and  list_price is not null and home_type_id " \
+                              "in (select id from home_type where type=%s and feature=%s) order by year_month desc"
+
+            with connection.cursor() as cursor:
+                cursor.execute(last_year_query, [county_id, '%-12', '2019-09', 'rental', each_home_type])
                 last_year_rows = cursor.fetchall()
             last_year_data = []
 
