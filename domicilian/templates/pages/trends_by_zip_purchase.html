@@ -1,0 +1,61 @@
+{% extends 'pages/base.html' %}
+  
+{% block header %}
+	<!-- Header Section -->
+        <header class="header-section">
+                <a href="index.html" class="site-logo">
+                        <img src="{{ STATIC_URL }}images/logo.png" alt="">
+                </a>
+                <nav class="header-nav">
+                        <ul class="main-menu">
+                                <li><a href="/map">Home</a></li>
+                                <li><a href="/trends_by_state_purchase/">Trends (By State)</a>
+					<ul class="sub-menu">
+                                                <li><a href="/trends_by_state_purchase/">Trends by State (Purchase)</a></li>
+                                                <li><a href="/trends_by_state_rental/">Trends by State (Rental)</a></li>
+                                        </ul>
+				</li>
+                                <li><a href="/trends_by_county_purchase/">Trends (By County)</a>
+					<ul class="sub-menu">
+                                                <li><a href="/trends_by_county_purchase/">Trends by County (Purchase)</a></li>
+                                                <li><a href="/trends_by_county_rental/">Trends by County (Rental)</a></li>
+                                        </ul>
+				</li>
+                                <li><a href="/trends_by_zip_purchase/" class="active">Trends (By Zip)</a>
+
+				</li>
+					
+                                <li><a href="#">Graphical Visualization</a></li>
+                        </ul>
+                </nav>
+        </header>
+{% endblock header %}
+
+{% block content %}
+	<div class="trends_container">
+  		<div class="dynamic_trends_div">
+            <div id="page_title">
+                <h3>Trends by Zipcode (Purchase) </h3>
+            </div>
+			<div id="chart1">
+				<svg id="chart1_dummy_svg" width="700" height="300"></svg>
+			</div>
+			<div id="chart2">
+				<svg id="chart2_dummy_svg" width="700" height="300"></svg>
+			</div>
+			<div id="chart3">
+				<svg id="chart3_dummy_svg" width="700" height="400"></svg>
+			</div>
+			<div id="chart4">
+				<svg id="chart4_dummy_svg" width="700" height="200"></svg>
+			</div>
+		</div>
+  		<div class="states_div"></div>
+	</div>
+{% endblock content %}
+
+{% block js %}
+    <script src="{{ STATIC_URL }}js/lib/d3.v5.min.js"></script>
+    <script src="{{ STATIC_URL }}js/lib/d3-scale-chromatic.v1.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}js/trends_by_zip_purchase.js"></script>
+{% endblock js %}
