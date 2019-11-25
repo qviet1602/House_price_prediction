@@ -32,7 +32,7 @@ svg.append('circle')
         d3.select(this).attr('cy', d3.event.y)
         d3.select('.menu').attr('transform', 'translate(0, ' + -d3.event.y + ')').attr('y-translation', d3.event.y);
       }
-    }));
+    }))
 
 /**
  * List of main functions and brief description
@@ -118,7 +118,7 @@ function createMenu() {
   }
 
   function menuOnDrag(d) {
-    console.log('drag: ', d3.event)
+    // console.log('drag: ', d3.event)
   }
 
   // Menu item drag end function
@@ -142,7 +142,7 @@ function createStateNode(stateName, x, y) {
     }
 
     if (!y) {
-      y = d3.event.y;
+      y = d3.event.y - yTranslation;
     }
 
     // Create state node
@@ -150,7 +150,7 @@ function createStateNode(stateName, x, y) {
       .attr('class', 'state-node ' + genClassName(stateName) + '-node')
       .attr('r', '20px')
       .attr('cx', x)
-      .attr('cy', y - yTranslation)
+      .attr('cy', y)
       .attr('fill', nodeColors[totalNodes])
       .attr('stroke', 'black')
       .attr('stroke-width', '2')
@@ -158,16 +158,21 @@ function createStateNode(stateName, x, y) {
         .on('start', nodeOnDragStart)
         .on('drag', stateNodeOnDrag)
         .on('end', nodeOnDragEnd))
-      .on('contextmenu', function () {
+      .on('contextmenu', function() {
         d3.event.preventDefault();
 
         createRightClickMenu(stateName);
+      }).on('mouseover', function() {
+        // Prevent stat box display if node is being dragged
+        if (!d3.select(this).attr('class').includes('active')) {
+          displayStats(stateName, '-node') // TODO: Implement this with actual data
+        }
       });
 
     // Create label for state node
     state.append('text')
       .attr('class', 'state-node-label ' + genClassName(stateName) + '-label')
-      .attr('y', y - 30 - yTranslation)
+      .attr('y', y - 30)
       .attr('x', x)
       .attr('font-size', '17px')
       .attr('text-anchor', 'middle')
@@ -191,7 +196,7 @@ var menuOptions = [
   'Show 5 Best Zip Codes',
   'Show 5 Safe Counties',
   'Show 5 Affordable Counties',
-  'Show Alls',
+  'Show All',
   'Delete State'
 ];
 
@@ -215,7 +220,7 @@ function dragSimilarStates() {
 
     for (var i = 0; i < similarStates.length; i++) {
       createStateNode(similarStates[i], d3.event.x + i * 100, d3.event.y + i * 100);
-      d3.select('.' + genClassName(similarStates[i]) + '-menu-item').attr('fill', nodeColors[i]);
+      d3.select('.' + genClassName(similarStates[i]) + '-menu-item').attr('fill', nodeColors[i + 1]);
     }
 
     removeRightClickMenu();
@@ -296,7 +301,7 @@ function createCountyNodes(stateName, countyList) {
     .attr('class', function (d) { return genClassName(stateName) + '-county-line ' + genClassName(d) + '-county-line' })
     .attr('stroke', 'black')
     .attr('stroke-width', 2)
-    .attr('stroke-opacity', 0.5)
+    .attr('stroke-opacity', 0.3)
     .attr('x1', stateNode.attr('cx'))
     .attr('y1', parseInt(stateNode.attr('cy')))
     .attr('x2', function (_, i) { return parseInt(stateNode.attr('cx')) - 100 + i * 50 })
@@ -327,13 +332,18 @@ function createCountyNodes(stateName, countyList) {
       d3.event.preventDefault();
 
       createRightClickMenu(stateName);
+    }).on('mouseover', function () {
+      // Prevent stat box display if node is being dragged
+      if (!d3.select(this).attr('class').includes('active')) {
+        displayStats(stateName, '-node') // TODO: Implement this with actual data
+      }
     });
 
   // Create county nodes
   counties.selectAll('.' + genClassName(stateName) + '-county-node')
     .data(countyList).enter()
     .append('circle')
-    .attr('class', function (d) { return genClassName(stateName) + '-county-node ' + genClassName(d) + '-county-node' })
+    .attr('class', function (d) { return 'county-node ' + genClassName(stateName) + '-county-node ' + genClassName(d) + '-county-node' })
     .attr('r', '15px')
     .attr('cx', function (_, i) { return parseInt(stateNode.attr('cx')) - 100 + i * 50 })
     .attr('cy', parseInt(stateNode.attr('cy')) + 100)
@@ -345,6 +355,12 @@ function createCountyNodes(stateName, countyList) {
       .on('start', nodeOnDragStart)
       .on('drag', countyNodeOnDrag)
       .on('end', nodeOnDragEnd))
+    .on('mouseover', function (d) {
+      // Prevent stat box display if node is being dragged
+      if (!d3.select(this).attr('class').includes('active')) {
+        displayStats(d, '-county-node') // TODO: Implement this with actual data
+      }
+    });
 
   // Create county node labels
   counties.selectAll('.' + genClassName(stateName) + '-county-label')
@@ -365,6 +381,7 @@ function createCountyNodes(stateName, countyList) {
 // Node drag start function
 function nodeOnDragStart(d) {
   removeRightClickMenu();
+  removeStatBox();
   d3.select(this).classed('active', true);
 }
 
@@ -407,6 +424,45 @@ function countyNodeOnDrag(countyName) {
 // Node drag end function
 function nodeOnDragEnd(d) {
   d3.select(this).classed('active', false);
+}
+
+function displayStats(name, className) {
+  if (d3.select('.stat-box').empty()) {
+    var statBox = svg.append('g').attr('class', 'stat-box');
+
+    var node = d3.select('.' + genClassName(name) + className);
+    var x = parseInt(node.attr('cx')) + 10;
+    var y = parseInt(node.attr('cy')) + 10;
+
+    statBox.append('rect')
+      .attr('class', 'stat-box')
+      .attr('height', '95px')
+      .attr('width', '250px')
+      .attr('x', x)
+      .attr('y', y)
+      .attr('fill', 'rgb(81, 116 ,187)')
+      .attr('stroke', 'rgb(57, 83, 137)')
+      .attr('stroke-width', 2)
+
+    // TODO: Get actual stats
+    stats = [
+      'Crime Rate: ' + 20.5,
+      'Best Schools Count: ' + 10,
+      'Median Price Prediction: ' + 80000,
+      'Affordable: ' + 'Yes'
+    ];
+
+    statBox.selectAll('.stat-line')
+      .data(stats)
+      .enter().append('text')
+      .attr('class', 'stat-line')
+      .attr('y', function(_, i) { return y + 22 + 20 * i })
+      .attr('x', x + 12)
+      .attr('font-size', '15px')
+      .attr('fill', 'white')
+      .attr('text-anchor', 'start')
+      .text(function (d) { return d });
+  }
 }
 
 // Create right click menu for state node
@@ -454,9 +510,24 @@ d3.select('.graphical-exploration').on('click', function() {
   }
 });
 
+// Remove stat box if user moves mouse outside of node/box
+d3.select('.graphical-exploration').on('mouseover', function() {
+  var statBox = d3.select('.stat-box');
+  var className = d3.event.target.className.baseVal;
+
+  if (!statBox.empty() && (!className.includes('stat-box') && !className.includes('state-node') && !className.includes('county-node') && !className.includes('stat-line'))) {
+    removeStatBox();
+  }
+});
+
 // Remove right click menu
 function removeRightClickMenu() {
   d3.select('.right-click-menu').remove();
+}
+
+// Remove stat box
+function removeStatBox() {
+  d3.select('.stat-box').remove();
 }
 
 // Delete all nodes, labels, and lines
