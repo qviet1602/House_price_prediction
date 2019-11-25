@@ -1,6 +1,7 @@
 # Visualizations
 
 ## Get State Median Prices
+
 ```
 GET /api/state_median_prices (requires authentication)
 ```
@@ -282,6 +283,351 @@ __Response__:
             "modified_date": "2019-11-18T13:25:40.547528Z",
             "state": 1,
             "home_type": 10
+        }
+    ]
+}
+```
+
+
+## Get safe counties
+
+```
+GET /api/crime_rate?zipcode__state__name=North+Dakota
+```
+
+__NOTE__:
+
+ - This API accepts query param of `zipcode__state__name` to get most safe counties in a specific state
+
+__Response__:
+
+```json
+{
+    "count": 50,
+    "next": "http://localhost:8000/api/crime_rate?page=2&zipcode__state__name=North+Dakota",
+    "previous": null,
+    "results": [
+        {
+            "county": "Steele County",
+            "state": "North Dakota",
+            "avg_crime_rate": 7.533333333333333
+        },
+        {
+            "county": "Oliver County",
+            "state": "North Dakota",
+            "avg_crime_rate": 10.2
+        },
+        {
+            "county": "Cass County",
+            "state": "North Dakota",
+            "avg_crime_rate": 13.868421052631579
+        },
+        {
+            "county": "Richland County",
+            "state": "North Dakota",
+            "avg_crime_rate": 13.908333333333333
+        },
+        {
+            "county": "Cavalier County",
+            "state": "North Dakota",
+            "avg_crime_rate": 14.075
+        },
+        {
+            "county": "Morton County",
+            "state": "North Dakota",
+            "avg_crime_rate": 14.32
+        },
+        {
+            "county": "Mercer County",
+            "state": "North Dakota",
+            "avg_crime_rate": 14.36
+        },
+        {
+            "county": "Barnes County",
+            "state": "North Dakota",
+            "avg_crime_rate": 14.876923076923077
+        },
+        {
+            "county": "Traill County",
+            "state": "North Dakota",
+            "avg_crime_rate": 14.9
+        },
+        {
+            "county": "McLean County",
+            "state": "North Dakota",
+            "avg_crime_rate": 14.981818181818182
+        },
+        {
+            "county": "Bowman County",
+            "state": "North Dakota",
+            "avg_crime_rate": 15.15
+        },
+        {
+            "county": "Adams County",
+            "state": "North Dakota",
+            "avg_crime_rate": 15.3
+        },
+        {
+            "county": "Lamoure County",
+            "state": "North Dakota",
+            "avg_crime_rate": 15.5
+        },
+        {
+            "county": "Stark County",
+            "state": "North Dakota",
+            "avg_crime_rate": 16.357142857142858
+        },
+        {
+            "county": "Sargent County",
+            "state": "North Dakota",
+            "avg_crime_rate": 16.975
+        },
+        {
+            "county": "Stutsman County",
+            "state": "North Dakota",
+            "avg_crime_rate": 17.23
+        },
+        {
+            "county": "Ward County",
+            "state": "North Dakota",
+            "avg_crime_rate": 17.307692307692307
+        },
+        {
+            "county": "Burke County",
+            "state": "North Dakota",
+            "avg_crime_rate": 17.38
+        },
+        {
+            "county": "Grand Forks County",
+            "state": "North Dakota",
+            "avg_crime_rate": 17.408333333333335
+        },
+        {
+            "county": "Williams County",
+            "state": "North Dakota",
+            "avg_crime_rate": 17.6625
+        },
+        {
+            "county": "Kidder County",
+            "state": "North Dakota",
+            "avg_crime_rate": 17.7
+        },
+        {
+            "county": "Hettinger County",
+            "state": "North Dakota",
+            "avg_crime_rate": 17.866666666666667
+        },
+        {
+            "county": "McHenry County",
+            "state": "North Dakota",
+            "avg_crime_rate": 17.95
+        },
+        {
+            "county": "Pembina County",
+            "state": "North Dakota",
+            "avg_crime_rate": 17.97142857142857
+        },
+        {
+            "county": "Foster County",
+            "state": "North Dakota",
+            "avg_crime_rate": 18.4
+        },
+        {
+            "county": "Dickey County",
+            "state": "North Dakota",
+            "avg_crime_rate": 18.55
+        },
+        {
+            "county": "Renville County",
+            "state": "North Dakota",
+            "avg_crime_rate": 18.7
+        },
+        {
+            "county": "Logan County",
+            "state": "North Dakota",
+            "avg_crime_rate": 18.95
+        },
+        {
+            "county": "Wells County",
+            "state": "North Dakota",
+            "avg_crime_rate": 19.1
+        },
+        {
+            "county": "Burleigh County",
+            "state": "North Dakota",
+            "avg_crime_rate": 19.21818181818182
+        }
+    ]
+}
+```
+
+## Get Affordable Counties
+
+```
+GET /api/affordable_counties?zipcode__state__name=California
+```
+
+__NOTE__:
+
+ - This API accepts query param of `zipcode__state__name` to get most affordable counties in a specific state
+
+__Response__:
+
+```json
+{
+    "count": 58,
+    "next": "http://localhost:8000/api/affordable_counties?page=2&zipcode__state__name=California",
+    "previous": null,
+    "results": [
+        {
+            "county": "Kings County",
+            "state": "California",
+            "avg_annual_income": 13799.57142857143
+        },
+        {
+            "county": "Imperial County",
+            "state": "California",
+            "avg_annual_income": 14421.07142857143
+        },
+        {
+            "county": "Tulare County",
+            "state": "California",
+            "avg_annual_income": 17621.433333333334
+        },
+        {
+            "county": "Del Norte County",
+            "state": "California",
+            "avg_annual_income": 18556.0
+        },
+        {
+            "county": "Merced County",
+            "state": "California",
+            "avg_annual_income": 18795.368421052633
+        },
+        {
+            "county": "Alpine County",
+            "state": "California",
+            "avg_annual_income": 19246.5
+        },
+        {
+            "county": "Butte County",
+            "state": "California",
+            "avg_annual_income": 19798.75
+        },
+        {
+            "county": "Stanislaus County",
+            "state": "California",
+            "avg_annual_income": 20368.541666666668
+        },
+        {
+            "county": "Fresno County",
+            "state": "California",
+            "avg_annual_income": 20387.29090909091
+        },
+        {
+            "county": "Siskiyou County",
+            "state": "California",
+            "avg_annual_income": 20690.238095238095
+        },
+        {
+            "county": "Glenn County",
+            "state": "California",
+            "avg_annual_income": 20932.166666666668
+        },
+        {
+            "county": "Modoc County",
+            "state": "California",
+            "avg_annual_income": 21405.545454545456
+        },
+        {
+            "county": "Lake County",
+            "state": "California",
+            "avg_annual_income": 21415.785714285714
+        },
+        {
+            "county": "Kern County",
+            "state": "California",
+            "avg_annual_income": 21639.977777777778
+        },
+        {
+            "county": "Inyo County",
+            "state": "California",
+            "avg_annual_income": 21759.272727272728
+        },
+        {
+            "county": "Tehama County",
+            "state": "California",
+            "avg_annual_income": 21972.416666666668
+        },
+        {
+            "county": "San Bernardino County",
+            "state": "California",
+            "avg_annual_income": 22417.14457831325
+        },
+        {
+            "county": "Trinity County",
+            "state": "California",
+            "avg_annual_income": 22456.69230769231
+        },
+        {
+            "county": "Mendocino County",
+            "state": "California",
+            "avg_annual_income": 23183.958333333332
+        },
+        {
+            "county": "Humboldt County",
+            "state": "California",
+            "avg_annual_income": 23283.2
+        },
+        {
+            "county": "Shasta County",
+            "state": "California",
+            "avg_annual_income": 23530.416666666668
+        },
+        {
+            "county": "Colusa County",
+            "state": "California",
+            "avg_annual_income": 23758.625
+        },
+        {
+            "county": "Mono County",
+            "state": "California",
+            "avg_annual_income": 24266.714285714286
+        },
+        {
+            "county": "Yuba County",
+            "state": "California",
+            "avg_annual_income": 24296.875
+        },
+        {
+            "county": "Riverside County",
+            "state": "California",
+            "avg_annual_income": 24985.565217391304
+        },
+        {
+            "county": "Lassen County",
+            "state": "California",
+            "avg_annual_income": 25129.384615384613
+        },
+        {
+            "county": "Plumas County",
+            "state": "California",
+            "avg_annual_income": 25288.785714285714
+        },
+        {
+            "county": "San Joaquin County",
+            "state": "California",
+            "avg_annual_income": 25357.533333333333
+        },
+        {
+            "county": "Madera County",
+            "state": "California",
+            "avg_annual_income": 25939.833333333332
+        },
+        {
+            "county": "Tuolumne County",
+            "state": "California",
+            "avg_annual_income": 25950.555555555555
         }
     ]
 }

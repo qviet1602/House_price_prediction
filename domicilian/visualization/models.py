@@ -16,7 +16,7 @@ class AnnualIncome(models.Model):
     modified_date = models.DateTimeField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "annual_income"
 
 
@@ -72,7 +72,7 @@ class City(models.Model):
     modified_date = models.DateTimeField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "city"
         unique_together = (("name", "county", "state"),)
 
@@ -135,7 +135,7 @@ class County(models.Model):
     modified_date = models.DateTimeField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "county"
         unique_together = (("name", "state"),)
 
@@ -203,7 +203,7 @@ class CrimeData(models.Model):
     modified_date = models.DateTimeField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "crime_data"
 
 
@@ -470,6 +470,6 @@ class Zipcode(models.Model):
     modified_date = models.DateTimeField()
 
     class Meta:
-        managed = False
+        managed = True
         db_table = "zipcode"
         unique_together = (("zip_code", "state", "county", "city"),)

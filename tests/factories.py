@@ -34,3 +34,33 @@ def create_state_median_prices(**kwargs):
         state = create_state()
         kwargs["state_code"] = state
     return G(apps.get_model("visualization", 'StateMedianPrice'), **kwargs)
+
+
+def create_county(**kwargs):
+    return G(apps.get_model("visualization", "County"), **kwargs)
+
+
+def create_city(**kwargs):
+    return G(apps.get_model("visualization", "City"), **kwargs)
+
+
+def create_zip_code(**kwargs):
+    state = create_state()
+    kwargs["state"] = state
+    county = create_county()
+    kwargs["county"] = county
+    city = create_city()
+    kwargs["city"] = city
+    return G(apps.get_model("visualization", "ZipCode"), **kwargs)
+
+
+def create_annual_income(**kwargs):
+    # zipcode = create_zip_code()
+    # kwargs["zipcode"] = zipcode
+    return G(apps.get_model("visualization", "AnnualIncome"), **kwargs)
+
+
+def create_crime_data(**kwargs):
+    zipcode = create_zip_code()
+    kwargs["zipcode"] = zipcode
+    return G(apps.get_model("visualization", "CrimeData"), **kwargs)
