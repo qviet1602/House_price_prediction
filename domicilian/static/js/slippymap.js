@@ -29,6 +29,16 @@ function forSaleIcon (feature, latlng) {
   return L.marker(latlng, { icon: saleMarker })
 }
 
+function bizIcon (feature, latlng) {
+  var bizMarker = L.AwesomeMarkers.icon({
+    icon: 'shopping-cart',
+    markerColor: 'lightblue',
+    prefix: 'fa',
+    extraClasses: 'biz-icon',
+  });
+  return L.marker(latlng, { icon: bizMarker })
+}
+
 // Function to toggle marker layers
 function toggleSchools() {
   if(!toggle) {
@@ -81,6 +91,23 @@ function toggleForRent() {
   toggle = !toggle;
 };
 
+function toggleBiz() {
+  if(!toggle) {
+    map.removeLayer(bizLayer);
+    var schools = d3.select('#bizToggle')
+      .style('background-color', 'white');
+      var schoolsInfo = d3.select("#bizInfo")
+      .style('color', 'black');
+  } else {
+    map.addLayer(bizLayer);
+    var schools = d3.select('#bizToggle')
+      .style('background-color', 'DodgerBlue');
+    var schoolsInfo = d3.select("#bizInfo")
+      .style('color', 'white');
+  }
+  toggle = !toggle;
+};
+
 //Get schools data
 async function getSchools(lat,long) {
 
@@ -126,6 +153,8 @@ async function getSchools(lat,long) {
     request1.send();  // make the request
   });
 };
+
+
 
 // plot schools data
 function plotSchools(schools) { 
@@ -352,22 +381,24 @@ async function getAddress(lat,long) {
   };
 
   //get buisness data
-  async function getbiz(lat,lon) {
+  async function getbiz1(lat,lon) {
 
     return new Promise(function (resolve, reject) {
-      var apikey = 'bbe0840065msh8c5d63ec1c6386ep1dcdfdjsnebfa3333d0f5';
-      var api_url = 'https://api.yelp.com/v3/businesses/search';
+      var apikey = 'zhWUU_2WcNraf8boB_mVxaa1yc-818kp9wl511sWCCAqRp83v-XTli6yH9d_UQnVK0u3gYgkgB3QGidj7_jGdHniL1nzSgRzyfDK0-kwvf81LUPg1gW8wr12p0jbXXYx';
+      var api_url = 'https://cold-fire-e963.jflick-cors.workers.dev/?https://api.yelp.com/v3/businesses/search';
     
       var request_url = api_url
         + '?'
-        + 'radius=5'
         + '&limit=50'
+        + '&radius=565'
+        + '&sort_by=distance'
         + '&latitude=' + encodeURIComponent(lat)
         + '&longitude=' + encodeURIComponent(lon)
     
       var request3 = new XMLHttpRequest();
       request3.open('GET', request_url, true);
       request3.setRequestHeader("Authorization", 'Bearer ' + apikey)
+      // request3.withCredentials = "true";
       
       request3.onload = function() {
         // see full list of possible response codes:
@@ -377,11 +408,12 @@ async function getAddress(lat,long) {
           // Success!
           var data = JSON.parse(request3.responseText);
           // console.log(data['schools']);
-          resolve(data)
+          console.log(data);
+          resolve(data.businesses)
     
         } else if (request3.status <= 500){ 
           // We reached our target server, but it returned an error
-                              
+          console.log(request3.responseText)                 
           console.log("unable to geocode! Response code: " + request3.status);
           var data = JSON.parse(request3.responseText);
           console.log(data.status.message);
@@ -389,15 +421,116 @@ async function getAddress(lat,long) {
           console.log("server error");
         }
       };
-      request2.onerror = function() {
+      request3.onerror = function() {
         // There was a connection error of some sort
         console.log("unable to connect to server");        
       };
     
-      request2.send();  // make the request
+      request3.send();  // make the request
     });
     };
 
+    //get buisness data
+  async function getbiz2 (lat,lon) {
+
+    return new Promise(function (resolve, reject) {
+      var apikey = 'zhWUU_2WcNraf8boB_mVxaa1yc-818kp9wl511sWCCAqRp83v-XTli6yH9d_UQnVK0u3gYgkgB3QGidj7_jGdHniL1nzSgRzyfDK0-kwvf81LUPg1gW8wr12p0jbXXYx';
+      var api_url = 'https://cold-fire-e963.jflick-cors.workers.dev/?https://api.yelp.com/v3/businesses/search';
+    
+      var request_url = api_url
+        + '?'
+        + '&limit=50'
+        + '&radius=565'
+        + '&offset=50'
+        + '&sort_by=distance'
+        + '&latitude=' + encodeURIComponent(lat)
+        + '&longitude=' + encodeURIComponent(lon)
+    
+      var request3 = new XMLHttpRequest();
+      request3.open('GET', request_url, true);
+      request3.setRequestHeader("Authorization", 'Bearer ' + apikey)
+      // request3.withCredentials = "true";
+      
+      request3.onload = function() {
+        // see full list of possible response codes:
+        // https://opencagedata.com/api#codes
+    
+        if (request3.status == 200){ 
+          // Success!
+          var data = JSON.parse(request3.responseText);
+          // console.log(data['schools']);
+          console.log(data);
+          resolve(data.businesses)
+    
+        } else if (request3.status <= 500){ 
+          // We reached our target server, but it returned an error
+          console.log(request3.responseText)                 
+          console.log("unable to geocode! Response code: " + request3.status);
+          var data = JSON.parse(request3.responseText);
+          console.log(data.status.message);
+        } else {
+          console.log("server error");
+        }
+      };
+      request3.onerror = function() {
+        // There was a connection error of some sort
+        console.log("unable to connect to server");        
+      };
+    
+      request3.send();  // make the request
+    });
+    };
+
+  //get buisness data
+  async function getbiz3 (lat,lon) {
+
+    return new Promise(function (resolve, reject) {
+      var apikey = 'zhWUU_2WcNraf8boB_mVxaa1yc-818kp9wl511sWCCAqRp83v-XTli6yH9d_UQnVK0u3gYgkgB3QGidj7_jGdHniL1nzSgRzyfDK0-kwvf81LUPg1gW8wr12p0jbXXYx';
+      var api_url = 'https://cold-fire-e963.jflick-cors.workers.dev/?https://api.yelp.com/v3/businesses/search';
+    
+      var request_url = api_url
+        + '?'
+        + '&limit=50'
+        + '&radius=565'
+        + '&offset=100'
+        + '&sort_by=distance'
+        + '&latitude=' + encodeURIComponent(lat)
+        + '&longitude=' + encodeURIComponent(lon)
+    
+      var request3 = new XMLHttpRequest();
+      request3.open('GET', request_url, true);
+      request3.setRequestHeader("Authorization", 'Bearer ' + apikey)
+      // request3.withCredentials = "true";
+      
+      request3.onload = function() {
+        // see full list of possible response codes:
+        // https://opencagedata.com/api#codes
+    
+        if (request3.status == 200){ 
+          // Success!
+          var data = JSON.parse(request3.responseText);
+          // console.log(data['schools']);
+          console.log(data);
+          resolve(data.businesses)
+    
+        } else if (request3.status <= 500){ 
+          // We reached our target server, but it returned an error
+          console.log(request3.responseText)                 
+          console.log("unable to geocode! Response code: " + request3.status);
+          var data = JSON.parse(request3.responseText);
+          console.log(data.status.message);
+        } else {
+          console.log("server error");
+        }
+      };
+      request3.onerror = function() {
+        // There was a connection error of some sort
+        console.log("unable to connect to server");        
+      };
+    
+      request3.send();  // make the request
+    });
+    };
 
 // plot rental data
 function plotForRent(rentalListings) { 
@@ -547,6 +680,79 @@ function plotForSale(salesListings) {
   }).addTo(map);
   };
 
+// plot buisness data
+function plotBiz(businesses) { 
+
+  data = []
+  
+  businesses.forEach(d => {
+    bizJson =
+    {
+      id: d.id,
+      type: "Feature",
+      properties: {
+        "Name": d.name,
+        "Category": d.categories[0].title || '',
+        "Location": d.location.display_address.toString(),
+        "Yelp Rating": d.rating,
+        "Phone": d.display_phone, 
+        "Price": d.price, 
+        "Yelp Link": d.url
+    },
+      geometry: {
+        coordinates: [d.coordinates.longitude, d.coordinates.latitude],
+        type: "Point"
+      }
+    };
+    data.push(bizJson);
+  })
+  
+  function onBiz(feature, layer) {
+  bizLayer.addLayer(layer);
+  window.toggle = false;
+  layer.on('mouseover', function () {
+      layer.bindPopup('<b>' + 'Name:</b> ' + feature.properties.Name + '</br><br>'
+                        + '<b>Category:</b> ' + feature.properties.Category + '<br><br>'
+                        + '<b>Yelp Rating:</b> ' + feature.properties["Yelp Rating"] + '<br><br>'
+                        + '<b>Price:</b> ' + feature.properties.Price).openPopup();
+    });
+    layer.on('mouseout', function () {
+      layer.closePopup();
+    });
+    layer.on('click', function () {
+      var details = d3.select('#details')
+      details.selectAll("text").remove();
+      details.selectAll("tspan").remove();
+  
+      sidebar.open('details');
+      details.append('text')
+        .attr("y", 20)
+        .attr('class','details-h2')
+        .text('Business Details')
+        .append('br')
+  
+        Object.keys(feature.properties).forEach(function (item) {
+          details.append('tspan')
+            .text(item + ': ')
+            .attr('class', 'key')
+           
+           
+          details.append('tspan')
+            .text(feature.properties[item])
+            .attr('class', 'value')
+            .attr("dy", 25)
+            .append('br');
+      });
+    });
+  };
+  
+  L.geoJSON(data, {
+    pointToLayer: bizIcon,
+    onEachFeature: onBiz
+  }).addTo(map);
+  };
+
+
 // define max bounds of the map (not sure if working correctly)
   var maxBounds =  L.latLngBounds(
   L.latLng(5.499550, -167.276413),
@@ -557,13 +763,14 @@ function plotForSale(salesListings) {
 var map = L
   .map('mapid')
   .fitBounds(maxBounds)
-  .setView(new L.LatLng(38.54734730982558, -121.7376619577408), 18); 
+  // .setView(new L.LatLng(38.54734730982558, -121.7376619577408), 18); //testing purposess
+  .setView(new L.LatLng(37.689740802722724, -109.599609375), 5); 
   // .setView([47, 2], 10)
   // .setView([40, -8025], 10);   // center position + zoom
 
 // MAIN FUNCTION
 map.on('click', async function(e) {
-    //alert("Lat, Lon : " + e.latlng.lat + ", " + e.latlng.lng)
+    // alert("Lat, Lon : " + e.latlng.lat + ", " + e.latlng.lng) //for debugging
     dropTile(e.latlng.lat, e.latlng.lng);
     var schools = await getSchools(e.latlng.lat, e.latlng.lng);
     plotSchools(schools);
@@ -572,6 +779,14 @@ map.on('click', async function(e) {
     plotForRent(rentals);
     var sales = await getForSale(postal_code);
     plotForSale(sales);
+
+    //I know this is messy but it's 1:30 AM and I had too much caffeine.
+    var bizList1 = await getbiz1(e.latlng.lat, e.latlng.lng);
+    var bizList2 = await getbiz2(e.latlng.lat, e.latlng.lng);
+    var bizList3 = await getbiz3(e.latlng.lat, e.latlng.lng);
+    plotBiz(bizList1);
+    plotBiz(bizList2);
+    plotBiz(bizList3);
 
   });
 
@@ -590,7 +805,7 @@ var sidebar = L.control.sidebar({ container: 'sidebar' })
                 '<p id="forSaleToggle"><button onclick="toggleForSale()" class="homesForSale"><i class="fa fa-home"></i></button><text id="salesInfo" class="buttonInfo">Homes For Sale</text></p>' +
                 '<p id="rentalsToggle"><button onclick="toggleForRent()" class="homesForRent"><i class="fa fa-home"></i></button><text id="rentalsInfo" class="buttonInfo">Homes For Rent</text></p>' +
                 '<p id="schoolsToggle"><button onclick="toggleSchools()" class="schools"><i class="fa fa-graduation-cap"></i></button><text id="schoolsInfo" class="buttonInfo">Schools</text></p>' + 
-               '<p><button class="businesses"><i class="fa fa-shopping-cart"></i></button><text class="buttonInfo">Businesses</text></p>',
+               '<p id="bizToggle"><button onclick="toggleBiz()" class="businesses"><i class="fa fa-shopping-cart"></i></button><text id="bizInfo" class="buttonInfo">Businesses</text></p>',
 
             })            
         // be notified when a panel is opened
@@ -650,6 +865,8 @@ var schoolsLayer = L.layerGroup().addTo(map)
 var rentalsLayer = L.layerGroup().addTo(map)
 
 var salesLayer = L.layerGroup().addTo(map)
+
+var bizLayer = L.layerGroup().addTo(map)
 
 // Add a svg layer to the map
 L.svg().addTo(map);
