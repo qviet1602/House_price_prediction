@@ -7,8 +7,8 @@ var parseTime = d3.timeParse("%Y");
 var left_margin = 60;
 var bottom_margin = 60;
 var promises = [
-  d3.json('/api/list_counties_rental/'),
-  d3.json('/api/county_data_rental/'),
+  d3.json('/api/list_zips_purchase/'),
+  d3.json('/api/zip_data_purchase/'),
 ];
 
 Promise.all(promises).then(ready);
@@ -48,7 +48,7 @@ function ready([state_list, state_data]) {
         draw_barChart(state_data);
 	all_rectangles = d3.selectAll("rect");
         all_rectangles.each(function(d, i) {
-		if(d['name'] != null && d['id'] != null && d['id'] == 1) {
+		if(d['name'] != null && d['id'] != null && d['id'] == 14101) {
                 	d3.select(this).style("fill", "green");
 		}
         })
@@ -66,7 +66,7 @@ function handleStateClick(d) {
 	d3.select("#line_chart3").remove();
 	
 	var state_promise = [
-  		d3.json('/api/county_data_rental/?county_id=' + clicked_state_id),
+  		d3.json('/api/zip_data_purchase/?zipcode_id=' + clicked_state_id),
 	];
 
 	Promise.all(state_promise).then(state_data_ready);
@@ -321,7 +321,7 @@ function draw_lineChart1(state_data) {
 function draw_lineChart2(state_data) {
 	fourBedroom_data = state_data[4]['fourBedroom']
 	fivePlusBedroom_data = state_data[5]['fivePlusBedroom']
-	singleFamilyHome_data = state_data[6]['singleFamilyResidenceRental']
+	singleFamilyHome_data = state_data[6]['singleFamilyHome']
 
 	min_fourBedroom_year = d3.min(fourBedroom_data, function(d) {
                 return parseTime(d.year);
@@ -467,7 +467,7 @@ function draw_lineChart2(state_data) {
     .text("Price");
 	//Draw lines
 	var all_colors = d3.schemeCategory10;
-        var colorScheme = {'fourBedroom': all_colors[0], 'fivePlusBedroom': all_colors[1], 'singleFamilyResidenceRental': all_colors[2]}
+        var colorScheme = {'fourBedroom': all_colors[0], 'fivePlusBedroom': all_colors[1], 'singleFamilyHome': all_colors[2]}
 
 
 
@@ -498,11 +498,11 @@ function draw_lineChart2(state_data) {
                           .attr("d", line)
                           .style("fill", "none")
                           .style("stroke-width", 1)
-                      .style("stroke", colorScheme['singleFamilyResidenceRental']);
+                      .style("stroke", colorScheme['singleFamilyHome']);
 
 
 	//Draw the legend
-        var legend_names = ['fourBedroom', 'fivePlusBedroom', 'singleFamilyResidenceRental']
+        var legend_names = ['fourBedroom', 'fivePlusBedroom', 'singleFamilyHome']
         chart2_svg.selectAll("legend_rect")
                           .data(legend_names)
                           .enter()
@@ -548,7 +548,7 @@ function draw_barChart(state_data) {
 	threeBedroom_data = state_data[3]['threeBedroom']
 	fourBedroom_data = state_data[4]['fourBedroom']
 	fivePlusBedroom_data = state_data[5]['fivePlusBedroom']
-	singleFamilyHome_data = state_data[6]['singleFamilyResidenceRental']
+	singleFamilyHome_data = state_data[6]['singleFamilyHome']
 
 	min_condoCoOp_price = d3.min(condoCoOp_data, function(d) {
                 return parseInt(d.list_price);
