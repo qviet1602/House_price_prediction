@@ -29,7 +29,7 @@ urlpatterns = [
         "about/", TemplateView.as_view(template_name="pages/about.html"), name="about"
     ),
     path("map/", TemplateView.as_view(template_name="pages/map.html"), name="map"),
-    path("trends/", TemplateView.as_view(template_name="pages/trends.html"), name="trends"),
+    path("visualize/", TemplateView.as_view(template_name="pages/graph.html"), name="visualize"),
     path("trends_by_state_purchase/", TemplateView.as_view(template_name="pages/trends_by_state_purchase.html"), name="trends_by_state_purchase"),
     path("trends_by_state_rental/", TemplateView.as_view(template_name="pages/trends_by_state_rental.html"), name="trends_by_state_rental"),
     path("trends_by_county_purchase/", TemplateView.as_view(template_name="pages/trends_by_county_purchase.html"), name="trends_by_county_purchase"),
