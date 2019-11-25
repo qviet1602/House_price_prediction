@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<!-- Load d3.js and the geo projection plugin -->
+<script type="text/javascript" nonce="e91f435f4c724e7492e7c7dc2fd" src="//local.adguard.org?ts=1573100986965&amp;type=content-script&amp;dmn=dl.boxcloud.com&amp;css=1&amp;js=1&amp;gcss=1&amp;rel=1&amp;rji=1&amp;stealth=1&amp;uag=TW96aWxsYS81LjAgKE1hY2ludG9zaDsgSW50ZWwgTWFjIE9TIFggMTBfMTRfNikgQXBwbGVXZWJLaXQvNjA1LjEuMTUgKEtIVE1MLCBsaWtlIEdlY2tvKSBWZXJzaW9uLzEzLjAuMyBTYWZhcmkvNjA1LjEuMTU="></script>
+<script type="text/javascript" nonce="e91f435f4c724e7492e7c7dc2fd" src="//local.adguard.org?ts=1573100986965&amp;name=AdGuard%20Assistant&amp;name=AdGuard%20Extra&amp;type=user-script"></script><script src="https://d3js.org/d3.v4.js"></script>
+<script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+
+<!-- Load Leaflet -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.4/dist/leaflet.css" integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA==" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.3.4/dist/leaflet.js" integrity="sha512-nMMmRyTVoLYqjP9hrbed9S+FzjZHW5gY1TWCHA5ckwXZBadntCNs8kEqAWdrb9O7rxbCaA4lKTIWjDXZxflOcA==" crossorigin=""></script>
+<script src="https://cdn.jsdelivr.net/npm/leaflet-sidebar-v2@3.2.1/js/leaflet-sidebar.min.js"></script>
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+
+<link rel="stylesheet" href="../static/node_modules/leaflet.awesome-markers/dist/leaflet.awesome-markers.css">
+<script src="../static/node_modules/leaflet.awesome-markers/dist/leaflet.awesome-markers.js"></script>
+
+<link rel="stylesheet" href="../static/css/slippymap.css">
+
+<body>
+<!-- optionally define the sidebar content via HTML markup -->
+<div id="sidebar" class="leaflet-sidebar collapsed">
+
+    <!-- nav tabs -->
+    <div class="leaflet-sidebar-tabs">
+        <!-- top aligned tabs -->
+        <ul role="tablist">
+            <li><a href="#home" role="tab"><i class="fa fa-bars active"></i></a></li>
+            <li><a href="#details" role="tab"><i class="fa fa-arrows"></i></a></li>
+        </ul>
+
+        <!-- bottom aligned tabs -->
+        <ul role="tablist">
+            <li><a href="https://github.com/nickpeihl/leaflet-sidebar-v2"><i class="fa fa-github"></i></a></li>
+        </ul>
+    </div>
+
+    <!-- panel content -->
+    <div class="leaflet-sidebar-content">
+        <div class="leaflet-sidebar-pane" id="home">
+            <h1 class="leaflet-sidebar-header">
+                Team 09 Final Project Fall 2019
+                <span class="leaflet-sidebar-close"><i class="fa fa-caret-left"></i></span>
+            </h1>
+
+            <h2>Welcome to the GeoExplorer!</h2>
+            <p> This is an interactive map that lets you explore neighborhoods to learn about:</p>
+            <ul>
+                <li>Available Homes for Rent</li>
+                <li>Available Homes for Sale</li>
+                <li>Nearby Schools</li>
+                <li>Neighborhood Businesses</li>
+            </ul>
+
+            <h3>Naivgation</h3>
+            <p>You can navigate the map by clicking and dragging to move.</p>
+            <p>You can zoom by either scrolling with your mouse wheel, pinching on your touch screen, or by using
+                the +/- controls in the top left </p>
+            <p>Click and drag to move around the map in the currently zoomed area.</p>
+
+            <h3>Exploring a Neighborhood</h3>
+            <p>Click anywhere to drag a pin. In just a moment, you'll see different map markers</p>
+            <p>Hover over a map marker to see quick information about that marker</p>
+            <p>Click on the marker to see details. A details screen will open in this sidebar. 
+                (Note: You can navigate to the details screen at anytime by clicking the quad-cross in the sidebar</p>
+            
+            <h3> Filtering Data</h3>
+            <p>Click on the Funnel in the sidebar to open the filtering menu.</p>
+            <p>Click on the icons to toggle whether or not you will see that marker category on the map</p>
+
+
+            <h3>Built With</h3>
+            <ul>
+                <li>D3.js v5.1</li>
+                <li>Leaflet.js</li>
+                <li>Leaflet-Sidebar.js</li>
+                <li>Realtor.com API</li>
+                <li>Yelp Fusion API</li>
+                <li>Opencage Reverse Geocoding API</li>
+            </ul>
+        </div>
+
+        <div class="leaflet-sidebar-pane" id="details">
+            <h1 class="leaflet-sidebar-header">
+                Details
+                <span class="leaflet-sidebar-close"><i class="fa fa-caret-left"></i></span>
+            </h1>
+            <p>
+                Click on an icon on the map to find out more information about it!
+            </p>
+        </div>
+
+        <div class="leaflet-sidebar-pane" id="messages">
+            <h1 class="leaflet-sidebar-header">Messages<span class="leaflet-sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Create an element where the map will take place -->
+<div id="mapid"></div>
+<script src="../static/js/slippymap.js"></script>
+</body>
