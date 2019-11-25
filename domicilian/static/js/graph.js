@@ -165,7 +165,7 @@ function createStateNode(stateName, x, y) {
       }).on('mouseover', function() {
         // Prevent stat box display if node is being dragged
         if (!d3.select(this).attr('class').includes('active')) {
-          displayStats(stateName, '-node') // TODO: Implement this with actual data
+          displayStats('.' + genClassName(stateName) + '-node') // TODO: Implement this with actual data
         }
       });
 
@@ -335,7 +335,7 @@ function createCountyNodes(stateName, countyList) {
     }).on('mouseover', function () {
       // Prevent stat box display if node is being dragged
       if (!d3.select(this).attr('class').includes('active')) {
-        displayStats(stateName, '-node') // TODO: Implement this with actual data
+        displayStats('.' + genClassName(stateName) + '-node') // TODO: Implement this with actual data
       }
     });
 
@@ -358,7 +358,7 @@ function createCountyNodes(stateName, countyList) {
     .on('mouseover', function (d) {
       // Prevent stat box display if node is being dragged
       if (!d3.select(this).attr('class').includes('active')) {
-        displayStats(d, '-county-node') // TODO: Implement this with actual data
+        displayStats('.' + genClassName(stateName) + '-county-node.' + genClassName(d) + '-county-node') // TODO: Implement this with actual data
       }
     });
 
@@ -426,11 +426,11 @@ function nodeOnDragEnd(d) {
   d3.select(this).classed('active', false);
 }
 
-function displayStats(name, className) {
+function displayStats(className) {
   if (d3.select('.stat-box').empty()) {
     var statBox = svg.append('g').attr('class', 'stat-box');
 
-    var node = d3.select('.' + genClassName(name) + className);
+    var node = d3.select(className);
     var x = parseInt(node.attr('cx')) + 10;
     var y = parseInt(node.attr('cy')) + 10;
 
