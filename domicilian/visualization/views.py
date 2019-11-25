@@ -121,6 +121,104 @@ def list_counties_purchase(request):
 @csrf_exempt
 @authentication_classes([])
 @permission_classes([])
+def list_counties_rental(request):
+    if request.method == 'GET':
+        counties_query = "select distinct county_id from county_median_price where list_price is not null and (year_month like '%-12' or year_month = '2019-09') and home_type_id in (11, 12, 13, 14, 15, 16, 9)"
+        with connection.cursor() as cursor:
+            cursor.execute(counties_query)
+            county_rows = cursor.fetchall()
+
+        county_ids = []
+        for each_county_row in county_rows:
+            county_ids.append(each_county_row[0])
+
+
+        county_id_string = ""
+        for each_county_id in county_ids:
+            county_id_string += "'" + str(each_county_id) + "',"
+
+        county_id_string = county_id_string[:-1]
+
+        county_info_query = 'select county.id, county.name, state.name from county inner join state on county.state_id = state.id where county.id in (' + county_id_string + ')'
+        with connection.cursor() as cursor:
+            cursor.execute(county_info_query)
+            county_data_rows = cursor.fetchall()
+
+        data = []
+        for each_county in county_data_rows:
+            each_data_dict = {}
+            each_data_dict['name'] = each_county[1] + " (" + each_county[2] + ")"
+            each_data_dict['id'] = each_county[0]
+            data.append(each_data_dict)
+
+        return JsonResponse(data, safe=False)
+
+@api_view(['GET'])
+@csrf_exempt
+@authentication_classes([])
+@permission_classes([])
+def list_zips_purchase(request):
+    if request.method == 'GET':
+        #zip_query = "select distinct zipcode_id from zip_timeseries where index_value is not null and (year_month like '%-12' or year_month = '2019-09') and home_type_id in (1, 2, 3, 4, 5, 6, 9)"
+        home_type_ids = [1, 2, 3, 4, 5, 6, 9]
+        zipcodes = []
+        for home_type_id in home_type_ids:
+            zipcode_ids = set()
+            zip_query = "select zipcode_id from zip_timeseries where (year_month like %s or year_month = %s) and index_value is not null and home_type_id = %s group by zipcode_id having count(index_value) > %s"
+            with connection.cursor() as cursor:
+                cursor.execute(zip_query, ['201%-12', '2019-09', home_type_id, 9])
+                zip_rows = cursor.fetchall()
+
+            for zip_row in zip_rows:
+                zipcode_ids.add(zip_row[0])
+
+            zipcodes.append(zipcode_ids)
+
+        zipcode_set1 = zipcodes[0]
+        zipcode_set2 = zipcodes[1]
+        zipcode_set3 = zipcodes[2]
+        zipcode_set4 = zipcodes[3]
+        zipcode_set5 = zipcodes[4]
+        zipcode_set6 = zipcodes[5]
+        zipcode_set7 = zipcodes[6]
+
+        set12 = zipcode_set1.intersection(zipcode_set2)
+
+        set123 = set12.intersection(zipcode_set3)
+
+        set1234 = set123.intersection(zipcode_set4)
+
+        set12345 = set1234.intersection(zipcode_set5)
+
+        set123456 = set12345.intersection(zipcode_set6)
+
+        set123457 = set123456.intersection(zipcode_set7)
+
+
+        zip_id_string = ""
+        for each_zip_id in set123457:
+            zip_id_string += "'" + str(each_zip_id) + "',"
+
+        zip_id_string = zip_id_string[:-1]
+
+        zip_info_query = 'select zipcode.id, zipcode.zip_code, state.name from zipcode inner join state on zipcode.state_id = state.id where zipcode.id in (' + zip_id_string + ') order by state.name asc, zipcode.zip_code asc'
+        with connection.cursor() as cursor:
+            cursor.execute(zip_info_query)
+            zip_data_rows = cursor.fetchall()
+
+        data = []
+        for each_zip in zip_data_rows:
+            each_data_dict = {}
+            each_data_dict['name'] = each_zip[1] + " (" + each_zip[2] + ")"
+            each_data_dict['id'] = each_zip[0]
+            data.append(each_data_dict)
+
+        return JsonResponse(data, safe=False)
+
+@api_view(['GET'])
+@csrf_exempt
+@authentication_classes([])
+@permission_classes([])
 def get_state_data_purchase(request):
     if request.method == 'GET':
         state_id = request.GET.get('state_id', 23)
@@ -283,6 +381,40 @@ def get_county_data_rental(request):
 
             with connection.cursor() as cursor:
                 cursor.execute(last_year_query, [county_id, '%-12', '2019-09', 'rental', each_home_type])
+                last_year_rows = cursor.fetchall()
+            last_year_data = []
+
+            for each_row in last_year_rows:
+                each_data_dict = {}
+                each_data_dict['list_price'] = each_row[1]
+                each_data_dict['year'] =  each_row[0][0:4]
+                last_year_data.append(each_data_dict)
+
+            home_data_dict = {}
+            home_data_dict[each_home_type] = last_year_data
+            data.append(home_data_dict)
+
+        return JsonResponse(data, safe=False)
+
+
+@api_view(['GET'])
+@csrf_exempt
+@authentication_classes([])
+@permission_classes([])
+def get_zip_data_purchase(request):
+    if request.method == 'GET':
+        county_id = request.GET.get('zipcode_id', 14101)
+
+        home_types = ["condoCoOp", "oneBedroom", "twoBedroom", "threeBedroom", "fourBedroom", "fivePlusBedroom",
+                      "singleFamilyHome"]
+        data = []
+        for each_home_type in home_types:
+            last_year_query = "select year_month, index_value from zip_timeseries where zipcode_id = %s " \
+                              "and (year_month like %s or year_month = %s) and  index_value is not null and home_type_id " \
+                              "in (select id from home_type where type=%s and feature=%s) order by year_month desc"
+
+            with connection.cursor() as cursor:
+                cursor.execute(last_year_query, [county_id, '201%-12', '2019-09', 'purchase', each_home_type])
                 last_year_rows = cursor.fetchall()
             last_year_data = []
 

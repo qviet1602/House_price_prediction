@@ -467,7 +467,7 @@ function draw_lineChart2(state_data) {
     .text("Price");
 	//Draw lines
 	var all_colors = d3.schemeCategory10;
-        var colorScheme = {'fourBedroom': all_colors[0], 'fivePlusBedroom': all_colors[1], 'singleFamilyHome': all_colors[2]}
+        var colorScheme = {'fourBedroom': all_colors[0], 'fivePlusBedroom': all_colors[1], 'singleFamilyResidenceRental': all_colors[2]}
 
 
 
@@ -498,11 +498,11 @@ function draw_lineChart2(state_data) {
                           .attr("d", line)
                           .style("fill", "none")
                           .style("stroke-width", 1)
-                      .style("stroke", colorScheme['singleFamilyHome']);
+                      .style("stroke", colorScheme['singleFamilyResidenceRental']);
 
 
 	//Draw the legend
-        var legend_names = ['fourBedroom', 'fivePlusBedroom', 'singleFamilyHome']
+        var legend_names = ['fourBedroom', 'fivePlusBedroom', 'singleFamilyResidenceRental']
         chart2_svg.selectAll("legend_rect")
                           .data(legend_names)
                           .enter()

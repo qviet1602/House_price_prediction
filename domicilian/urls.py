@@ -34,12 +34,16 @@ urlpatterns = [
     path("trends_by_state_rental/", TemplateView.as_view(template_name="pages/trends_by_state_rental.html"), name="trends_by_state_rental"),
     path("trends_by_county_purchase/", TemplateView.as_view(template_name="pages/trends_by_county_purchase.html"), name="trends_by_county_purchase"),
     path("trends_by_county_rental/", TemplateView.as_view(template_name="pages/trends_by_county_rental.html"), name="trends_by_county_rental"),
+    path("trends_by_zip_purchase/", TemplateView.as_view(template_name="pages/trends_by_zip_purchase.html"), name="trends_by_zip_purchase"),
     path("api/purchase_median_prices/", list_purchase_median_prices),
     path("api/rental_median_prices/", list_rental_median_prices),
     path("api/list_states/", list_states),
     path("api/list_counties_purchase/", list_counties_purchase),
+    path("api/list_counties_rental/", list_counties_rental),
+    path("api/list_zips_purchase/", list_zips_purchase),
     path("api/county_data_purchase/", get_county_data_purchase),
     path("api/county_data_rental/", get_county_data_rental),
+    path("api/zip_data_purchase/", get_zip_data_purchase),
     path("api/state_data_purchase/", get_state_data_purchase),
     path("api/state_data_rental/", get_state_data_rental)
     # Your stuff: custom urls go here
