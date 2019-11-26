@@ -81,10 +81,7 @@ function updateMap(us, prices, colorScheme, index) {
     .attr('stroke-width', 1)
     .attr('d', path)
     .on('click', function(d) {
-      // var text = d.properties.name;
-      // var price = prices.get(text);
-
-      var state = d.properties.name;
+      var state = prices.get(d.properties.name)['RegionID'];
       document.cookie = 'state=' + state;
 
       // TODO: Click should take user to state county screen
