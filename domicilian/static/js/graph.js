@@ -230,18 +230,21 @@ var menuFunctions = [
 ];
 
 // TODO: Remove this option when more than one state node exists
-function dragSimilarStates() {
+function dragSimilarStates(stateName) {
   if (totalNodes === 1) {
-    // Dummy states for testing
-    // TODO: Replace this with real data
-    var similarStates = ['Washington', 'California'];
+    d3_event_x = d3.event.x
+    d3_event_y = d3.event.y
+    d3.json("/api/similar_states/?state_name=" + stateName)
+        .then(function(data){
+           for (var i = 0; i < data.length; i++) {
+                each_state = data[i]
+                createStateNode(each_state, d3_event_x + i * 100, d3_event_y + window.scrollY + i * 100);
+                d3.select('.' + genClassName(each_state['name']) + '-menu-item').attr('fill', nodeColors[i + 1]);
+           }
 
-    for (var i = 0; i < similarStates.length; i++) {
-      createStateNode(similarStates[i], d3.event.x + i * 100, d3.event.y + window.scrollY + i * 100);
-      d3.select('.' + genClassName(similarStates[i]) + '-menu-item').attr('fill', nodeColors[i + 1]);
-    }
+            removeRightClickMenu();
 
-    removeRightClickMenu();
+    });
   }
 }
 

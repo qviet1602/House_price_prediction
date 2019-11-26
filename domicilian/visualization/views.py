@@ -5,7 +5,8 @@ from rest_framework.decorators import permission_classes
 from django.db import connection
 from django.http import JsonResponse
 from decimal import Decimal
-from collections import OrderedDict
+import numpy as np
+import scipy.spatial.distance as dst
 
 @api_view(['GET'])
 @csrf_exempt
@@ -839,6 +840,169 @@ def get_affordable_counties(request):
             each_data_dict = {}
             each_data_dict['id'] = each_row[2]
             each_data_dict['name'] = each_row[3]
+            data.append(each_data_dict)
+
+        return JsonResponse(data, safe=False)
+
+
+@api_view(['GET'])
+@csrf_exempt
+@authentication_classes([])
+@permission_classes([])
+def get_safe_counties(request):
+    if request.method == 'GET':
+        state_name = request.GET.get('state_name', 'Alabama')
+
+        crime_data_query = "select avg(violent_crime), avg(property_crime), zipcode.county_id, county.name from " \
+                           "crime_data inner join zipcode on crime_data.zipcode_id = zipcode.id " \
+                           "inner join county on zipcode.county_id = county.id " \
+                           "inner join state on zipcode.state_id = state.id where state.name = %s  " \
+                           "group by county.name, zipcode.county_id " \
+                           "order by avg(crime_data.violent_crime) asc, avg(crime_data.property_crime) asc limit %s"
+        with connection.cursor() as cursor:
+            cursor.execute(crime_data_query, [state_name, 5])
+            crime_data_row = cursor.fetchall()
+
+        data = []
+
+        for each_row in crime_data_row:
+            each_data_dict = {}
+            each_data_dict['id'] = each_row[2]
+            each_data_dict['name'] = each_row[3]
+            data.append(each_data_dict)
+
+        return JsonResponse(data, safe=False)
+
+def get_similar_states(request):
+    if request.method == 'GET':
+        selected_state = request.GET.get('state_name', 'Alabama')
+
+        #Get data for all three states and aggregate this data into one dataset
+        crime_data_query = "select avg(violent_crime), avg(property_crime), zipcode.state_id, state.name from " \
+                           "crime_data inner join zipcode on crime_data.zipcode_id = zipcode.id " \
+                           "inner join state on zipcode.state_id = state.id  " \
+                           "group by state.name, zipcode.state_id " \
+                           "order by avg(crime_data.violent_crime) asc, avg(crime_data.property_crime) asc"
+
+        school_data_query = "select count(*), zipcode.state_id, state.name from school_data " \
+                          "inner join zipcode on school_data.zipcode_id = zipcode.id " \
+                          "inner join state on zipcode.state_id = state.id " \
+                          "where schooldigger_rating is not null " \
+                          "and schooldigger_rating > %s group by state.name, zipcode.state_id order by count(*) desc"
+
+        annual_income_query = "select avg(avg_annual_income), avg(median_annual_income), zipcode.state_id, state.name from " \
+                              "annual_income inner join zipcode on annual_income.zipcode_id = zipcode.id " \
+                              "inner join state on zipcode.state_id = state.id " \
+                              "group by state.name, zipcode.state_id " \
+                              "order by avg(annual_income.avg_annual_income) asc, avg(annual_income.median_annual_income) asc"
+        median_prices_query = "select list_price, state_id, state.name from state_median_price " \
+                              "inner join state on state_median_price.state_id = state.id where year_month = %s and home_type_id = %s"
+
+        with connection.cursor() as cursor:
+            cursor.execute(crime_data_query)
+            crime_data_rows = cursor.fetchall()
+
+        with connection.cursor() as cursor:
+            cursor.execute(school_data_query, [2])
+            school_data_rows = cursor.fetchall()
+
+        with connection.cursor() as cursor:
+            cursor.execute(annual_income_query)
+            annual_data_rows = cursor.fetchall()
+
+        with connection.cursor() as cursor:
+            cursor.execute(median_prices_query, ['2019-09', 10])
+            median_prices_rows = cursor.fetchall()
+
+        #Now merge all this data into one
+
+        crime_data_map_by_state = {}
+
+        for each_row in crime_data_rows:
+            crime_data_map_by_state[each_row[3]] = each_row
+
+        school_data_map_by_state = {}
+
+        for each_row in school_data_rows:
+            school_data_map_by_state[each_row[2]] = each_row
+
+        annual_data_map_by_state = {}
+
+        for each_row in annual_data_rows:
+            annual_data_map_by_state[each_row[3]] = each_row
+
+        median_price_map_by_state = {}
+        for each_row in median_prices_rows:
+            median_price_map_by_state[each_row[2]] = each_row
+
+
+        keys = crime_data_map_by_state.keys()
+        full_dataset = []
+        idx = 0
+        states = {}
+        for each_key in keys:
+            each_data_instance = []
+            crime_data = crime_data_map_by_state[each_key]
+            school_data = school_data_map_by_state[each_key]
+            annual_data = annual_data_map_by_state[each_key]
+            median_price = median_price_map_by_state[each_key]
+
+            each_data_instance.append(crime_data[0])
+            each_data_instance.append(crime_data[1])
+            each_data_instance.append(school_data[0])
+            each_data_instance.append(annual_data[0])
+            each_data_instance.append(annual_data[1])
+            each_data_instance.append(median_price[0])
+            states[idx] = each_key
+            idx += 1
+            full_dataset.append(each_data_instance)
+
+        numpy_dataset = np.array(full_dataset, dtype=np.float)
+
+        similarity_values = dst.squareform(dst.pdist(numpy_dataset, 'euclidean'))
+
+        current_state_idx = None
+        for idx in range(len(states)):
+            state_name = states[idx]
+            if selected_state == state_name:
+                current_state_idx = idx
+
+
+        interested_row = similarity_values[current_state_idx, :]
+
+        dict = {}
+        idx = 0
+        for each in interested_row:
+            dict[each] = idx
+            idx += 1
+
+        sorted_vals = sorted(dict.keys())
+
+        similar_states = []
+
+        for val in sorted_vals:
+            if val == 0.0:
+                continue
+            if len(similar_states) < 3:
+                current_idx = dict.get(val)
+                state_name = states[current_idx]
+                similar_states.append(state_name)
+            else:
+                break
+
+        states_query = "select id, state_code, name from state where name in (%s, %s, %s)"
+        with connection.cursor() as cursor:
+            cursor.execute(states_query, similar_states)
+            state_rows = cursor.fetchall()
+
+        data = []
+
+        for each_row in state_rows:
+            each_data_dict = {}
+            each_data_dict['name'] = each_row[2]
+            each_data_dict['state_code'] = each_row[1]
+            each_data_dict['id'] = each_row[0]
+
             data.append(each_data_dict)
 
         return JsonResponse(data, safe=False)

@@ -51,6 +51,7 @@ urlpatterns = [
     path("api/best_zips/", get_best_zips),
     path("api/safe_counties/", get_safe_counties),
     path("api/affordable/", get_affordable_counties),
+    path("api/similar_states/", get_similar_states),
     # Your stuff: custom urls go here
 ]
 
