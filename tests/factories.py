@@ -64,3 +64,7 @@ def create_crime_data(**kwargs):
     zipcode = create_zip_code()
     kwargs["zipcode"] = zipcode
     return G(apps.get_model("visualization", "CrimeData"), **kwargs)
+
+
+def create_predicted_prices(**kwargs):
+    return G(apps.get_model("visualization", "PredictedPrices"), **kwargs)

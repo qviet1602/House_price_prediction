@@ -45,3 +45,25 @@ def test_affordable_api(client):
     assert len(results) == 1
     expected_keys = ('county', 'state', 'avg_annual_income')
     assert set(expected_keys).issubset(results[0].keys())
+
+
+def test_predicted_prices_api_with_no_query_param(client):
+    url = reverse("predicted-prices")
+    response = client.json.get(url)
+    assert response.status_code == 400
+    assert response.data['error'] == 'county_id or home_type_id is not provided.'
+
+
+def test_predicted_prices_api_with_valid_data(client):
+    f.create_predicted_prices(county_id=3, home_type_id=3, y_pred=12342.40)
+    url = reverse("predicted-prices") + "?county_id=3&home_type_id=3"
+    response = client.json.get(url)
+    assert response.status_code == 200
+    expected_keys = ('county_id', 'home_type_id', 'predicted_price')
+    assert set(expected_keys).issubset(response.data.keys())
+
+
+def test_predicted_prices_api_when_predicted_price_not_available(client):
+    url = reverse("predicted-prices") + "?county_id=1&home_type_id=1"
+    response = client.json.get(url)
+    assert response.status_code == 204
