@@ -69,21 +69,26 @@ class PredictedPricesView(APIView):
 
     def get(self, request, format=None):
 
-        county_id, home_type_id = (
-            request.query_params.get("county_id", None),
+        county_name, home_type_id = (
+            request.query_params.get("county_name", None),
             request.query_params.get("home_type_id", None),
         )
-        if county_id and home_type_id:
+        if county_name and home_type_id:
             try:
-                county_id, home_type_id = float(county_id), float(home_type_id)
+                county_name, home_type_id = county_name, float(home_type_id)
             except ValueError:
                 return response.BadRequest(
-                    {"error": "county_id/home_type_id information is not correct."}
+                    {"error": "county_name/home_type_id information is not correct."}
                 )
 
             # The year and month are constantly 2020 and 9 repsectively for now.
             # TODO: Make this dynamic when we make this project
             # more dynamic
+
+            county_obj = models.County.objects.filter(name__icontains=county_name).first()
+            if not county_obj:
+                return response.BadRequest({"error": "county_name is not correct."})
+            county_id = county_obj.id
 
             instance = models.PredictedPrices.objects.filter(county_id=county_id, home_type_id=home_type_id).first()
 
@@ -93,5 +98,5 @@ class PredictedPricesView(APIView):
             return response.Ok(serializer.data)
 
         return response.BadRequest(
-            {"error": "county_id or home_type_id is not provided."}
+            {"error": "county_name or home_type_id is not provided."}
         )
