@@ -1,19 +1,14 @@
-
 .graphical-exploration {
   display: block;
-  position: fixed;
+  position: absolute;
   left: 0;
-  height: 100%;
+  height: 2630px;
   width: 100%;
 }
 
 .active {
   stroke-width: 4;
 }
-
-/* .selected {
-  fill: rgb(84, 172, 94);
-} */
 
 .hidden {
   /* visibility: hidden; */
@@ -25,7 +20,7 @@
 .menu-item,
 .menu-item-label,
 .state-node,
-/* .state-node-label, */
+.county-node,
 .right-click-menu-item,
 .right-click-menu-item-label {
   cursor: pointer;
