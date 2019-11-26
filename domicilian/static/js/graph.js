@@ -17,22 +17,35 @@ var height = parseInt(svg.style('height'))
 var menu = svg.append('g')
   .attr('class', 'menu');
 
-createMenu();
+// Adjust nodes, labels, and lines on scroll to remain in view at all times
+// This allows the user to scroll through the state list without losing their existing nodes
+d3.select(window).on('scroll', function() {
+  removeRightClickMenu();
 
-// This is a hacky scroll bar since SVGs do not handle scroll events well
-// TODO: Scale this for screen size so that users can access all states
-// TODO: Make sure this works properly
-svg.append('circle')
-  .attr('r', 10)
-  .attr('cx', width - 10)
-  .attr('cy', 0 + 10)
-  .call(d3.drag()
-    .on('drag', function() {
-      if (d3.event.y > 10 && d3.event.y < height - 10) {
-        d3.select(this).attr('cy', d3.event.y)
-        d3.select('.menu').attr('transform', 'translate(0, ' + -d3.event.y + ')').attr('y-translation', d3.event.y);
-      }
-    }))
+  // Move all state nodes, labels, and lines with scroll
+  var nodes = d3.selectAll('.state .state-node');
+  nodes.each(function(d, i) {
+    var y = d3.select(this).attr('original-y');
+
+    d3.select(this).attr('cy', parseInt(y) + window.scrollY)
+    d3.select(this.parentNode).select('.state-node-label').attr('y', parseInt(y) - 30 + window.scrollY);
+    d3.select(this.parentNode).selectAll('line').each(function() {
+      d3.select(this).attr('y1', parseInt(y) + window.scrollY);
+    })
+  });
+
+  // Move all county nodes, labels, and lines with scroll
+  nodes = d3.selectAll('.counties .county-node');
+  nodes.each(function(d, i) {
+    var y = d3.select(this).attr('original-y');
+
+    d3.select(this).attr('cy', parseInt(y) + window.scrollY)
+    d3.select(d3.select(this.parentNode).selectAll('text').nodes()[i % 5]).attr('y', parseInt(y) - 30 + window.scrollY);
+    d3.select(d3.select(this.parentNode).selectAll('line').nodes()[i % 5]).attr('y2', parseInt(y) + window.scrollY);
+  });
+})
+
+createMenu();
 
 /**
  * List of main functions and brief description
@@ -151,6 +164,7 @@ function createStateNode(stateName, x, y) {
       .attr('r', '20px')
       .attr('cx', x)
       .attr('cy', y)
+      .attr('original-y', y - window.scrollY)
       .attr('fill', nodeColors[totalNodes])
       .attr('stroke', 'black')
       .attr('stroke-width', '2')
@@ -219,7 +233,7 @@ function dragSimilarStates() {
     var similarStates = ['Washington', 'California'];
 
     for (var i = 0; i < similarStates.length; i++) {
-      createStateNode(similarStates[i], d3.event.x + i * 100, d3.event.y + i * 100);
+      createStateNode(similarStates[i], d3.event.x + i * 100, d3.event.y + window.scrollY + i * 100);
       d3.select('.' + genClassName(similarStates[i]) + '-menu-item').attr('fill', nodeColors[i + 1]);
     }
 
@@ -321,6 +335,7 @@ function createCountyNodes(stateName, countyList) {
     .attr('r', '20px')
     .attr('cx', cx)
     .attr('cy', cy)
+    .attr('original-y', parseInt(cy) - window.scrollY)
     .attr('fill', fill)
     .attr('stroke', 'black')
     .attr('stroke-width', '2')
@@ -347,6 +362,7 @@ function createCountyNodes(stateName, countyList) {
     .attr('r', '15px')
     .attr('cx', function (_, i) { return parseInt(stateNode.attr('cx')) - 100 + i * 50 })
     .attr('cy', parseInt(stateNode.attr('cy')) + 100)
+    .attr('original-y', parseInt(stateNode.attr('cy')) + 100 - window.scrollY)
     .attr('fill', stateNode.attr('fill'))
     .attr('stroke', 'black')
     .attr('stroke-width', 2)
@@ -424,6 +440,10 @@ function countyNodeOnDrag(countyName) {
 // Node drag end function
 function nodeOnDragEnd(d) {
   d3.select(this).classed('active', false);
+
+  // Reset original-y value to account for scroll
+  var y = d3.select(this).attr('cy');
+  d3.select(this).attr('original-y', parseInt(y) - window.scrollY);
 }
 
 function displayStats(className) {
@@ -482,7 +502,7 @@ function createRightClickMenu(stateName) {
     .attr('class', 'right-click-menu-item')
     .attr('height', rightClickMenuItemHeight)
     .attr('width', 210)
-    .attr('y', function (_, i) { return d3.event.y + i * 40 })
+    .attr('y', function (_, i) { return d3.event.y + window.scrollY + i * 40 })
     .attr('x', d3.event.x)
     .attr('fill', 'rgb(81, 116 ,187)')
     .attr('stroke', 'rgb(57, 83, 137)')
@@ -493,7 +513,7 @@ function createRightClickMenu(stateName) {
     .data(options)
     .enter().append('text')
     .attr('class', 'right-click-menu-item-label')
-    .attr('y', function (d, i) { return d3.event.y + i * 40 + 25 })
+    .attr('y', function (d, i) { return d3.event.y + window.scrollY + i * 40 + 25 })
     .attr('x', d3.event.x + 10)
     .attr('font-size', '15px')
     .attr('fill', 'white')
