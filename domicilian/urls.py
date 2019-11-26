@@ -45,7 +45,12 @@ urlpatterns = [
     path("api/county_data_rental/", get_county_data_rental),
     path("api/zip_data_purchase/", get_zip_data_purchase),
     path("api/state_data_purchase/", get_state_data_purchase),
-    path("api/state_data_rental/", get_state_data_rental)
+    path("api/state_data_rental/", get_state_data_rental),
+    path("api/node_stats/", get_node_stats),
+    path("api/best_counties/", get_best_counties),
+    path("api/best_zips/", get_best_zips),
+    path("api/safe_counties/", get_safe_counties),
+    path("api/affordable/", get_affordable_counties),
     # Your stuff: custom urls go here
 ]
 

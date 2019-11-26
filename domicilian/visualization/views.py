@@ -4,6 +4,8 @@ from rest_framework.decorators import authentication_classes
 from rest_framework.decorators import permission_classes
 from django.db import connection
 from django.http import JsonResponse
+from decimal import Decimal
+from collections import OrderedDict
 
 @api_view(['GET'])
 @csrf_exempt
@@ -427,5 +429,416 @@ def get_zip_data_purchase(request):
             home_data_dict = {}
             home_data_dict[each_home_type] = last_year_data
             data.append(home_data_dict)
+
+        return JsonResponse(data, safe=False)
+
+@api_view(['GET'])
+@csrf_exempt
+@authentication_classes([])
+@permission_classes([])
+def get_node_stats(request):
+    if request.method == 'GET':
+        node_data = request.GET.get('node_data', 'state_Alabama')
+        node_type, node_id = node_data.split("_")
+        statistics = {}
+        if node_type == 'state':
+            state_query = "select id from state where name = %s"
+            with connection.cursor() as cursor:
+                cursor.execute(state_query, [node_id])
+                state_row = cursor.fetchone()
+
+            node_id = state_row[0]
+
+            crime_data_query = "select avg(violent_crime), avg(property_crime) from crime_data where zipcode_id " \
+                               "in (select id from zipcode where zipcode.state_id = %s)"
+
+            with connection.cursor() as cursor:
+                cursor.execute(crime_data_query, [node_id])
+                crime_data_row = cursor.fetchone()
+
+            violent_crime = crime_data_row[0]
+            property_crime = crime_data_row[1]
+
+            statistics['violent_crime'] = round(violent_crime, 2)
+            statistics['property_crime'] = round(property_crime, 2)
+
+            schools_query = "select count(*) from school_data where schooldigger_rating is not null " \
+                            "and schooldigger_rating >= 3 and zipcode_id in (select id from zipcode where state_id = %s)"
+
+            with connection.cursor() as cursor:
+                cursor.execute(schools_query, [node_id])
+                school_data_row = cursor.fetchone()
+
+            num_of_schools = school_data_row[0]
+            statistics['num_of_schools'] = num_of_schools
+
+            annual_income_query = "select avg(avg_annual_income), avg(median_annual_income) from annual_income where zipcode_id " \
+                                  "in (select id from zipcode where state_id = %s)"
+
+            with connection.cursor() as cursor:
+                cursor.execute(annual_income_query, [node_id])
+                annual_income_data_row = cursor.fetchone()
+
+            avg_avg_annual_income = annual_income_data_row[0]
+            avg_median_annual_income = annual_income_data_row[1]
+            statistics['avg_avg_annual_income'] = round(avg_avg_annual_income, 2)
+            statistics['avg_median_annual_income'] = round(avg_median_annual_income, 2)
+
+            us_avg = Decimal(28555.0)
+
+            avg_diff = avg_avg_annual_income - us_avg
+            is_affordable = False
+            if avg_diff < 0 or avg_diff < 10000:
+                is_affordable = True
+
+            statistics['is_affordable'] = is_affordable
+
+        elif node_type == 'county':
+            node_id = int(node_id)
+            crime_data_query = "select avg(violent_crime), avg(property_crime) from crime_data where zipcode_id " \
+                               "in (select id from zipcode where county_id = %s)"
+
+            with connection.cursor() as cursor:
+                cursor.execute(crime_data_query, [node_id])
+                crime_data_row = cursor.fetchone()
+
+            violent_crime = crime_data_row[0]
+            property_crime = crime_data_row[1]
+
+            statistics['violent_crime'] = round(violent_crime, 2)
+            statistics['property_crime'] = round(property_crime, 2)
+
+            schools_query = "select count(*) from school_data where schooldigger_rating is not null " \
+                            "and schooldigger_rating >= 3 and zipcode_id in (select id from zipcode where county_id = %s)"
+
+            with connection.cursor() as cursor:
+                cursor.execute(schools_query, [node_id])
+                school_data_row = cursor.fetchone()
+
+            num_of_schools = school_data_row[0]
+            statistics['num_of_schools'] = num_of_schools
+
+            annual_income_query = "select avg(avg_annual_income), avg(median_annual_income) from annual_income where zipcode_id " \
+                                  "in (select id from zipcode where county_id = %s)"
+
+            with connection.cursor() as cursor:
+                cursor.execute(annual_income_query, [node_id])
+                annual_income_data_row = cursor.fetchone()
+
+            avg_avg_annual_income = annual_income_data_row[0]
+            avg_median_annual_income = annual_income_data_row[1]
+            statistics['avg_avg_annual_income'] = round(avg_avg_annual_income, 2)
+            statistics['avg_median_annual_income'] = round(avg_median_annual_income, 2)
+
+            us_avg = Decimal(28555.0)
+
+            avg_diff = avg_avg_annual_income - us_avg
+            is_affordable = False
+            if avg_diff < 0 or avg_diff < 10000:
+                is_affordable = True
+
+            statistics['is_affordable'] = is_affordable
+
+        elif node_type == 'zipcode':
+            node_id = int(node_id)
+            print("Zipcode Id ", node_id)
+            crime_data_query = "select violent_crime, property_crime from crime_data where zipcode_id = %s"
+
+            with connection.cursor() as cursor:
+                cursor.execute(crime_data_query, [node_id])
+                crime_data_row = cursor.fetchone()
+
+            violent_crime = crime_data_row[0]
+            property_crime = crime_data_row[1]
+
+            statistics['violent_crime'] = round(violent_crime, 2)
+            statistics['property_crime'] = round(property_crime, 2)
+
+            schools_query = "select count(*) from school_data where schooldigger_rating is not null " \
+                            "and schooldigger_rating >= 3 and zipcode_id = %s"
+
+            with connection.cursor() as cursor:
+                cursor.execute(schools_query, [node_id])
+                school_data_row = cursor.fetchone()
+
+            num_of_schools = school_data_row[0]
+            statistics['num_of_schools'] = num_of_schools
+
+            annual_income_query = "select avg_annual_income, median_annual_income from annual_income where zipcode_id = %s"
+
+            with connection.cursor() as cursor:
+                cursor.execute(annual_income_query, [node_id])
+                annual_income_data_row = cursor.fetchone()
+
+            avg_avg_annual_income = annual_income_data_row[0]
+            avg_median_annual_income = annual_income_data_row[1]
+            statistics['avg_avg_annual_income'] = round(avg_avg_annual_income, 2)
+            statistics['avg_median_annual_income'] = round(avg_median_annual_income, 2)
+
+            us_avg = Decimal(28555.0)
+
+            avg_diff = avg_avg_annual_income - us_avg
+            is_affordable = False
+            if avg_diff < 0 or avg_diff < 10000:
+                is_affordable = True
+
+            statistics['is_affordable'] = is_affordable
+
+        return JsonResponse(statistics, safe=False)
+
+
+@api_view(['GET'])
+@csrf_exempt
+@authentication_classes([])
+@permission_classes([])
+def get_best_counties(request):
+    if request.method == 'GET':
+        state_name = request.GET.get('state_name', 'Alabama')
+
+        #Find counties with least crime rate
+        final_county_ids = set()
+        limit = 40
+
+        total_ids = 0
+        iteration = 0
+        while total_ids < 5:
+            iteration += 1
+            crime_data_query = "select avg(violent_crime), avg(property_crime), zipcode.county_id, county.name from " \
+                               "crime_data inner join zipcode on crime_data.zipcode_id = zipcode.id " \
+                               "inner join county on zipcode.county_id = county.id " \
+                               "inner join state on zipcode.state_id = state.id where state.name = %s  " \
+                               "group by county.name, zipcode.county_id " \
+                               "order by avg(crime_data.violent_crime) asc, avg(crime_data.property_crime) asc limit %s"
+            with connection.cursor() as cursor:
+                cursor.execute(crime_data_query, [state_name, limit])
+                crime_data_row = cursor.fetchall()
+
+            county_ids1 = []
+            for each_row in crime_data_row:
+                county_ids1.append(each_row[2])
+
+            school_data_row = "select count(*), zipcode.county_id, county.name from school_data " \
+                              "inner join zipcode on school_data.zipcode_id = zipcode.id " \
+                              "inner join county on zipcode.county_id = county.id " \
+                              "inner join state on zipcode.state_id = state.id " \
+                              "where state.name = %s and schooldigger_rating is not null " \
+                              "and schooldigger_rating > %s group by county.name, zipcode.county_id order by count(*) desc limit %s"
+
+            with connection.cursor() as cursor:
+                cursor.execute(school_data_row, [state_name, 2, limit])
+                school_data_row = cursor.fetchall()
+
+            county_ids2 = []
+
+            for each_row in school_data_row:
+                county_ids2.append(each_row[1])
+
+
+            annual_income_query = "select avg(avg_annual_income), avg(median_annual_income), zipcode.county_id, county.name from " \
+                               "annual_income inner join zipcode on annual_income.zipcode_id = zipcode.id " \
+                               "inner join county on zipcode.county_id = county.id " \
+                               "inner join state on zipcode.state_id = state.id where state.name = %s  " \
+                               "group by county.name, zipcode.county_id " \
+                               "order by avg(annual_income.avg_annual_income) asc, avg(annual_income.median_annual_income) asc limit %s"
+            with connection.cursor() as cursor:
+                cursor.execute(annual_income_query, [state_name, limit])
+                annual_income_data_row = cursor.fetchall()
+
+            county_ids3 = []
+            for each_row in annual_income_data_row:
+                county_ids3.append(each_row[2])
+
+
+            first_common_data = []
+
+            for i in range(len(county_ids1)):
+                if county_ids1[i] in county_ids2:
+                    first_common_data.append(county_ids1[i])
+            final_list = []
+            for i in range(len(first_common_data)):
+                if first_common_data[i] in county_ids3:
+                    final_list.append(first_common_data[i])
+
+
+            print("Len ", len(final_list))
+            total_ids = len(final_list)
+            final_county_ids = final_list
+            if total_ids < 5:
+                limit += 100
+
+            if iteration > 4:
+                break
+
+        county_str = ""
+        for each in final_county_ids:
+            county_str = county_str + "'" + str(each) + "',"
+        county_str = county_str[:-1]
+
+        county_query = "select id, name from county where id in (" + county_str + ")"
+        with connection.cursor() as cursor:
+            cursor.execute(county_query)
+            county_data_rows = cursor.fetchall()
+
+        data = []
+
+        for each_row in county_data_rows:
+            each_data_dict = {}
+            each_data_dict['id'] = each_row[0]
+            each_data_dict['name'] = each_row[1][:-6]
+            data.append(each_data_dict)
+
+        data = data[0:5]
+
+        return JsonResponse(data, safe=False)
+
+
+@api_view(['GET'])
+@csrf_exempt
+@authentication_classes([])
+@permission_classes([])
+def get_best_zips(request):
+    if request.method == 'GET':
+        state_name = request.GET.get('state_name', 'Alabama')
+
+        #Find zips with least crime rate
+        final_zip_ids = set()
+        limit = 40
+
+        total_ids = 0
+        iteration = 0
+        while total_ids < 5:
+            iteration += 1
+            crime_data_query = "select violent_crime, property_crime, zipcode_id, zipcode.zip_code from " \
+                               "crime_data inner join zipcode on crime_data.zipcode_id = zipcode.id " \
+                               "inner join state on zipcode.state_id = state.id where state.name = %s  " \
+                               "order by crime_data.violent_crime asc, crime_data.property_crime asc limit %s"
+            with connection.cursor() as cursor:
+                cursor.execute(crime_data_query, [state_name, limit])
+                crime_data_row = cursor.fetchall()
+
+            zipcode_ids1 = []
+            for each_row in crime_data_row:
+                zipcode_ids1.append(each_row[2])
+
+            school_data_row = "select count(*), zipcode_id, zipcode.zip_code from school_data " \
+                              "inner join zipcode on school_data.zipcode_id = zipcode.id " \
+                              "inner join state on zipcode.state_id = state.id " \
+                              "where state.name = %s and schooldigger_rating is not null " \
+                              "and schooldigger_rating > %s group by zipcode_id, zipcode.zip_code order by count(*) desc limit %s"
+
+            with connection.cursor() as cursor:
+                cursor.execute(school_data_row, [state_name, 2, limit])
+                school_data_row = cursor.fetchall()
+
+            zipcode_ids2 = []
+
+            for each_row in school_data_row:
+                zipcode_ids2.append(each_row[1])
+
+
+            annual_income_query = "select avg_annual_income, median_annual_income, zipcode_id, zipcode.zip_code from " \
+                               "annual_income inner join zipcode on annual_income.zipcode_id = zipcode.id " \
+                               "inner join state on zipcode.state_id = state.id where state.name = %s  " \
+                               "order by annual_income.avg_annual_income asc, annual_income.median_annual_income asc limit %s"
+            with connection.cursor() as cursor:
+                cursor.execute(annual_income_query, [state_name, limit])
+                annual_income_data_row = cursor.fetchall()
+
+            zipcode_ids3 = []
+            for each_row in annual_income_data_row:
+                zipcode_ids3.append(each_row[2])
+
+
+            first_common_data = []
+
+            for i in range(len(zipcode_ids1)):
+                if zipcode_ids1[i] in zipcode_ids2:
+                    first_common_data.append(zipcode_ids1[i])
+            final_list = []
+            for i in range(len(first_common_data)):
+                if first_common_data[i] in zipcode_ids3:
+                    final_list.append(first_common_data[i])
+
+
+            print("Len ", len(final_list))
+            total_ids = len(final_list)
+            final_zip_ids = final_list
+            if total_ids < 5:
+                limit += 100
+
+            if iteration > 4:
+                break
+
+        zip_str = ""
+        for each in final_zip_ids:
+            zip_str = zip_str + "'" + str(each) + "',"
+        zip_str = zip_str[:-1]
+
+        zip_query = "select id, zip_code from zipcode where id in (" + zip_str + ")"
+        with connection.cursor() as cursor:
+            cursor.execute(zip_query)
+            zip_data_rows = cursor.fetchall()
+
+        data = []
+
+        for each_row in zip_data_rows:
+            each_data_dict = {}
+            each_data_dict['id'] = each_row[0]
+            each_data_dict['name'] = each_row[1]
+            data.append(each_data_dict)
+
+        data = data[0:5]
+
+        return JsonResponse(data, safe=False)
+
+@api_view(['GET'])
+@csrf_exempt
+@authentication_classes([])
+@permission_classes([])
+def get_safe_counties(request):
+    if request.method == 'GET':
+        state_name = request.GET.get('state_name', 'Alabama')
+
+        crime_data_query = "select avg(violent_crime), avg(property_crime), zipcode.county_id, county.name from " \
+                           "crime_data inner join zipcode on crime_data.zipcode_id = zipcode.id " \
+                           "inner join county on zipcode.county_id = county.id " \
+                           "inner join state on zipcode.state_id = state.id where state.name = %s  " \
+                           "group by county.name, zipcode.county_id " \
+                           "order by avg(crime_data.violent_crime) asc, avg(crime_data.property_crime) asc limit %s"
+        with connection.cursor() as cursor:
+            cursor.execute(crime_data_query, [state_name, 5])
+            crime_data_row = cursor.fetchall()
+
+        data = []
+
+        for each_row in crime_data_row:
+            each_data_dict = {}
+            each_data_dict['id'] = each_row[2]
+            each_data_dict['name'] = each_row[3]
+            data.append(each_data_dict)
+
+        return JsonResponse(data, safe=False)
+
+def get_affordable_counties(request):
+    if request.method == 'GET':
+        state_name = request.GET.get('state_name', 'Alabama')
+
+        annual_income_query = "select avg(avg_annual_income), avg(median_annual_income), zipcode.county_id, county.name from " \
+                              "annual_income inner join zipcode on annual_income.zipcode_id = zipcode.id " \
+                              "inner join county on zipcode.county_id = county.id " \
+                              "inner join state on zipcode.state_id = state.id where state.name = %s  " \
+                              "group by county.name, zipcode.county_id having avg(avg_annual_income) <= %s" \
+                              "order by avg(annual_income.avg_annual_income) asc, avg(annual_income.median_annual_income) asc limit %s"
+        with connection.cursor() as cursor:
+            cursor.execute(annual_income_query, [state_name, 38555, 5])
+            annual_data_row = cursor.fetchall()
+
+        data = []
+
+        for each_row in annual_data_row:
+            each_data_dict = {}
+            each_data_dict['id'] = each_row[2]
+            each_data_dict['name'] = each_row[3]
+            data.append(each_data_dict)
 
         return JsonResponse(data, safe=False)
