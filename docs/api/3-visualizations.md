@@ -632,3 +632,24 @@ __Response__:
     ]
 }
 ```
+
+
+## Get Predicted Prices
+
+```
+GET /api/predicted_prices?county_id=3&home_type_id=3
+```
+
+__NOTE__: This API accepts mandatory parameter `county_id` and `type_id` to give corresponding predicted price for year 2020 and month 09.
+
+__NOTE__: In case the predicted prices for a given combination of county_id and home_type_id are not available, client will get a `204: No Content` status code with empty body.
+
+__Response__:
+
+```json
+{
+    "county_id": 3.0,
+    "predicted_price": 44138.0,
+    "home_type_id": 3.0
+}
+```

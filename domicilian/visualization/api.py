@@ -60,7 +60,8 @@ class AffordableCountiesViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 
 class PredictedPricesView(APIView):
     """
-    A view that returns predicted prices.
+    A view that returns predicted prices for given `county_id`
+    and `home_type_id`.
     """
 
     permission_classes = [AllowAny]
@@ -85,6 +86,9 @@ class PredictedPricesView(APIView):
             # more dynamic
 
             instance = models.PredictedPrices.objects.filter(county_id=county_id, home_type_id=home_type_id).first()
+
+            if not instance:
+                return response.NoContent()
             serializer = serializers.PredictedPricesSerializer(instance)
             return response.Ok(serializer.data)
 
