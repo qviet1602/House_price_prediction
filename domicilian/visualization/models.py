@@ -306,6 +306,23 @@ class NeighborhoodTimeseries(models.Model):
         db_table = "neighborhood_timeseries"
 
 
+class PredictedPrices(models.Model):
+    index = models.BigIntegerField(blank=True, null=True)
+    schooldigger_rating = models.FloatField(blank=True, null=True)
+    average_standard_score = models.FloatField(blank=True, null=True)
+    county_id = models.FloatField(blank=True, null=True)
+    violent_crime = models.FloatField(blank=True, null=True)
+    property_crime = models.FloatField(blank=True, null=True)
+    home_type_id = models.FloatField(blank=True, null=True)
+    year = models.BigIntegerField(blank=True, null=True)
+    month = models.FloatField(blank=True, null=True)
+    y_pred = models.FloatField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'predicted_prices'
+
+
 class SchoolData(models.Model):
     zipcode = models.ForeignKey("Zipcode", models.DO_NOTHING)
     school_name = models.CharField(max_length=150, blank=True, null=True)
