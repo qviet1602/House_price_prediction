@@ -24,7 +24,7 @@ function ready([us, rental, purchase]) {
         hash_value['RegionName'] = rental[i]['name']
         hash_value['RegionID'] = rental[i]['state_code']
         hash_value['2019-09'] = rental[i]['list_price']
-        rentalPrices.set(key, hash_value); 	
+        rentalPrices.set(key, hash_value);
    }
    for(var i=0; i<purchase.length;i++) {
 	key = purchase[i]['name']
@@ -32,7 +32,7 @@ function ready([us, rental, purchase]) {
         hash_value['RegionName'] = purchase[i]['name']
         hash_value['RegionID'] = purchase[i]['state_code']
         hash_value['2019-09'] = purchase[i]['list_price']
-        purchasePrices.set(key, hash_value); 	
+        purchasePrices.set(key, hash_value);
    }
   // Default to rental prices
   updateMap(us, rentalPrices, d3.schemeBlues[9], 'Zillow Rent Index (ZRI)');
@@ -78,12 +78,23 @@ function updateMap(us, prices, colorScheme, index) {
       }
     })
     .attr('stroke', 'black')
+    .attr('stroke-width', 1)
     .attr('d', path)
     .on('click', function(d) {
+      // var text = d.properties.name;
+      // var price = prices.get(text);
+
+      var state = d.properties.name;
+      document.cookie = 'state=' + state;
+
       // TODO: Click should take user to state county screen
-      var text = d.properties.name;
-      var price = prices.get(text);
     })
+    .on('mouseover', function() {
+      d3.select(this).attr('stroke-width', 3)
+    })
+    .on('mouseout', function () {
+      d3.select(this).attr('stroke-width', 1)
+    });
 
 
   // TODO: Update the legend without removing it each time
