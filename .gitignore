@@ -103,3 +103,6 @@ Session.vim
 
 # PID files
 *.pid
+
+# IPython notebook checkpoints
+*.ipynb_checkpoints/
