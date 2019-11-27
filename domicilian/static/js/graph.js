@@ -252,8 +252,160 @@ function showBestCounties(stateName) {
      d3.json("/api/best_counties/?state_name=" + stateName)
   .then(function(data){
     //var countyList = ['County A', 'County B', 'County C', 'County D', 'County E']
-           createCountyNodes(stateName, data, 'county');
+    createCountyNodes(stateName, data, 'county');
+    //createForceCountyNodes(stateName, data)
   });
+}
+
+function createForceCountyNodes(stateName, data) {
+    var linkNodes = [{ id: stateName, idx: - 1, group: 0}];
+
+    var color = d3.schemeCategory10;
+    var links = []
+    var width = 500;
+    var height = 500;
+
+    for(var i=0; i <data.length; i++) {
+        each = data[i]
+        linkNodes.push({id: each['name'], idx: each['id'], group: 0})
+        links.push({ source: stateName, target: each['name'], value: 2})
+    }
+
+    var simulation = d3.forceSimulation()
+    .force("link", d3.forceLink().id(function(d) { return d.id; }).distance(200))
+    .force("charge", d3.forceManyBody())
+    .force("center", d3.forceCenter(width / 2, height / 2));
+
+    var link = svg.append("g")
+      .attr("class", "links")
+    .selectAll("line")
+    .data(links)
+    .enter().append("line")
+      .attr("stroke-width", function(d) { return Math.sqrt(d.value); });
+
+  var node = svg.append("g")
+      .attr("class", "nodes")
+    .selectAll("g")
+    .data(linkNodes)
+    .enter().append("g")
+    .on("mouseover", mouseover)
+    .on("mouseout", mouseout)
+
+  var circles = node.append("circle")
+      .attr("r", 15)
+      .attr("fill", function(d) { return color[d.group]; })
+      .call(d3.drag()
+          .on("start", dragstarted)
+          .on("drag", dragged)
+          .on("end", dragended));
+
+  var lables = node.append("text")
+      .text(function(d) {
+        return d.id;
+      })
+      .attr('x', 6)
+      .attr('y', 3);
+
+  node.append("title")
+      .text(function(d) { return d.id; });
+
+  simulation
+      .nodes(linkNodes)
+      .on("tick", ticked);
+
+  simulation.force("link")
+      .links(links);
+
+  function ticked() {
+    link
+        .attr("x1", function(d) { return d.source.x; })
+        .attr("y1", function(d) { return d.source.y; })
+        .attr("x2", function(d) { return d.target.x; })
+        .attr("y2", function(d) { return d.target.y; });
+
+    node
+        .attr("transform", function(d) {
+          return "translate(" + d.x + "," + d.y + ")";
+        })
+  }
+
+  function dragstarted(d) {
+  if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+  d.fx = d.x;
+  d.fy = d.y;
+}
+
+function dragged(d) {
+  d.fx = d3.event.x;
+  d.fy = d3.event.y;
+}
+
+function dragended(d) {
+  if (!d3.event.active) simulation.alphaTarget(0);
+  d.fx = null;
+  d.fy = null;
+}
+
+function mouseover(d, i) {
+  node_type = 'state'
+  node_id = stateName
+  if(i > 0) {
+    node_type = 'county'
+    node_id = d['idx']
+  }
+
+  var x = d.x
+  var y = d.y
+   node_data = node_type + "_" + node_id
+    d3.json("/api/node_stats/?node_data=" + node_data)
+      .then(function(data){
+        if (d3.select('.stat-box').empty()) {
+    var statBox = svg.append('g').attr('class', 'stat-box');
+
+    //var node = d3.select(className);
+    //var x = parseInt(node.attr('cx')) + 10;
+    //var y = parseInt(node.attr('cy')) + 10;
+
+    statBox.append('rect')
+      .attr('class', 'stat-box')
+      .attr('height', '150px')
+      .attr('width', '250px')
+      .attr('x', x)
+      .attr('y', y)
+      .attr('fill', 'rgb(81, 116 ,187)')
+      .attr('stroke', 'rgb(57, 83, 137)')
+      .attr('stroke-width', 2)
+
+    is_affordable =  data['is_affordable'] == true ? "Yes" : "No",
+    stats = [
+      'Violent Crime: ' + data['violent_crime'],
+      'Property Crime: ' + data['property_crime'],
+      'Best Schools Count: ' + data['num_of_schools'],
+      'Avg Annual Income: ' + data['avg_avg_annual_income'],
+      'Avg Median Income: ' + data['avg_median_annual_income'],
+      'Affordable: ' + is_affordable,
+      'Median Price Prediction: ' + 80000
+    ];
+
+    statBox.selectAll('.stat-line')
+      .data(stats)
+      .enter().append('text')
+      .attr('class', 'stat-line')
+      .attr('y', function(_, i) { return y + 22 + 20 * i })
+      .attr('x', x + 12)
+      .attr('font-size', '15px')
+      .attr('fill', 'white')
+      .attr('text-anchor', 'start')
+      .text(function (d) { return d });
+  }
+     });
+}
+
+function mouseout() {
+  d3.select(this).select("circle").transition()
+      .duration(750)
+      .attr("r", 15);
+}
 
 }
 

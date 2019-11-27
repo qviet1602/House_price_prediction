@@ -655,6 +655,8 @@ def list_best_counties(state_name):
         final_county_ids = final_list
         if total_ids < 5:
             limit += 100
+        else:
+            break
 
         if iteration > 4:
             break
@@ -728,7 +730,6 @@ def list_best_zips(state_name):
         for each_row in annual_income_data_row:
             zipcode_ids3.append(each_row[2])
 
-        print("Total ", len(zipcode_ids1), len(zipcode_ids2), len(zipcode_ids3))
         first_common_data = []
 
         for i in range(len(zipcode_ids1)):
@@ -739,7 +740,6 @@ def list_best_zips(state_name):
             if first_common_data[i] in zipcode_ids3:
                 final_list.append(first_common_data[i])
 
-        print("Len ", len(final_list))
         total_ids = len(final_list)
         final_zip_ids = final_list
         if total_ids < 5:
@@ -993,7 +993,7 @@ def get_similar_states(request):
 
         return JsonResponse(data, safe=False)
 
-def similar_counties(all_counties_str):
+def similar_counties(all_counties_str, counties_list):
 
     # Get data for all best counties and aggregate this data into one dataset
     crime_data_query = "select avg(violent_crime), avg(property_crime), zipcode.county_id, county.name from " \
@@ -1033,7 +1033,6 @@ def similar_counties(all_counties_str):
         cursor.execute(median_prices_query)
         median_price_rows = cursor.fetchall()
 
-    print("County Lengths ", len(crime_data_rows), len(school_data_rows), len(annual_data_rows), len(median_price_rows))
     # Now merge all this data into one
 
     crime_data_map = {}
@@ -1333,7 +1332,7 @@ def get_similar_all(request):
 
         all_counties_str = all_counties_str[:-1]
 
-        data = similar_counties(all_counties_str)
+        data = similar_counties(all_counties_str, all_counties)
 
         final_data = dict()
         final_data['best_counties'] = data
@@ -1364,7 +1363,7 @@ def get_similar_all(request):
 
         all_counties_str = all_counties_str[:-1]
 
-        data = similar_counties(all_counties_str)
+        data = similar_counties(all_counties_str, all_counties)
 
         final_data['safe_counties'] = data
 
@@ -1391,7 +1390,7 @@ def get_similar_all(request):
 
         all_counties_str = all_counties_str[:-1]
 
-        data = similar_counties(all_counties_str)
+        data = similar_counties(all_counties_str, all_counties)
 
         final_data['affordable_counties'] = data
 
