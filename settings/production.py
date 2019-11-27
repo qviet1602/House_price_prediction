@@ -112,7 +112,8 @@ if ENABLE_MEDIA_UPLOAD_TO_S3:
 
 # Static Assets
 # ------------------------
-STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
+# STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
+STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
 
 # EMAIL
 # ------------------------------------------------------------------------------
@@ -126,7 +127,8 @@ EMAIL_PORT = env.int("EMAIL_PORT", default=587)
 # ------------------------------------------------------------------------------
 # Raises ImproperlyConfigured exception if DATABASE_URL not in os.environ
 DATABASES["default"].update(env.db("DATABASE_URL"))  # Don't override all db settings
-DATABASES["default"]["ENGINE"] = "django.contrib.gis.db.backends.postgis"
+# DATABASES["default"]["ENGINE"] = "django.contrib.gis.db.backends.postgis"
+DATABASES["default"]["ENGINE"] = "django.db.backends.postgresql"
 
 # CACHING
 # ------------------------------------------------------------------------------

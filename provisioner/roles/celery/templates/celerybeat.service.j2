@@ -15,4 +15,3 @@ ExecStart={{ venv_path }}/bin/celery beat -A {{ project_name }}  -l {{ celery_lo
 [Install]
 WantedBy=multi-user.target
 Alias=celerybeat-{{ project_namespace }}.service
-
