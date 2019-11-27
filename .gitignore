@@ -83,7 +83,7 @@ dump.rdb
 # python-dotenv
 .env
 
-# eater
+# domicilian
 _docs_html/
 media/
 provisioner/site.retry

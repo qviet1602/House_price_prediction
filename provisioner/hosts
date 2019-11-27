@@ -3,8 +3,8 @@
 
 [vagrant:vars]
 vm=1
-deploy_env=vagrant
-project_namespace={{ project_name }}-{{ deploy_env }}
+deploy_environment=vagrant
+project_namespace={{ project_name }}-{{ deploy_environment }}
 user=vagrant
 project_path=/home/vagrant/domicilian-web
 venv_path=/home/vagrant/venv
@@ -21,11 +21,11 @@ domicilian.sanyamkhurana.com
 
 [dev:vars]
 vm=0
-deploy_env=dev
+deploy_environment=dev
 user=ubuntu
-project_namespace={{ project_name }}-{{ deploy_env }}
-project_path=/home/ubuntu/{{ deploy_env }}/domicilian-web
-venv_path={{ project_path }}/venv
+project_namespace={{ project_name }}-{{ deploy_environment }}
+project_path=/home/ubuntu/{{ deploy_environment }}/domicilian-web
+venv_path=/home/ubuntu/{{ deploy_environment }}/{{ project_name }}-venv
 use_letsencrypt=True
 letsencrypt_email=skhurana39@gatech.edu
 django_requirements_file=requirements.txt
@@ -38,11 +38,11 @@ qa.domicilian.com
 
 [qa:vars]
 vm=0
-deploy_env=qa
+deploy_environment=qa
 user=ubuntu
-project_namespace={{ project_name }}-{{ deploy_env }}
-project_path=/home/ubuntu/{{ deploy_env }}/domicilian-web
-venv_path={{ project_path }}/venv
+project_namespace={{ project_name }}-{{ deploy_environment }}
+project_path=/home/ubuntu/{{ deploy_environment }}/domicilian-web
+venv_path=/home/ubuntu/{{ deploy_environment }}/{{ project_name }}-venv
 use_letsencrypt=True
 letsencrypt_email=skhurana39@gatech.edu
 django_requirements_file=requirements.txt
@@ -54,11 +54,11 @@ domicilian.com
 
 [production:vars]
 vm=0
-deploy_env=prod
+deploy_environment=prod
 user=ubuntu
-project_namespace={{ project_name }}-{{ deploy_env }}
-project_path=/home/ubuntu/{{ deploy_env }}/domicilian-web
-venv_path={{ project_path }}/venv
+project_namespace={{ project_name }}-{{ deploy_environment }}
+project_path=/home/ubuntu/{{ deploy_environment }}/domicilian-web
+venv_path=/home/ubuntu/{{ deploy_environment }}/{{ project_name }}-venv
 use_letsencrypt=True
 letsencrypt_email=skhurana39@gatech.edu
 django_requirements_file=requirements.txt

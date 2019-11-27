@@ -13,7 +13,7 @@ socket={{uwsgi_socket}}
 workers={{uwsgi_workers}}
 # daemonize=/var/log/uwsgi/fueled.log
 log-x-forwarded-for=true
-plugins=python37
+plugins=python36
 
 # for newrelic support
 enable-threads=true
@@ -23,7 +23,7 @@ autoload=true
 no-orphans=true
 chmod-socket=660
 log-date=true
-logto={{ uwsgi_log_file }}
+logto = {{project_log_dir}}/uwsgi.log
 
 
 # os write errors
