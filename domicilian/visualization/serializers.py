@@ -3,7 +3,7 @@
 from rest_framework import serializers
 
 # domicillian Stuff
-from .models import CrimeData, StateMedianPrice
+from .models import CrimeData, StateMedianPrice, PredictedPrices
 
 
 class StateMedianPricesSerializer(serializers.ModelSerializer):
@@ -30,3 +30,11 @@ class AffordableCountiesSerializer(serializers.Serializer):
     class Meta:
         model = CrimeData
         fields = ("county", "avg_annual_income", "state")
+
+
+class PredictedPricesSerializer(serializers.ModelSerializer):
+    predicted_price = serializers.FloatField(source="y_pred")
+
+    class Meta:
+        model = PredictedPrices
+        fields = ("county_id", "predicted_price", "home_type_id")

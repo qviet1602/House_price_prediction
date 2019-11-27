@@ -1,6 +1,6 @@
 ---
 pg_hstore: False
 pg_gis: False
-pg_db: '{{ project_namespace }}'
-pg_user: dev
-pg_password: password
+pg_db: cse6242
+pg_user: cse6242
+pg_password: cse6242

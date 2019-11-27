@@ -1,11 +1,11 @@
 ngnix_listen: '443 http2 ssl'
 nginx_user: 'www-data'
-nginx_worker_processes: auto
+nginx_worker_processes: 1
 nginx_worker_connections: 1024
 nginx_client_max_body_size: '10M'
 
 
-nginx_conf_file_name: '{{ project_namespace }}'
+nginx_conf_file_name: '{{ project_name }}-{{ deploy_environment }}'
 
 # SSL common configurations
 ssl_cert_dir: '/etc/nginx/ssl'
@@ -29,6 +29,6 @@ error_log_file: '/var/log/nginx/{{ domain_name }}.error.log'
 
 # htpasswsd
 # docs username, password
-htpasswd_file_path: '/etc/nginx/.htpasswd-{{ project_namespace }}'
-nginx_docs_username: 'dom'
-nginx_docs_password: 'Dom1234!'
+htpasswd_file_path: '/etc/nginx/.htpasswd-{{ deploy_environment }}'
+nginx_docs_username: '{{ project_name }}-docs'
+nginx_docs_password: '{{ project_name }}-1234!'

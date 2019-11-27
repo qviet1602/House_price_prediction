@@ -83,7 +83,7 @@ dump.rdb
 # python-dotenv
 .env
 
-# eater
+# domicilian
 _docs_html/
 media/
 provisioner/site.retry
@@ -103,3 +103,6 @@ Session.vim
 
 # PID files
 *.pid
+
+# IPython notebook checkpoints
+*.ipynb_checkpoints/
