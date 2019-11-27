@@ -14,11 +14,11 @@
     pkg: ['postgresql-11', 'postgresql-contrib', 'python-psycopg2']
     state: present
 
-- name: Install postgis packages
-  apt:
-    pkg: "postgis-2.5"
-    state: present
-  when: pg_gis
+# - name: Install postgis packages
+#   apt:
+#     pkg: "postgis-2.5"
+#     state: present
+#   when: pg_gis
 
 - name: setup database
   become_user: postgres

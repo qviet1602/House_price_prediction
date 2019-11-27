@@ -17,7 +17,7 @@ pg_password=vagrant
 domain_name=vagrant.domicilian.com
 
 [dev]
-dev.domicilian.com
+domicilian.sanyamkhurana.com
 
 [dev:vars]
 vm=0
@@ -30,7 +30,7 @@ use_letsencrypt=True
 letsencrypt_email=skhurana39@gatech.edu
 django_requirements_file=requirements.txt
 django_settings="settings.production"
-domain_name=dev.domicilian.com
+domain_name=domicilian.sanyamkhurana.com
 
 
 [qa]
