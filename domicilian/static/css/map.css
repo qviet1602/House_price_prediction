@@ -10,6 +10,10 @@ body {
   width: 100%
 }
 
+.states {
+  cursor: pointer;
+}
+
 #select {
   display: inline-block;
   text-align: initial;
