@@ -287,10 +287,18 @@ function selectAllForAllSimilarStates(stateName) {
 
 // TODO: Implement this to handle more than five counties
 function showAll(stateName) {
-  // Dummy counties for testing
-  // TODO: Retrieve appropriate counties and data
-  var countyList = ['County A', 'County B', 'County C', 'County D', 'County E']
-  createCountyNodes(stateName, countyList);
+  d3.json("/api/all_data/?state_name=" + stateName)
+  .then(function(data){
+      best_counties = data['best_counties']
+      safe_counties = data['safe_counties']
+      affordable_counties = data['affordable_counties']
+      best_zips = data['best_zips']
+
+      createCountyNodes(stateName, best_counties, 'county');
+      createCountyNodes(stateName, safe_counties, 'county');
+      createCountyNodes(stateName, affordable_counties, 'county');
+      createCountyNodes(stateName, best_zips, 'zipcode');
+  });
 }
 
 // Delete the state node and all children nodes

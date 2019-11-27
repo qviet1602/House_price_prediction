@@ -587,6 +587,190 @@ def get_node_stats(request):
 
         return JsonResponse(statistics, safe=False)
 
+def list_best_counties(state_name):
+    # Find counties with least crime rate
+    final_county_ids = set()
+    limit = 40
+
+    total_ids = 0
+    iteration = 0
+    while total_ids < 5:
+        iteration += 1
+        crime_data_query = "select avg(violent_crime), avg(property_crime), zipcode.county_id, county.name from " \
+                           "crime_data inner join zipcode on crime_data.zipcode_id = zipcode.id " \
+                           "inner join county on zipcode.county_id = county.id " \
+                           "inner join state on zipcode.state_id = state.id where state.name = %s  " \
+                           "group by county.name, zipcode.county_id " \
+                           "order by avg(crime_data.violent_crime) asc, avg(crime_data.property_crime) asc limit %s"
+        with connection.cursor() as cursor:
+            cursor.execute(crime_data_query, [state_name, limit])
+            crime_data_row = cursor.fetchall()
+
+        county_ids1 = []
+        for each_row in crime_data_row:
+            county_ids1.append(each_row[2])
+
+        school_data_row = "select count(*), zipcode.county_id, county.name from school_data " \
+                          "inner join zipcode on school_data.zipcode_id = zipcode.id " \
+                          "inner join county on zipcode.county_id = county.id " \
+                          "inner join state on zipcode.state_id = state.id " \
+                          "where state.name = %s and schooldigger_rating is not null " \
+                          "and schooldigger_rating > %s group by county.name, zipcode.county_id order by count(*) desc limit %s"
+
+        with connection.cursor() as cursor:
+            cursor.execute(school_data_row, [state_name, 2, limit])
+            school_data_row = cursor.fetchall()
+
+        county_ids2 = []
+
+        for each_row in school_data_row:
+            county_ids2.append(each_row[1])
+
+        annual_income_query = "select avg(avg_annual_income), avg(median_annual_income), zipcode.county_id, county.name from " \
+                              "annual_income inner join zipcode on annual_income.zipcode_id = zipcode.id " \
+                              "inner join county on zipcode.county_id = county.id " \
+                              "inner join state on zipcode.state_id = state.id where state.name = %s  " \
+                              "group by county.name, zipcode.county_id " \
+                              "order by avg(annual_income.avg_annual_income) asc, avg(annual_income.median_annual_income) asc limit %s"
+        with connection.cursor() as cursor:
+            cursor.execute(annual_income_query, [state_name, limit])
+            annual_income_data_row = cursor.fetchall()
+
+        county_ids3 = []
+        for each_row in annual_income_data_row:
+            county_ids3.append(each_row[2])
+
+        first_common_data = []
+
+        for i in range(len(county_ids1)):
+            if county_ids1[i] in county_ids2:
+                first_common_data.append(county_ids1[i])
+        final_list = []
+        for i in range(len(first_common_data)):
+            if first_common_data[i] in county_ids3:
+                final_list.append(first_common_data[i])
+
+        print("Len ", len(final_list))
+        total_ids = len(final_list)
+        final_county_ids = final_list
+        if total_ids < 5:
+            limit += 100
+
+        if iteration > 4:
+            break
+
+    county_str = ""
+    for each in final_county_ids:
+        county_str = county_str + "'" + str(each) + "',"
+    county_str = county_str[:-1]
+
+    county_query = "select id, name from county where id in (" + county_str + ")"
+    with connection.cursor() as cursor:
+        cursor.execute(county_query)
+        county_data_rows = cursor.fetchall()
+
+    data = []
+
+    for each_row in county_data_rows:
+        each_data_dict = {}
+        each_data_dict['id'] = each_row[0]
+        each_data_dict['name'] = each_row[1][:-6]
+        data.append(each_data_dict)
+
+    data = data[0:5]
+    return data
+
+def list_best_zips(state_name):
+    # Find zips with least crime rate
+    final_zip_ids = set()
+    limit = 40
+
+    total_ids = 0
+    iteration = 0
+    while total_ids < 5:
+        iteration += 1
+        crime_data_query = "select violent_crime, property_crime, zipcode_id, zipcode.zip_code from " \
+                           "crime_data inner join zipcode on crime_data.zipcode_id = zipcode.id " \
+                           "inner join state on zipcode.state_id = state.id where state.name = %s  " \
+                           "order by crime_data.violent_crime asc, crime_data.property_crime asc limit %s"
+        with connection.cursor() as cursor:
+            cursor.execute(crime_data_query, [state_name, limit])
+            crime_data_row = cursor.fetchall()
+
+        zipcode_ids1 = []
+        for each_row in crime_data_row:
+            zipcode_ids1.append(each_row[2])
+
+        school_data_row = "select count(*), zipcode_id, zipcode.zip_code from school_data " \
+                          "inner join zipcode on school_data.zipcode_id = zipcode.id " \
+                          "inner join state on zipcode.state_id = state.id " \
+                          "where state.name = %s and schooldigger_rating is not null " \
+                          "and schooldigger_rating > %s group by zipcode_id, zipcode.zip_code order by count(*) desc limit %s"
+
+        with connection.cursor() as cursor:
+            cursor.execute(school_data_row, [state_name, 2, limit])
+            school_data_row = cursor.fetchall()
+
+        zipcode_ids2 = []
+
+        for each_row in school_data_row:
+            zipcode_ids2.append(each_row[1])
+
+        annual_income_query = "select avg_annual_income, median_annual_income, zipcode_id, zipcode.zip_code from " \
+                              "annual_income inner join zipcode on annual_income.zipcode_id = zipcode.id " \
+                              "inner join state on zipcode.state_id = state.id where state.name = %s  " \
+                              "order by annual_income.avg_annual_income asc, annual_income.median_annual_income asc limit %s"
+        with connection.cursor() as cursor:
+            cursor.execute(annual_income_query, [state_name, limit])
+            annual_income_data_row = cursor.fetchall()
+
+        zipcode_ids3 = []
+        for each_row in annual_income_data_row:
+            zipcode_ids3.append(each_row[2])
+
+        print("Total ", len(zipcode_ids1), len(zipcode_ids2), len(zipcode_ids3))
+        first_common_data = []
+
+        for i in range(len(zipcode_ids1)):
+            if zipcode_ids1[i] in zipcode_ids2:
+                first_common_data.append(zipcode_ids1[i])
+        final_list = []
+        for i in range(len(first_common_data)):
+            if first_common_data[i] in zipcode_ids3:
+                final_list.append(first_common_data[i])
+
+        print("Len ", len(final_list))
+        total_ids = len(final_list)
+        final_zip_ids = final_list
+        if total_ids < 5:
+            limit += 100
+        else:
+            break
+
+        if iteration > 10:
+            break
+
+    zip_str = ""
+    for each in final_zip_ids:
+        zip_str = zip_str + "'" + str(each) + "',"
+    zip_str = zip_str[:-1]
+
+    zip_query = "select id, zip_code from zipcode where id in (" + zip_str + ")"
+    with connection.cursor() as cursor:
+        cursor.execute(zip_query)
+        zip_data_rows = cursor.fetchall()
+
+    data = []
+
+    for each_row in zip_data_rows:
+        each_data_dict = {}
+        each_data_dict['id'] = each_row[0]
+        each_data_dict['name'] = each_row[1]
+        data.append(each_data_dict)
+
+    data = data[0:5]
+
+    return data
 
 @api_view(['GET'])
 @csrf_exempt
@@ -595,100 +779,7 @@ def get_node_stats(request):
 def get_best_counties(request):
     if request.method == 'GET':
         state_name = request.GET.get('state_name', 'Alabama')
-
-        #Find counties with least crime rate
-        final_county_ids = set()
-        limit = 40
-
-        total_ids = 0
-        iteration = 0
-        while total_ids < 5:
-            iteration += 1
-            crime_data_query = "select avg(violent_crime), avg(property_crime), zipcode.county_id, county.name from " \
-                               "crime_data inner join zipcode on crime_data.zipcode_id = zipcode.id " \
-                               "inner join county on zipcode.county_id = county.id " \
-                               "inner join state on zipcode.state_id = state.id where state.name = %s  " \
-                               "group by county.name, zipcode.county_id " \
-                               "order by avg(crime_data.violent_crime) asc, avg(crime_data.property_crime) asc limit %s"
-            with connection.cursor() as cursor:
-                cursor.execute(crime_data_query, [state_name, limit])
-                crime_data_row = cursor.fetchall()
-
-            county_ids1 = []
-            for each_row in crime_data_row:
-                county_ids1.append(each_row[2])
-
-            school_data_row = "select count(*), zipcode.county_id, county.name from school_data " \
-                              "inner join zipcode on school_data.zipcode_id = zipcode.id " \
-                              "inner join county on zipcode.county_id = county.id " \
-                              "inner join state on zipcode.state_id = state.id " \
-                              "where state.name = %s and schooldigger_rating is not null " \
-                              "and schooldigger_rating > %s group by county.name, zipcode.county_id order by count(*) desc limit %s"
-
-            with connection.cursor() as cursor:
-                cursor.execute(school_data_row, [state_name, 2, limit])
-                school_data_row = cursor.fetchall()
-
-            county_ids2 = []
-
-            for each_row in school_data_row:
-                county_ids2.append(each_row[1])
-
-
-            annual_income_query = "select avg(avg_annual_income), avg(median_annual_income), zipcode.county_id, county.name from " \
-                               "annual_income inner join zipcode on annual_income.zipcode_id = zipcode.id " \
-                               "inner join county on zipcode.county_id = county.id " \
-                               "inner join state on zipcode.state_id = state.id where state.name = %s  " \
-                               "group by county.name, zipcode.county_id " \
-                               "order by avg(annual_income.avg_annual_income) asc, avg(annual_income.median_annual_income) asc limit %s"
-            with connection.cursor() as cursor:
-                cursor.execute(annual_income_query, [state_name, limit])
-                annual_income_data_row = cursor.fetchall()
-
-            county_ids3 = []
-            for each_row in annual_income_data_row:
-                county_ids3.append(each_row[2])
-
-
-            first_common_data = []
-
-            for i in range(len(county_ids1)):
-                if county_ids1[i] in county_ids2:
-                    first_common_data.append(county_ids1[i])
-            final_list = []
-            for i in range(len(first_common_data)):
-                if first_common_data[i] in county_ids3:
-                    final_list.append(first_common_data[i])
-
-
-            print("Len ", len(final_list))
-            total_ids = len(final_list)
-            final_county_ids = final_list
-            if total_ids < 5:
-                limit += 100
-
-            if iteration > 4:
-                break
-
-        county_str = ""
-        for each in final_county_ids:
-            county_str = county_str + "'" + str(each) + "',"
-        county_str = county_str[:-1]
-
-        county_query = "select id, name from county where id in (" + county_str + ")"
-        with connection.cursor() as cursor:
-            cursor.execute(county_query)
-            county_data_rows = cursor.fetchall()
-
-        data = []
-
-        for each_row in county_data_rows:
-            each_data_dict = {}
-            each_data_dict['id'] = each_row[0]
-            each_data_dict['name'] = each_row[1][:-6]
-            data.append(each_data_dict)
-
-        data = data[0:5]
+        data = list_best_counties(state_name)
 
         return JsonResponse(data, safe=False)
 
@@ -701,96 +792,52 @@ def get_best_zips(request):
     if request.method == 'GET':
         state_name = request.GET.get('state_name', 'Alabama')
 
-        #Find zips with least crime rate
-        final_zip_ids = set()
-        limit = 40
-
-        total_ids = 0
-        iteration = 0
-        while total_ids < 5:
-            iteration += 1
-            crime_data_query = "select violent_crime, property_crime, zipcode_id, zipcode.zip_code from " \
-                               "crime_data inner join zipcode on crime_data.zipcode_id = zipcode.id " \
-                               "inner join state on zipcode.state_id = state.id where state.name = %s  " \
-                               "order by crime_data.violent_crime asc, crime_data.property_crime asc limit %s"
-            with connection.cursor() as cursor:
-                cursor.execute(crime_data_query, [state_name, limit])
-                crime_data_row = cursor.fetchall()
-
-            zipcode_ids1 = []
-            for each_row in crime_data_row:
-                zipcode_ids1.append(each_row[2])
-
-            school_data_row = "select count(*), zipcode_id, zipcode.zip_code from school_data " \
-                              "inner join zipcode on school_data.zipcode_id = zipcode.id " \
-                              "inner join state on zipcode.state_id = state.id " \
-                              "where state.name = %s and schooldigger_rating is not null " \
-                              "and schooldigger_rating > %s group by zipcode_id, zipcode.zip_code order by count(*) desc limit %s"
-
-            with connection.cursor() as cursor:
-                cursor.execute(school_data_row, [state_name, 2, limit])
-                school_data_row = cursor.fetchall()
-
-            zipcode_ids2 = []
-
-            for each_row in school_data_row:
-                zipcode_ids2.append(each_row[1])
-
-
-            annual_income_query = "select avg_annual_income, median_annual_income, zipcode_id, zipcode.zip_code from " \
-                               "annual_income inner join zipcode on annual_income.zipcode_id = zipcode.id " \
-                               "inner join state on zipcode.state_id = state.id where state.name = %s  " \
-                               "order by annual_income.avg_annual_income asc, annual_income.median_annual_income asc limit %s"
-            with connection.cursor() as cursor:
-                cursor.execute(annual_income_query, [state_name, limit])
-                annual_income_data_row = cursor.fetchall()
-
-            zipcode_ids3 = []
-            for each_row in annual_income_data_row:
-                zipcode_ids3.append(each_row[2])
-
-
-            first_common_data = []
-
-            for i in range(len(zipcode_ids1)):
-                if zipcode_ids1[i] in zipcode_ids2:
-                    first_common_data.append(zipcode_ids1[i])
-            final_list = []
-            for i in range(len(first_common_data)):
-                if first_common_data[i] in zipcode_ids3:
-                    final_list.append(first_common_data[i])
-
-
-            print("Len ", len(final_list))
-            total_ids = len(final_list)
-            final_zip_ids = final_list
-            if total_ids < 5:
-                limit += 100
-
-            if iteration > 4:
-                break
-
-        zip_str = ""
-        for each in final_zip_ids:
-            zip_str = zip_str + "'" + str(each) + "',"
-        zip_str = zip_str[:-1]
-
-        zip_query = "select id, zip_code from zipcode where id in (" + zip_str + ")"
-        with connection.cursor() as cursor:
-            cursor.execute(zip_query)
-            zip_data_rows = cursor.fetchall()
-
-        data = []
-
-        for each_row in zip_data_rows:
-            each_data_dict = {}
-            each_data_dict['id'] = each_row[0]
-            each_data_dict['name'] = each_row[1]
-            data.append(each_data_dict)
-
-        data = data[0:5]
+        data = list_best_zips(state_name)
 
         return JsonResponse(data, safe=False)
+
+
+def list_safe_counties(state_name):
+    crime_data_query = "select avg(violent_crime), avg(property_crime), zipcode.county_id, county.name from " \
+                       "crime_data inner join zipcode on crime_data.zipcode_id = zipcode.id " \
+                       "inner join county on zipcode.county_id = county.id " \
+                       "inner join state on zipcode.state_id = state.id where state.name = %s  " \
+                       "group by county.name, zipcode.county_id " \
+                       "order by avg(crime_data.violent_crime) asc, avg(crime_data.property_crime) asc limit %s"
+    with connection.cursor() as cursor:
+        cursor.execute(crime_data_query, [state_name, 5])
+        crime_data_row = cursor.fetchall()
+
+    data = []
+
+    for each_row in crime_data_row:
+        each_data_dict = {}
+        each_data_dict['id'] = each_row[2]
+        each_data_dict['name'] = each_row[3]
+        data.append(each_data_dict)
+
+    return data
+
+def list_affordable_counties(state_name):
+    annual_income_query = "select avg(avg_annual_income), avg(median_annual_income), zipcode.county_id, county.name from " \
+                          "annual_income inner join zipcode on annual_income.zipcode_id = zipcode.id " \
+                          "inner join county on zipcode.county_id = county.id " \
+                          "inner join state on zipcode.state_id = state.id where state.name = %s  " \
+                          "group by county.name, zipcode.county_id having avg(avg_annual_income) <= %s" \
+                          "order by avg(annual_income.avg_annual_income) asc, avg(annual_income.median_annual_income) asc limit %s"
+    with connection.cursor() as cursor:
+        cursor.execute(annual_income_query, [state_name, 38555, 5])
+        annual_data_row = cursor.fetchall()
+
+    data = []
+
+    for each_row in annual_data_row:
+        each_data_dict = {}
+        each_data_dict['id'] = each_row[2]
+        each_data_dict['name'] = each_row[3]
+        data.append(each_data_dict)
+
+    return data
 
 @api_view(['GET'])
 @csrf_exempt
@@ -800,23 +847,7 @@ def get_safe_counties(request):
     if request.method == 'GET':
         state_name = request.GET.get('state_name', 'Alabama')
 
-        crime_data_query = "select avg(violent_crime), avg(property_crime), zipcode.county_id, county.name from " \
-                           "crime_data inner join zipcode on crime_data.zipcode_id = zipcode.id " \
-                           "inner join county on zipcode.county_id = county.id " \
-                           "inner join state on zipcode.state_id = state.id where state.name = %s  " \
-                           "group by county.name, zipcode.county_id " \
-                           "order by avg(crime_data.violent_crime) asc, avg(crime_data.property_crime) asc limit %s"
-        with connection.cursor() as cursor:
-            cursor.execute(crime_data_query, [state_name, 5])
-            crime_data_row = cursor.fetchall()
-
-        data = []
-
-        for each_row in crime_data_row:
-            each_data_dict = {}
-            each_data_dict['id'] = each_row[2]
-            each_data_dict['name'] = each_row[3]
-            data.append(each_data_dict)
+        data = list_safe_counties(state_name)
 
         return JsonResponse(data, safe=False)
 
@@ -824,52 +855,7 @@ def get_affordable_counties(request):
     if request.method == 'GET':
         state_name = request.GET.get('state_name', 'Alabama')
 
-        annual_income_query = "select avg(avg_annual_income), avg(median_annual_income), zipcode.county_id, county.name from " \
-                              "annual_income inner join zipcode on annual_income.zipcode_id = zipcode.id " \
-                              "inner join county on zipcode.county_id = county.id " \
-                              "inner join state on zipcode.state_id = state.id where state.name = %s  " \
-                              "group by county.name, zipcode.county_id having avg(avg_annual_income) <= %s" \
-                              "order by avg(annual_income.avg_annual_income) asc, avg(annual_income.median_annual_income) asc limit %s"
-        with connection.cursor() as cursor:
-            cursor.execute(annual_income_query, [state_name, 38555, 5])
-            annual_data_row = cursor.fetchall()
-
-        data = []
-
-        for each_row in annual_data_row:
-            each_data_dict = {}
-            each_data_dict['id'] = each_row[2]
-            each_data_dict['name'] = each_row[3]
-            data.append(each_data_dict)
-
-        return JsonResponse(data, safe=False)
-
-
-@api_view(['GET'])
-@csrf_exempt
-@authentication_classes([])
-@permission_classes([])
-def get_safe_counties(request):
-    if request.method == 'GET':
-        state_name = request.GET.get('state_name', 'Alabama')
-
-        crime_data_query = "select avg(violent_crime), avg(property_crime), zipcode.county_id, county.name from " \
-                           "crime_data inner join zipcode on crime_data.zipcode_id = zipcode.id " \
-                           "inner join county on zipcode.county_id = county.id " \
-                           "inner join state on zipcode.state_id = state.id where state.name = %s  " \
-                           "group by county.name, zipcode.county_id " \
-                           "order by avg(crime_data.violent_crime) asc, avg(crime_data.property_crime) asc limit %s"
-        with connection.cursor() as cursor:
-            cursor.execute(crime_data_query, [state_name, 5])
-            crime_data_row = cursor.fetchall()
-
-        data = []
-
-        for each_row in crime_data_row:
-            each_data_dict = {}
-            each_data_dict['id'] = each_row[2]
-            each_data_dict['name'] = each_row[3]
-            data.append(each_data_dict)
+        data = list_affordable_counties(state_name)
 
         return JsonResponse(data, safe=False)
 
@@ -1004,5 +990,461 @@ def get_similar_states(request):
             each_data_dict['id'] = each_row[0]
 
             data.append(each_data_dict)
+
+        return JsonResponse(data, safe=False)
+
+def similar_counties(all_counties_str):
+
+    # Get data for all best counties and aggregate this data into one dataset
+    crime_data_query = "select avg(violent_crime), avg(property_crime), zipcode.county_id, county.name from " \
+                       "crime_data inner join zipcode on crime_data.zipcode_id = zipcode.id " \
+                       "inner join county on zipcode.county_id = county.id where zipcode.county_id in (" + all_counties_str + ") " \
+                       "group by county.name, zipcode.county_id "
+
+    school_data_query = "select count(*), zipcode.county_id, county.name from school_data " \
+                        "inner join zipcode on school_data.zipcode_id = zipcode.id " \
+                        "inner join county on zipcode.county_id = county.id where zipcode.county_id in (" + all_counties_str + ") " \
+                        "and schooldigger_rating is not null " \
+                        "and schooldigger_rating > 2 group by county.name, zipcode.county_id"
+
+    annual_income_query = "select avg(avg_annual_income), avg(median_annual_income), zipcode.county_id, county.name from " \
+                          "annual_income inner join zipcode on annual_income.zipcode_id = zipcode.id " \
+                          "inner join county on zipcode.county_id = county.id where zipcode.county_id in (" + all_counties_str + ") " \
+                          "group by county.name, zipcode.county_id"
+
+    median_prices_query = "select list_price, county_id, county.name from county_median_price " \
+                          "inner join county on county_median_price.county_id = county.id where year_month = '2019-09' " \
+                          "and home_type_id = 10 and county.id in (" + all_counties_str + ")"
+
+
+    with connection.cursor() as cursor:
+        cursor.execute(crime_data_query)
+        crime_data_rows = cursor.fetchall()
+
+    with connection.cursor() as cursor:
+        cursor.execute(school_data_query)
+        school_data_rows = cursor.fetchall()
+
+    with connection.cursor() as cursor:
+        cursor.execute(annual_income_query)
+        annual_data_rows = cursor.fetchall()
+
+    with connection.cursor() as cursor:
+        cursor.execute(median_prices_query)
+        median_price_rows = cursor.fetchall()
+
+    print("County Lengths ", len(crime_data_rows), len(school_data_rows), len(annual_data_rows), len(median_price_rows))
+    # Now merge all this data into one
+
+    crime_data_map = {}
+
+    for each_row in crime_data_rows:
+        crime_data_map[each_row[3]] = each_row
+
+    school_data_map = {}
+
+    for each_row in school_data_rows:
+        school_data_map[each_row[2]] = each_row
+
+    annual_data_map = {}
+
+    for each_row in annual_data_rows:
+        annual_data_map[each_row[3]] = each_row
+
+    median_data_map = {}
+
+    for each_row in median_price_rows:
+        median_data_map[each_row[2]] = each_row
+
+
+    min_keys_length = len(crime_data_rows)
+    keys = crime_data_map.keys()
+    if len(school_data_rows) < min_keys_length:
+        min_keys_length = len(school_data_rows)
+        keys = school_data_map.keys()
+    if len(annual_data_rows) < min_keys_length:
+        min_keys_length = len(annual_data_rows)
+        keys = annual_data_map.keys()
+    if len(median_price_rows) < min_keys_length:
+        keys = median_data_map.keys()
+
+    full_dataset = []
+    idx = 0
+    entities = {}
+    entities_map = {}
+    for each_key in keys:
+        each_data_instance = []
+        crime_data = crime_data_map.get(each_key, None)
+        school_data = school_data_map.get(each_key, None)
+        annual_data = annual_data_map.get(each_key, None)
+        median_data = median_data_map.get(each_key, None)
+
+        if crime_data is None or school_data is None or annual_data is None or median_data is None:
+            continue
+
+        each_data_instance.append(crime_data[0])
+        each_data_instance.append(crime_data[1])
+        each_data_instance.append(school_data[0])
+        each_data_instance.append(annual_data[0])
+        each_data_instance.append(annual_data[1])
+        each_data_instance.append(median_data[0])
+        entities[idx] = each_key
+        entities_map[each_key] = crime_data[2]
+        idx += 1
+        full_dataset.append(each_data_instance)
+
+    numpy_dataset = np.array(full_dataset, dtype=np.float)
+
+    similarity_values = dst.squareform(dst.pdist(numpy_dataset, 'euclidean'))
+
+    rows = similarity_values.shape[0]
+    cols = similarity_values.shape[1]
+    all_idx_similarity_data = []
+    for row in range(rows):
+        full_column = similarity_values[row, :]
+        current_map = {}
+        idx = 0
+        for each in full_column:
+            current_map[each] = idx
+            idx += 1
+
+        sorted_keys = sorted(current_map.keys())
+        each_idx_data = []
+        for key in sorted_keys:
+            each_idx_data.append(current_map.get(key))
+
+        all_idx_similarity_data.append(each_idx_data)
+
+    main_similarities = []
+    count_down = 3
+    for each_row_idx in range(len(all_idx_similarity_data)):
+        each_col = all_idx_similarity_data[each_row_idx]
+        similarites = []
+        for col_idx in range(len(each_col)):
+            if each_row_idx < int(rows/3):
+                if each_col[col_idx] < int(rows/3):
+                    continue
+                elif each_col[col_idx] >= int(rows/3):
+                    similarites.append(each_col[col_idx])
+            elif each_row_idx < 10:
+                if each_col[col_idx] < 2 * int(rows/3):
+                    continue
+                elif each_col[col_idx] >= 2 * int(rows/3):
+                    similarites.append(each_col[col_idx])
+
+        if len(similarites) != 0:
+            if each_row_idx % int(rows/3) == 0:
+                count_down -= 1
+            if len(similarites[0:count_down]) != 0:
+                main_similarities.append(similarites[0:count_down])
+
+    data = []
+    for each_row in range(len(main_similarities)):
+        each_data_dict = {}
+        each_data_dict['name'] = entities[each_row]
+        each_data_dict['id'] = entities_map[each_data_dict['name']]
+        similars = main_similarities[each_row]
+
+        similar_values = []
+        for similar in similars:
+            similar_data_dict = {}
+            similar_data_dict['name'] = entities[similar]
+            similar_data_dict['id'] = entities_map[each_data_dict['name']]
+            similar_values.append(similar_data_dict)
+
+        each_data_dict['similars'] = similar_values
+        data.append(each_data_dict)
+
+    return data
+
+def similar_zips(all_zips_str):
+
+    # Get data for all best zipcodes and aggregate this data into one dataset
+    crime_data_query = "select violent_crime, property_crime, zipcode.id, zipcode.zip_code from " \
+                       "crime_data inner join zipcode on crime_data.zipcode_id = zipcode.id " \
+                       "where zipcode.id in (" + all_zips_str + ")"
+
+    school_data_query = "select count(*), zipcode.id, zipcode.zip_code from school_data " \
+                        "inner join zipcode on school_data.zipcode_id = zipcode.id " \
+                        "where zipcode.id in (" + all_zips_str + ") " \
+                        "and schooldigger_rating is not null and schooldigger_rating > 2 " \
+                        "group by zipcode.id, zipcode.zip_code"
+
+
+    annual_income_query = "select avg_annual_income, median_annual_income, zipcode.id, zipcode.zip_code from " \
+                          "annual_income inner join zipcode on annual_income.zipcode_id = zipcode.id " \
+                          "where zipcode.id in (" + all_zips_str + ")"
+
+
+    with connection.cursor() as cursor:
+        cursor.execute(crime_data_query)
+        crime_data_rows = cursor.fetchall()
+
+    with connection.cursor() as cursor:
+        cursor.execute(school_data_query)
+        school_data_rows = cursor.fetchall()
+
+    with connection.cursor() as cursor:
+        cursor.execute(annual_income_query)
+        annual_data_rows = cursor.fetchall()
+
+    # Now merge all this data into one
+
+    crime_data_map = {}
+
+    for each_row in crime_data_rows:
+        crime_data_map[each_row[3]] = each_row
+
+    school_data_map = {}
+
+    for each_row in school_data_rows:
+        school_data_map[each_row[2]] = each_row
+
+    annual_data_map = {}
+
+    for each_row in annual_data_rows:
+        annual_data_map[each_row[3]] = each_row
+
+    min_keys_length = len(crime_data_rows)
+    keys = crime_data_map.keys()
+    if len(school_data_rows) < min_keys_length:
+        min_keys_length = len(school_data_rows)
+        keys = school_data_map.keys()
+    if len(annual_data_rows) < min_keys_length:
+        keys = annual_data_map.keys()
+
+    full_dataset = []
+    idx = 0
+    entities = {}
+    entities_map = {}
+    for each_key in keys:
+        each_data_instance = []
+        crime_data = crime_data_map.get(each_key, None)
+        school_data = school_data_map.get(each_key, None)
+        annual_data = annual_data_map.get(each_key, None)
+
+        if crime_data is None or school_data is None or annual_data is None:
+            continue
+
+        each_data_instance.append(crime_data[0])
+        each_data_instance.append(crime_data[1])
+        each_data_instance.append(school_data[0])
+        each_data_instance.append(annual_data[0])
+        each_data_instance.append(annual_data[1])
+        #each_data_instance.append(median_data[0])
+        entities[idx] = each_key
+        entities_map[each_key] = crime_data[2]
+        idx += 1
+        full_dataset.append(each_data_instance)
+
+    numpy_dataset = np.array(full_dataset, dtype=np.float)
+
+    similarity_values = dst.squareform(dst.pdist(numpy_dataset, 'euclidean'))
+
+    rows = similarity_values.shape[0]
+    cols = similarity_values.shape[1]
+    all_idx_similarity_data = []
+    for row in range(rows):
+        full_column = similarity_values[row, :]
+        current_map = {}
+        idx = 0
+        for each in full_column:
+            current_map[each] = idx
+            idx += 1
+
+        sorted_keys = sorted(current_map.keys())
+        each_idx_data = []
+        for key in sorted_keys:
+            each_idx_data.append(current_map.get(key))
+
+        all_idx_similarity_data.append(each_idx_data)
+
+    main_similarities = []
+    count_down = 3
+    for each_row_idx in range(len(all_idx_similarity_data)):
+        each_col = all_idx_similarity_data[each_row_idx]
+        similarites = []
+        for col_idx in range(len(each_col)):
+            if each_row_idx == col_idx:
+                continue
+            if each_row_idx < 5:
+                if each_col[col_idx] < int(rows/3):
+                    continue
+                elif each_col[col_idx] >= int(rows/3):
+                    similarites.append(each_col[col_idx])
+            elif each_row_idx < 10:
+                if each_col[col_idx] < 2 * int(rows/3):
+                    continue
+                elif each_col[col_idx] >= 2 * int(rows/3):
+                    similarites.append(each_col[col_idx])
+
+        if len(similarites) != 0:
+            if each_row_idx % int(rows/3) == 0:
+                count_down -= 1
+            main_similarities.append(similarites[0:count_down])
+
+    data = []
+    for each_row in range(len(main_similarities)):
+        each_data_dict = {}
+        each_data_dict['name'] = entities[each_row]
+        each_data_dict['id'] = entities_map[each_data_dict['name']]
+        similars = main_similarities[each_row]
+
+        similar_values = []
+        for similar in similars:
+            similar_data_dict = {}
+            similar_data_dict['name'] = entities[similar]
+            similar_data_dict['id'] = entities_map[each_data_dict['name']]
+            similar_values.append(similar_data_dict)
+
+        each_data_dict['similars'] = similar_values
+        data.append(each_data_dict)
+
+    return data
+
+@api_view(['GET'])
+@csrf_exempt
+@authentication_classes([])
+@permission_classes([])
+def get_similar_all(request):
+    if request.method == 'GET':
+        selected_states = request.GET.get('states', 'Arkansas_Ohio_Mississippi')
+
+        all_states = selected_states.split("_")
+        best_counties1 = list_best_counties(all_states[0])
+        best_counties2 = list_best_counties(all_states[1])
+        best_counties3 = list_best_counties(all_states[2])
+
+        all_counties = []
+
+        for each in best_counties1:
+            all_counties.append(each['id'])
+
+        for each in best_counties2:
+            all_counties.append(each['id'])
+
+        for each in best_counties3:
+            all_counties.append(each['id'])
+
+        all_counties_str = ""
+
+        for each in all_counties:
+            all_counties_str = all_counties_str + "'" + str(each) + "',"
+
+        all_counties_str = all_counties_str[:-1]
+
+        data = similar_counties(all_counties_str)
+
+        final_data = dict()
+        final_data['best_counties'] = data
+
+
+        #Safe counties
+        safe_counties1 = list_safe_counties(all_states[0])
+        safe_counties2 = list_safe_counties(all_states[1])
+        safe_counties3 = list_safe_counties(all_states[2])
+
+        print("Len ", len(safe_counties1), len(safe_counties2), len(safe_counties3))
+
+        all_counties = []
+
+        for each in safe_counties1:
+            all_counties.append(each['id'])
+
+        for each in safe_counties2:
+            all_counties.append(each['id'])
+
+        for each in safe_counties3:
+            all_counties.append(each['id'])
+
+        all_counties_str = ""
+
+        for each in all_counties:
+            all_counties_str = all_counties_str + "'" + str(each) + "',"
+
+        all_counties_str = all_counties_str[:-1]
+
+        data = similar_counties(all_counties_str)
+
+        final_data['safe_counties'] = data
+
+        # Affordable counties
+        affordable_counties1 = list_affordable_counties(all_states[0])
+        affordable_counties2 = list_affordable_counties(all_states[1])
+        affordable_counties3 = list_affordable_counties(all_states[2])
+
+        all_counties = []
+
+        for each in affordable_counties1:
+            all_counties.append(each['id'])
+
+        for each in affordable_counties2:
+            all_counties.append(each['id'])
+
+        for each in affordable_counties3:
+            all_counties.append(each['id'])
+
+        all_counties_str = ""
+
+        for each in all_counties:
+            all_counties_str = all_counties_str + "'" + str(each) + "',"
+
+        all_counties_str = all_counties_str[:-1]
+
+        data = similar_counties(all_counties_str)
+
+        final_data['affordable_counties'] = data
+
+
+        # best zips
+        best_zips1 = list_best_zips(all_states[0])
+        best_zips2 = list_best_zips(all_states[1])
+        best_zips3 = list_best_zips(all_states[2])
+
+        all_zips = []
+
+        for each in best_zips1:
+            all_zips.append(each['id'])
+
+        for each in best_zips2:
+            all_zips.append(each['id'])
+
+        for each in best_zips3:
+            all_zips.append(each['id'])
+
+        all_zips_str = ""
+
+        for each in all_zips:
+            all_zips_str = all_zips_str + "'" + str(each) + "',"
+
+        all_zips_str = all_zips_str[:-1]
+
+        print("Zip IDs ", all_zips_str)
+        data = similar_zips(all_zips_str)
+
+        final_data['best_zips'] = data
+
+        return JsonResponse(final_data, safe=False)
+
+
+@api_view(['GET'])
+@csrf_exempt
+@authentication_classes([])
+@permission_classes([])
+def get_all_data(request):
+    if request.method == 'GET':
+        state_name = request.GET.get('state', 'Arkansas')
+
+        best_counties = list_best_counties(state_name)
+        safe_counties = list_safe_counties(state_name)
+        affordable_counties = list_affordable_counties(state_name)
+        best_zips = list_best_zips(state_name)
+
+        data = {}
+
+        data['best_counties'] = best_counties
+        data['safe_counties'] = safe_counties
+        data['affordable_counties'] = affordable_counties
+        data['best_zips'] = best_zips
 
         return JsonResponse(data, safe=False)
