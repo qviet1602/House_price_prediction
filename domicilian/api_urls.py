@@ -1,9 +1,11 @@
 # Third Party Stuff
+from django.urls import path
+
 # domicilian Stuff
 from domicilian.base.api.routers import SingletonRouter
 from domicilian.users.api import CurrentUserViewSet
 from domicilian.users.auth.api import AuthViewSet
-from domicilian.visualization.api import CrimeRateViewSet, StateMedianPricesViewSet, AffordableCountiesViewSet
+from domicilian.visualization.api import CrimeRateViewSet, StateMedianPricesViewSet, AffordableCountiesViewSet, PredictedPricesView
 from rest_framework.routers import DefaultRouter
 
 default_router = DefaultRouter(trailing_slash=False)
@@ -20,4 +22,12 @@ default_router.register("affordable_counties", AffordableCountiesViewSet, basena
 
 # Combine urls from both default and singleton routers and expose as
 # 'urlpatterns' which django can pick up from this module.
-urlpatterns = default_router.urls + singleton_router.urls
+urlpatterns = (
+    default_router.urls
+    + singleton_router.urls
+    + [
+        path(
+            "predicted_prices", PredictedPricesView.as_view(), name="predicted-prices"
+        )
+    ]
+)
