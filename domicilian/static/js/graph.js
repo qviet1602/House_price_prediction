@@ -7,7 +7,13 @@ var createdNodes = {};
 var totalNodes = 0;
 var colors = d3.schemeCategory10;
 var nodeGroups = [0, 1, 2];
-var nodeColors = [colors[1], colors[2], colors[3]];
+var nodeColors = [d3.schemeBlues[5], d3.schemeOranges[5], d3.schemeGreens[5]];
+var countyNodes = {
+  best: {},
+  zip: {},
+  safe: {},
+  affordable: {}
+};
 
 var svg = d3.select('svg');
 var width = parseInt(svg.style('width'));
@@ -125,7 +131,7 @@ function createMenu(menu, usStates) {
     removeRightClickMenu();
 
     if (createdNodes[d['name']] === undefined && totalNodes < 3) {
-      d3.select(this).attr('fill', nodeColors[nodeGroups[0]]);
+      d3.select(this).attr('fill', nodeColors[nodeGroups[0]][2]);
     }
 
     d3.select(this).classed('active', true);
@@ -147,7 +153,8 @@ var menuOptions = [
   'Show 5 Safe Counties',
   'Show 5 Affordable Counties',
   'Show All',
-  'Delete State'
+  'Delete State',
+  'Select All for All Similar States'
 ];
 
 // Right click menu functions
@@ -158,7 +165,8 @@ var menuFunctions = [
   showSafeCounties,
   showAffordableCounties,
   showAll,
-  deleteState
+  deleteState,
+  selectAllForAllSimilarStates
 ];
 
 // TODO: Remove this option when more than one state node exists
@@ -171,7 +179,7 @@ function dragSimilarStates(stateName) {
         for (var i = 0; i < data.length - 1; i++) {
           each_state = data[i]
           createForceStateNode(each_state, d3_event_x + i * 5, d3_event_y + i * 100);
-          d3.select('.' + genClassName(each_state['name']) + '-menu-item').attr('fill', nodeColors[i + 1]);
+          d3.select('.' + genClassName(each_state['name']) + '-menu-item').attr('fill', nodeColors[i + 1][2]);
         }
 
         removeRightClickMenu();
@@ -180,30 +188,58 @@ function dragSimilarStates(stateName) {
 }
 
 function showBestCounties(stateName) {
+  if (countyNodes.best[stateName]) {
+    removeRightClickMenu();
+    return;
+  }
+
+  countyNodes.best[stateName] = true;
+
   d3.json('/api/best_counties/?state_name=' + stateName)
     .then(function (data) {
-      createForceCountyNodes(stateName, data)
+      createForceCountyNodes(stateName, data, 0)
     });
 }
 
 function showBestZipCodes(stateName) {
+  if (countyNodes.zip[stateName]) {
+    removeRightClickMenu();
+    return;
+  }
+
+  countyNodes.zip[stateName] = true;
+
   d3.json('/api/best_zips/?state_name=' + stateName)
     .then(function (data) {
-      createForceCountyNodes(stateName, data, true);
+      createForceCountyNodes(stateName, data, 1);
     });
 }
 
 function showSafeCounties(stateName) {
+  if (countyNodes.safe[stateName]) {
+    removeRightClickMenu();
+    return;
+  }
+
+  countyNodes.safe[stateName] = true;
+
   d3.json('/api/safe_counties/?state_name=' + stateName)
     .then(function (data) {
-      createForceCountyNodes(stateName, data);
+      createForceCountyNodes(stateName, data, 3);
     });
 }
 
 function showAffordableCounties(stateName) {
+  if (countyNodes.affordable[stateName]) {
+    removeRightClickMenu();
+    return;
+  }
+
+  countyNodes.affordable[stateName] = true;
+
   d3.json('/api/affordable/?state_name=' + stateName)
     .then(function (data) {
-      createForceCountyNodes(stateName, data);
+      createForceCountyNodes(stateName, data, 4);
     });
 }
 
@@ -215,10 +251,36 @@ function showAll(stateName) {
       affordable_counties = data['affordable_counties']
       best_zips = data['best_zips']
 
-      createForceCountyNodes(stateName, best_counties);
-      createForceCountyNodes(stateName, safe_counties);
-      createForceCountyNodes(stateName, affordable_counties);
-      createForceCountyNodes(stateName, best_zips);
+      if (!countyNodes.best[stateName]) {
+        countyNodes.best[stateName] = true;
+        createForceCountyNodes(stateName, best_counties, 0);
+      }
+
+      if (!countyNodes.zip[stateName]) {
+        countyNodes.zip[stateName] = true;
+        createForceCountyNodes(stateName, best_zips, 1);
+      }
+
+      if (!countyNodes.safe[stateName]) {
+        countyNodes.safe[stateName] = true;
+        createForceCountyNodes(stateName, safe_counties, 3);
+      }
+
+      if (!countyNodes.affordable[stateName]) {
+        countyNodes.affordable[stateName] = true;
+        createForceCountyNodes(stateName, affordable_counties, 4);
+      }
+
+      removeRightClickMenu();
+    });
+}
+
+function selectAllForAllSimilarStates(stateName) {
+  d3.json('/api/similar_all/?states=' + 'Alabama_Alaska_Arizona')
+    .then(function (data) {
+      console.log('data: ', data);
+
+      // createForceCountyNodes(stateName, countyList);
     });
 }
 
@@ -243,6 +305,10 @@ function deleteState(stateName) {
 
   nodeGroups.push(createdNodes[stateName]);
   delete createdNodes[stateName];
+  delete countyNodes.best[stateName];
+  delete countyNodes.zip[stateName];
+  delete countyNodes.safe[stateName];
+  delete countyNodes.affordable[stateName];
   totalNodes--;
 
   // Remove clear all button if no more state nodes exist
@@ -282,7 +348,7 @@ function createForceStateNode(stateObj, x, y) {
 
   nodeEnter.append('circle')
     .attr('r', '20px')
-    .attr('fill', function (d) { return nodeColors[d.group] })
+    .attr('fill', function (d) { return nodeColors[d.group][2] })
     .attr('stroke', 'black')
     .attr('stroke-width', '2')
     .call(d3.drag()
@@ -334,7 +400,7 @@ function createForceStateNode(stateObj, x, y) {
   }
 }
 
-function createForceCountyNodes(stateName, data) {
+function createForceCountyNodes(stateName, data, colorShade) {
   for (var i = 0; i < data.length; i++) {
     each = data[i]
 
@@ -367,7 +433,7 @@ function createForceCountyNodes(stateName, data) {
 
   nodeEnter.append('circle')
     .attr('r', '15px')
-    .attr('fill', function (d) { return nodeColors[createdNodes[stateName]] })
+    .attr('fill', function (d) { return nodeColors[createdNodes[stateName]][colorShade] })
     .attr('stroke', 'black')
     .attr('stroke-width', 2)
     .call(d3.drag()
@@ -623,6 +689,12 @@ function deleteAllNodes() {
   simulation.restart();
 
   createdNodes = {};
+  countyNodes = {
+    best: {},
+    zip: {},
+    safe: {},
+    affordable: {}
+  };
   nodeGroups = [0, 1, 2];
   totalNodes = 0;
 
