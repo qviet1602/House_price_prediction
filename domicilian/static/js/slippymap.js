@@ -272,8 +272,8 @@ async function getForRent(postal) {
 
         console.log("unable to geocode! Response code: " + request2.status);
         var data = JSON.parse(request2.responseText);
-        console.log(data.status.message);
       } else {
+        console.log(request2);
         console.log("server error");
       }
     };
@@ -283,6 +283,52 @@ async function getForRent(postal) {
     };
 
     request2.send();  // make the request
+  });
+};
+
+//get prediction 
+async function getPrediction(countyName,type) {
+
+  return new Promise(function (resolve, reject) {
+
+    var api_url = '/api/predicted_prices';
+
+    var request_url = api_url
+      + '?'
+      + '&county=' + encodeURIComponent(countyName)
+      + '&home_type_id=' + String(type);
+
+    var request4 = new XMLHttpRequest();
+    request4.open('GET', request_url, true);
+    // request3.withCredentials = "true";
+
+    request4.onload = function () {
+      // see full list of possible response codes:
+      // https://opencagedata.com/api#codes
+
+      if (request4.status == 200) {
+        // Success!
+        var data = JSON.parse(request4.responseText);
+        // console.log(data['schools']);
+        console.log(data);
+        resolve(data.predicted_price)
+
+      } else if (request4.status <= 500) {
+        // We reached our target server, but it returned an error
+        // console.log(request4.responseText)
+        console.log("unable to get prediction! Response code: " + request4.status);
+        // var data = JSON.parse(request4.responseText);
+        resolve('None')
+      } else {
+        console.log("server error");
+        resolve('None')
+      }
+    };
+    request4.onerror = function () {
+      // There was a connection error of some sort
+      console.log("unable to connect to server");
+    };
+    request4.send();  // make the request
   });
 };
 
@@ -321,7 +367,6 @@ async function getForSale(postal) {
 
         console.log("unable to geocode! Response code: " + request2.status);
         var data = JSON.parse(request2.responseText);
-        console.log(data.status.message);
       } else {
         console.log("server error");
       }
@@ -359,7 +404,7 @@ async function getAddress(lat, long) {
       if (request.status == 200) {
         // Success!
         var data = JSON.parse(request.responseText);
-        resolve(data.results[0].components.postcode);
+        resolve(data.results[0].components);
 
       } else if (request.status <= 500) {
         // We reached our target server, but it returned an error
@@ -533,11 +578,32 @@ async function getbiz3(lat, lon) {
 };
 
 // plot rental data
-function plotForRent(rentalListings) {
+async function plotForRent(rentalListings, county) {
 
   data = []
 
-  rentalListings.forEach(d => {
+  console.log(rentalListings[0])
+
+  rentalListings.forEach(async function(d) {
+
+    var rental_type = d.prop_type;
+
+    var prediction_type;
+
+    switch (true) {
+      case (rental_type == 'single_family' || rental_type == 'apartment' && d.beds == 1): prediction_type = 11; break;
+      case (rental_type == 'single_family' || rental_type == 'apartment' && d.beds == 2): prediction_type = 12; break;
+      case (rental_type == 'single_family' || rental_type == 'apartment' && d.beds == 3): prediction_type = 13; break;
+      case (rental_type == 'single_family' || rental_type == 'apartment' && d.beds == 4): prediction_type = 14; break;
+      case (rental_type == 'single_family' || rental_type == 'apartment' && d.beds <= 5): prediction_type = 15; break;
+      case (rental_type == 'condo') : prediction_type = 16; break;
+      default: prediction_type = 19; break;
+    };
+
+    console.log(prediction_type);
+    var predicted_price = await getPrediction(county, prediction_type);
+    console.log(predicted_price);
+
     rentalJson =
       {
         id: d.listing_id,
@@ -550,6 +616,7 @@ function plotForRent(rentalListings) {
           "Pets": d.pet_policy,
           "Square Footage": d.sqft,
           "Address": d.address,
+          "Predicted Price": predicted_price
 
         },
         geometry: {
@@ -567,7 +634,8 @@ function plotForRent(rentalListings) {
       layer.bindPopup('<b>' + 'Name:</b> ' + feature.properties.Name + '</br><br>'
         + '<b>Beds:</b> ' + feature.properties.Beds + '<br><br>'
         + '<b>Baths:</b> ' + feature.properties.Baths + '<br><br>'
-        + '<b>Price:</b> ' + feature.properties.Price).openPopup();
+        + '<b>Price:</b> ' + feature.properties.Price + '<br><br>'
+        + '<b>Predicted Price:</b> ' + feature.properties["Predicted Price"]).openPopup();
     });
     layer.on('mouseout', function () {
       layer.closePopup();
@@ -607,11 +675,28 @@ function plotForRent(rentalListings) {
 };
 
 // plot sales data
-function plotForSale(salesListings) {
+function plotForSale(salesListings, county) {
 
   data = []
 
-  salesListings.forEach(d => {
+  salesListings.forEach(async function(d) {
+
+    var sale_type = d.prop_type;
+
+    var prediction_type;
+
+    switch (true) {
+      case (sale_type == 'single_family' || sale_type == 'mobile' && d.beds == 1): prediction_type = 2; break;
+      case (sale_type == 'single_family' || sale_type == 'mobile' && d.beds == 2): prediction_type = 3; break;
+      case (sale_type == 'single_family' || sale_type == 'mobile' && d.beds == 3): prediction_type = 4; break;
+      case (sale_type == 'single_family' || sale_type == 'mobile' && d.beds == 4): prediction_type = 5; break;
+      case (sale_type == 'single_family' || sale_type == 'mobile' && d.beds <= 5): prediction_type = 6; break;
+      case (sale_type == 'condo') : prediction_type = 1; break;
+      default: prediction_type = 10; break;
+    };
+
+    var predicted_price = await getPrediction(county, prediction_type);
+
     saleJson =
       {
         id: d.listing_id,
@@ -621,6 +706,7 @@ function plotForSale(salesListings) {
           "Beds": d.beds,
           "Baths": d.baths,
           "Price": d.price,
+          "Predicted Price": predicted_price,
           "Square Footage": d.sqft,
           "Lot Size": d.lot_size,
           "Address": d.address,
@@ -642,7 +728,8 @@ function plotForSale(salesListings) {
       layer.bindPopup('<b>' + 'Name:</b> ' + feature.properties.Name + '</br><br>'
         + '<b>Beds:</b> ' + feature.properties.Beds + '<br><br>'
         + '<b>Baths:</b> ' + feature.properties.Baths + '<br><br>'
-        + '<b>Price:</b> ' + feature.properties.Price).openPopup();
+        + '<b>Price:</b> ' + feature.properties.Price + '<br><br>'
+        + '<b>Predicted Price:</b> ' + feature.properties["Predicted Price"]).openPopup();
     });
     layer.on('mouseout', function () {
       layer.closePopup();
@@ -831,15 +918,18 @@ var map = L
 
 // MAIN FUNCTION
 map.on('click', async function (e) {
-  alert("Lat, Lon : " + e.latlng.lat + ", " + e.latlng.lng) //for debugging
+  // alert("Lat, Lon : " + e.latlng.lat + ", " + e.latlng.lng) //for debugging
   dropTile(e.latlng.lat, e.latlng.lng);
   var schools = await getSchools(e.latlng.lat, e.latlng.lng);
   plotSchools(schools);
-  var postal_code = await getAddress(e.latlng.lat, e.latlng.lng);
+  var addressComponents = await getAddress(e.latlng.lat, e.latlng.lng);
+  console.log(addressComponents);
+  var county = addressComponents.county;
+  var postal_code = addressComponents.postcode;
   var rentals = await getForRent(postal_code);
-  plotForRent(rentals);
+  plotForRent(rentals, county);
   var sales = await getForSale(postal_code);
-  plotForSale(sales);
+  plotForSale(sales, county);
 
   //I know this is messy but it's 1:30 AM and I had too much caffeine.
   var bizList1 = await getbiz1(e.latlng.lat, e.latlng.lng);
