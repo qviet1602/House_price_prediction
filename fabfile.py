@@ -121,7 +121,7 @@ def dev():
     env.host_group = "dev"
     env.remote = "origin"
     env.branch = "master"
-    env.hosts = ["dev.domicilian.com"]
+    env.hosts = ["domicilian.sanyamkhurana.com"]
     env.dotenv_path = "/home/ubuntu/dev/domicilian/.env"
     env.config_setter = fab.run
 
