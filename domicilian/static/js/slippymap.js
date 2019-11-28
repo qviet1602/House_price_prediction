@@ -286,7 +286,7 @@ async function getForRent(postal) {
   });
 };
 
-//get prediction 
+//get prediction
 async function getPrediction(countyName,type) {
 
   return new Promise(function (resolve, reject) {
@@ -911,8 +911,8 @@ if (document.cookie.split('=')[1] == undefined) {
 var map = L
   .map('mapid')
   .fitBounds(maxBounds)
-  .setView(new L.LatLng(stateLocs[state].lat, stateLocs[state].lon), 5.5); //testing purposess
-  // .setView(new L.LatLng(37.689740802722724, -109.599609375), 5);
+//   .setView(new L.LatLng(stateLocs[state].lat, stateLocs[state].lon), 5.5); //testing purposess
+  .setView(new L.LatLng(37.689740802722724, -109.599609375), 5);
 // .setView([47, 2], 10)
 // .setView([40, -8025], 10);   // center position + zoom
 
