@@ -271,6 +271,7 @@ function createForceStateNode(stateObj, x, y) {
   linkEnter.append('line')
     .attr('stroke', 'black')
     .attr('stroke-width', function (d) { return Math.sqrt(d.value) })
+    .attr('stroke-opacity', 0.3)
 
   link = linkEnter.merge(link);
   link.exit().remove();
@@ -355,6 +356,7 @@ function createForceCountyNodes(stateName, data) {
   linkEnter.append('line')
     .attr('stroke', 'black')
     .attr('stroke-width', function (d) { return Math.sqrt(d.value) })
+    .attr('stroke-opacity', 0.3)
 
   link = linkEnter.merge(link);
   link.exit().remove();
