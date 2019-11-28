@@ -38,6 +38,7 @@ urlpatterns = [
     path("api/purchase_median_prices/", list_purchase_median_prices),
     path("api/rental_median_prices/", list_rental_median_prices),
     path("api/list_states/", list_states),
+    path("api/list_states_rental/", list_states_rental),
     path("api/list_counties_purchase/", list_counties_purchase),
     path("api/list_counties_rental/", list_counties_rental),
     path("api/list_zips_purchase/", list_zips_purchase),
