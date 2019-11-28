@@ -52,10 +52,11 @@ def list_states(request):
 
 def list_states_rental(request):
     if request.method == 'GET':
-        states_query = "select state_id, string_agg(DISTINCT home_type_id::text, ',') from state_timeseries " \
+        states_query = "select state_id, string_agg(DISTINCT year_month, ','), string_agg(DISTINCT home_type_id::text, ',') from state_timeseries " \
                          "where index_value is not null and (year_month like '201%-12' or year_month = '2019-09') " \
                          "and home_type_id in (7, 8) group by state_id " \
-                         "having string_agg(DISTINCT home_type_id::text, ',') = '7,8'"
+                         "having string_agg(DISTINCT home_type_id::text, ',') = '7,8' " \
+                       "and string_agg(DISTINCT year_month, ',') = '2010-12,2011-12,2012-12,2013-12,2014-12,2015-12,2016-12,2017-12,2018-12,2019-09'"
 
         with connection.cursor() as cursor:
             cursor.execute(states_query)
@@ -125,10 +126,11 @@ def list_counties_purchase(request):
 @permission_classes([])
 def list_counties_rental(request):
     if request.method == 'GET':
-        counties_query = "select county_id, string_agg(DISTINCT home_type_id::text, ',') from county_timeseries " \
+        counties_query = "select county_id, string_agg(DISTINCT year_month, ','), string_agg(DISTINCT home_type_id::text, ',') from county_timeseries " \
                          "where index_value is not null and (year_month like '201%-12' or year_month = '2019-09') " \
                          "and home_type_id in (7, 8) group by county_id " \
-                         "having string_agg(DISTINCT home_type_id::text, ',') = '7,8'"
+                         "having string_agg(DISTINCT home_type_id::text, ',') = '7,8' " \
+                         "and string_agg(DISTINCT year_month, ',') = '2010-12,2011-12,2012-12,2013-12,2014-12,2015-12,2016-12,2017-12,2018-12,2019-09'"
         with connection.cursor() as cursor:
             cursor.execute(counties_query)
             county_rows = cursor.fetchall()
@@ -193,10 +195,11 @@ def list_zips_purchase(request):
 
 def list_zips_rental(request):
     if request.method == 'GET':
-        zips_query = "select zipcode_id, string_agg(DISTINCT home_type_id::text, ',') from zip_timeseries " \
+        zips_query = "select zipcode_id, string_agg(DISTINCT year_month, ','), string_agg(DISTINCT home_type_id::text, ',') from zip_timeseries " \
                          "where index_value is not null and (year_month like '201%-12' or year_month = '2019-09') " \
                          "and home_type_id in (7, 8) group by zipcode_id " \
-                         "having string_agg(DISTINCT home_type_id::text, ',') = '7,8'"
+                         "having string_agg(DISTINCT home_type_id::text, ',') = '7,8' " \
+                     "and string_agg(DISTINCT year_month, ',') = '2010-12,2011-12,2012-12,2013-12,2014-12,2015-12,2016-12,2017-12,2018-12,2019-09'"
 
         with connection.cursor() as cursor:
             cursor.execute(zips_query)
@@ -678,7 +681,6 @@ def list_best_counties(state_name):
             if first_common_data[i] in county_ids3:
                 final_list.append(first_common_data[i])
 
-        print("Len ", len(final_list))
         total_ids = len(final_list)
         final_county_ids = final_list
         if total_ids < 5:
@@ -858,16 +860,30 @@ def list_safe_counties(state_name):
 
 
 def list_affordable_counties(state_name):
+    min_price_query = "select index_value from state_timeseries inner join state on state_timeseries.state_id = state.id where state.name='" + state_name + "' and index_value is not null and (year_month like '2019-%') "
+
+    with connection.cursor() as cursor:
+        cursor.execute(min_price_query)
+        min_price_row = cursor.fetchall()
+    values = []
+    for each in min_price_row:
+        values.append(each[0])
+    if len(values) == 0:
+        min_value = 28555
+    else:
+        min_value = np.min(values)
+
     annual_income_query = (
         "select avg(avg_annual_income), avg(median_annual_income), zipcode.county_id, county.name from "
         "annual_income inner join zipcode on annual_income.zipcode_id = zipcode.id "
         "inner join county on zipcode.county_id = county.id "
         "inner join state on zipcode.state_id = state.id where state.name = %s  "
-        "group by county.name, zipcode.county_id having avg(avg_annual_income) <= %s"
+        "group by county.name, zipcode.county_id having avg(median_annual_income) > %s "
         "order by avg(annual_income.avg_annual_income) asc, avg(annual_income.median_annual_income) asc limit %s"
     )
+
     with connection.cursor() as cursor:
-        cursor.execute(annual_income_query, [state_name, 38555, 5])
+        cursor.execute(annual_income_query, [state_name, int(min_value * 2), 5])
         annual_data_row = cursor.fetchall()
 
     data = []
@@ -932,8 +948,8 @@ def get_similar_states(request):
             "order by avg(annual_income.avg_annual_income) asc, avg(annual_income.median_annual_income) asc"
         )
         median_prices_query = (
-            "select list_price, state_id, state.name from state_median_price "
-            "inner join state on state_median_price.state_id = state.id where year_month = %s and home_type_id = %s"
+            "select list_price, state_id, state.name from state_timeseries "
+            "inner join state on state_timeseries.state_id = state.id where year_month = %s and home_type_id = %s"
         )
 
         with connection.cursor() as cursor:
@@ -949,7 +965,7 @@ def get_similar_states(request):
             annual_data_rows = cursor.fetchall()
 
         with connection.cursor() as cursor:
-            cursor.execute(median_prices_query, ["2019-09", 10])
+            cursor.execute(median_prices_query, ["2019-09", 2])
             median_prices_rows = cursor.fetchall()
 
         # Now merge all this data into one
@@ -1046,7 +1062,7 @@ def get_similar_states(request):
         return JsonResponse(data, safe=False)
 
 
-def similar_counties(all_counties_str, counties_list):
+def similar_counties(all_counties_str):
 
     # Get data for all best counties and aggregate this data into one dataset
     crime_data_query = (
@@ -1400,7 +1416,7 @@ def get_similar_all(request):
 
         all_counties_str = all_counties_str[:-1]
 
-        data = similar_counties(all_counties_str, all_counties)
+        data = similar_counties(all_counties_str)
 
         final_data = dict()
 
@@ -1431,7 +1447,7 @@ def get_similar_all(request):
 
         all_counties_str = all_counties_str[:-1]
 
-        data = similar_counties(all_counties_str, all_counties)
+        data = similar_counties(all_counties_str)
 
         for each_data in data:
             county_id = each_data["id"]
@@ -1460,7 +1476,7 @@ def get_similar_all(request):
 
         all_counties_str = all_counties_str[:-1]
 
-        data = similar_counties(all_counties_str, all_counties)
+        data = similar_counties(all_counties_str)
 
         for each_data in data:
             county_id = each_data["id"]
