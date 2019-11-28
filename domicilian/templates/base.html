@@ -12,15 +12,15 @@
     <script>
         Raven.config('{% sentry_public_dsn %}').install()
     </script>
-   {% endif %} {% block css %}
-        <link href="{% static 'css/normalize.css' %}" rel="stylesheet">
-        <link href="{% static 'css/main.css' %}" rel="stylesheet">
-        <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/map.css" />
-        <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/graph.css" />
-        <link rel="stylesheet" type="text/css" href="{% static 'css/trends.css' %}" /> {% endblock css %} {% block head_extras %} {% endblock %}
-        <link rel="stylesheet" type="text/css" href="{% static 'css/font-awesome.min.css' %}" />
-        <link rel="stylesheet" type="text/css" href="{% static 'css/slicknav.min.css'%}" />
-        <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}" />
+    {% endif %} {% block css %}
+    <link href="{% static 'css/normalize.css' %}" rel="stylesheet">
+    <link href="{% static 'css/main.css' %}" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/map.css" />
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/graph.css" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/trends.css' %}" /> {% endblock css %} {% block head_extras %} {% endblock %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/font-awesome.min.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/slicknav.min.css'%}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}" />
 </head>
 
 <body class="{% block body_classes %}{% endblock body_classes %} ">
@@ -52,7 +52,7 @@
                 <li><a href="/trends_by_zip_purchase" class="{% if request.resolver_match.url_name == 'trends_by_zip_purchase' %}active{% endif %}">Trends (By Zip)</a>
 
                 </li>
-                <li><a href="/graphical_visualization" class="{% if request.resolver_match.url_name == 'graphical_visualization' %}active{% endif %}">Graphical Visualization</a></li>
+                <li><a href="/visualize" class="{% if request.resolver_match.url_name == 'visualize' %}active{% endif %}">Graphical Visualization</a></li>
             </ul>
         </nav>
     </header>
