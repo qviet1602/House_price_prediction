@@ -1,10 +1,10 @@
 var states_div_width = 250;
 var states_div_height = 600;
 var dynamic_trends_div_width = 700;
-var chart_height = 300;
+var chart_height = 400;
 var states_bar_height = 50;
 var parseTime = d3.timeParse("%Y");
-var left_margin = 60;
+var left_margin = 80;
 var bottom_margin = 60;
 var promises = [
   d3.json('/api/list_states/'),
@@ -24,8 +24,8 @@ function ready([state_list, state_data]) {
 	var bar = states_list_svg.selectAll("g")
     			     .data(state_list)
   			     .enter().append("g")
-    			     .attr("transform", function(d, i) { 
-				return "translate(0," + i * states_bar_height + ")"; 
+    			     .attr("transform", function(d, i) {
+				return "translate(0," + i * states_bar_height + ")";
 			     });
 
 	bar.append("rect")
@@ -38,10 +38,10 @@ function ready([state_list, state_data]) {
     	   .attr("x", 80)
     	   .attr("y", states_bar_height / 2)
      	   .attr("dy", ".35em")
-           .attr("font-family", "Arial")
+           .attr("font-family", "Sans-Serif")
            .style("fill", "white")
-    	   .text(function(d) { return d['name']; }); 
-	
+    	   .text(function(d) { return d['name']; });
+
 	//Draw line chart here given this data
         draw_lineChart1(state_data);
         draw_lineChart2(state_data);
@@ -56,15 +56,15 @@ function ready([state_list, state_data]) {
 
 function handleStateClick(d) {
 	all_rectangles = d3.selectAll("rect");
-	all_rectangles.each(function(d, i) { 
+	all_rectangles.each(function(d, i) {
 		d3.select(this).style("fill", "steelblue");
 	})
-	clicked_state_id = d['id'] 
+	clicked_state_id = d['id']
 	d3.select(this).style("fill", "green");
 	d3.select("#line_chart1").remove();
 	d3.select("#line_chart2").remove();
 	d3.select("#line_chart3").remove();
-	
+
 	var state_promise = [
   		d3.json('/api/state_data_purchase/?state_id=' + clicked_state_id),
 	];
@@ -84,7 +84,7 @@ function draw_lineChart1(state_data) {
 	oneBedroom_data = state_data[1]['oneBedroom']
 	twoBedroom_data = state_data[2]['twoBedroom']
 	threeBedroom_data = state_data[3]['threeBedroom']
-	
+
 	min_condoCoOp_year = d3.min(condoCoOp_data, function(d) {
                 return parseTime(d.year);
         });
@@ -98,7 +98,7 @@ function draw_lineChart1(state_data) {
 	min_threeBedroom_year = d3.min(threeBedroom_data, function(d) {
                 return parseTime(d.year);
         });
-	
+
 	min_condoCoOp_price = d3.min(condoCoOp_data, function(d) {
                 return parseInt(d.list_price);
         });
@@ -114,7 +114,7 @@ function draw_lineChart1(state_data) {
         });
 
 	chart1_all_min_years = []
-	
+
 	chart1_all_min_years.push(min_condoCoOp_year);
 	chart1_all_min_years.push(min_oneBedroom_year);
 	chart1_all_min_years.push(min_twoBedroom_year);
@@ -123,7 +123,7 @@ function draw_lineChart1(state_data) {
 	min_year = d3.min(chart1_all_min_years);
 
 	chart1_all_min_prices = []
-	
+
 	chart1_all_min_prices.push(min_condoCoOp_price);
 	chart1_all_min_prices.push(min_oneBedroom_price);
 	chart1_all_min_prices.push(min_twoBedroom_price);
@@ -167,10 +167,10 @@ function draw_lineChart1(state_data) {
         chart1_all_max_years.push(max_threeBedroom_year);
 
         max_year = d3.max(chart1_all_max_years);
-	
+
 
         chart1_all_max_prices = []
-        
+
         chart1_all_max_prices.push(max_condoCoOp_price);
         chart1_all_max_prices.push(max_oneBedroom_price);
         chart1_all_max_prices.push(max_twoBedroom_price);
@@ -208,9 +208,9 @@ function draw_lineChart1(state_data) {
                         + new_xAxis_y_pos + ")";
         chart1_svg.append("g").attr("class", "axis").attr("transform",
                         translate_xAxis_by).call(xAxis);
-	
+
 	// Draw y axis
-	
+
 	var y_axisScale = d3.scaleLinear().domain(
                         [ min_price, max_price ]).range(
                         [ chart_height - bottom_margin, left_margin ]);
@@ -232,7 +232,7 @@ function draw_lineChart1(state_data) {
     //Set a label for the y-axis
         chart1_svg.append("text")
     .attr("transform", "rotate(-90)")
-    .attr("y", -5)
+    .attr("y", 5)
     .attr("x",0 - (chart_height / 2))
     .attr("dy", "1em")
     .attr("font-family", "Helvetica")
@@ -241,7 +241,7 @@ function draw_lineChart1(state_data) {
 	//Draw lines
 	var all_colors = d3.schemeCategory10;
         var colorScheme = {'condo': '#FFC300', 'oneBedroom': '#FF5733', 'twoBedroom': '#C70039', 'threeBedroom': '#900C3F'}
-	
+
 
 
         var line = d3.line()
@@ -259,29 +259,29 @@ function draw_lineChart1(state_data) {
                           .style("fill", "none")
                           .style("stroke-width", 1)
                       .style("stroke", colorScheme['condo']);
-	
+
          chart1_svg.append("path")
                           .datum(oneBedroom_data)
                           .attr("d", line)
                           .style("fill", "none")
                           .style("stroke-width", 1)
-                      .style("stroke", colorScheme['oneBedroom']); 
-	
+                      .style("stroke", colorScheme['oneBedroom']);
+
 	chart1_svg.append("path")
                           .datum(twoBedroom_data)
                           .attr("d", line)
                           .style("fill", "none")
                           .style("stroke-width", 1)
-                      .style("stroke", colorScheme['twoBedroom']); 
+                      .style("stroke", colorScheme['twoBedroom']);
 
 	 chart1_svg.append("path")
                           .datum(threeBedroom_data)
                           .attr("d", line)
                           .style("fill", "none")
                           .style("stroke-width", 1)
-                      .style("stroke", colorScheme['threeBedroom']); 
-	
-	
+                      .style("stroke", colorScheme['threeBedroom']);
+
+
 	//Draw the legend
         var legend_names = ['condo', 'oneBedroom', 'twoBedroom','threeBedroom']
         chart1_svg.selectAll("legend_rect")
@@ -459,7 +459,7 @@ function draw_lineChart2(state_data) {
     //Set a label for the y-axis
         chart2_svg.append("text")
     .attr("transform", "rotate(-90)")
-    .attr("y", -5)
+    .attr("y", 5)
     .attr("x",0 - (chart_height / 2))
     .attr("dy", "1em")
     .attr("font-family", "Helvetica")
@@ -540,7 +540,7 @@ function draw_barChart(state_data) {
     var chart3_svg = d3.select("#chart3_dummy_svg").append("svg");
 	chart3_svg.attr("width", dynamic_trends_div_width)
 		  .attr("id", "line_chart3")
-		  .attr("height", 400);
+		  .attr("height", 800);
 
     condoCoOp_data = state_data[0]['condoCoOp']
 	oneBedroom_data = state_data[1]['oneBedroom']

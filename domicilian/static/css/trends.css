@@ -1,37 +1,36 @@
 .trends_container {
-  width: 1000px;
-  display: flex;
-  border-spacing: 10px;
-  margin-top:100px;
-  flex-direction:row;
+    width: 1000px;
+    display: flex;
+    border-spacing: 10px;
+    margin-top: 100px;
+    flex-direction: row;
 }
 
 .states_div {
-  width:250px;
-  height:600px;
-  #background:cyan;
-  flex:250;
-  overflow-y:scroll;
+    /* margin-left: -200px; */
+    width: 250px;
+    height: 600px;
+    flex: 250;
+    overflow-y: scroll;
 }
 
 .dynamic_trends_div {
-  width:700px;
-  height:1200px;
-  display: flex;
-  flex-direction:column;
-  flex:0;
+    width: 700px;
+    height: 1200px;
+    display: flex;
+    flex-direction: column;
+    flex: 0;
 }
 
 #chart1 {
-    flex:0;
+    flex: 0;
     position: relative;
-    margin-top:0px;
+    margin-top: 0px;
     vertical-align: top;
 }
 
 #chart2 {
-    flex:0;
+    flex: 0;
     position: relative;
     vertical-align: top;
 }
-
