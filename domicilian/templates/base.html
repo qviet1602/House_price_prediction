@@ -8,25 +8,19 @@
     <title>{% block title %}domicilian{% endblock title %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="version" content="{{ site_info.RELEASE_VERSION }}">
-    <meta name="description" content="{% block meta_description %}{% endblock meta_description %}">
-    {% if site_info.IS_RAVEN_INSTALLED %}
-        <script>
-                Raven.config('{% sentry_public_dsn %}').install()
+    <meta name="description" content="{% block meta_description %}{% endblock meta_description %}"> {% if site_info.IS_RAVEN_INSTALLED %}
+    <script>
+        Raven.config('{% sentry_public_dsn %}').install()
     </script>
-<<<<<<< HEAD
-    {% endif %}
-    {% block css %}
-        <link href="{% static 'css/normalize.css' %}" rel="stylesheet">
-        <link href="{% static 'css/main.css' %}" rel="stylesheet">
-        <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/map.css" />
-        <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/graph.css" />
-        <link rel="stylesheet" type="text/css" href="{% static 'css/trends.css' %}" /> 
-    {% endblock css %}
-    {% block head_extras %}
-    {% endblock %}
-    <link rel="stylesheet" type="text/css" href="{% static 'css/font-awesome.min.css' %}"/>
-      <link rel="stylesheet" type="text/css" href="{% static 'css/slicknav.min.css'%}" />
-      <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}" />
+    {% endif %} {% block css %}
+    <link href="{% static 'css/normalize.css' %}" rel="stylesheet">
+    <link href="{% static 'css/main.css' %}" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/map.css" />
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/graph.css" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/trends.css' %}" /> {% endblock css %} {% block head_extras %} {% endblock %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/font-awesome.min.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/slicknav.min.css'%}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}" />
 </head>
 
 <body class="{% block body_classes %}{% endblock body_classes %} ">
@@ -35,40 +29,38 @@
     <![endif]-->
 
     {% block header %}
-        <!-- Header Section -->
-        <header class="header-section">
-                <a href="index.html" class="site-logo">
-                        <img src="{{ STATIC_URL }}images/logo.png" alt="">
-                </a>
-                <nav class="header-nav">
-                        <ul class="main-menu">
-                                <li><a href="/map" class="active">Home</a></li>
-				<li><a href="/trends_by_state_purchase/">Trends (By State)</a>
-                                        <ul class="sub-menu">
-                                                <li><a href="/trends_by_state_purchase/">Trends by State (Purchase)</a></li>
-                                                <li><a href="/trends_by_state_rental/">Trends by State (Rental)</a></li>
-                                        </ul>
-                                </li>
-                                <li><a href="/trends_by_county_purchase/">Trends (By County)</a>
-                                        <ul class="sub-menu">
-                                                <li><a href="/trends_by_county_purchase/">Trends by County (Purchase)</a></li>
-                                                <li><a href="/trends_by_county_rental/">Trends by County (Rental)</a></li>
-                                        </ul>
-                                </li>
-                                <li><a href="/trends_by_zip_purchase">Trends (By Zip)</a>
+    <!-- Header Section -->
+    <header class="header-section">
+        <a href="index.html" class="site-logo">
+            <img src="{{ STATIC_URL }}images/logo.png" alt="">
+        </a>
+        <nav class="header-nav">
+            <ul class="main-menu">
+                <li><a href="/map" class="active">Home</a></li>
+                <li><a href="/trends_by_state_purchase/">Trends (By State)</a>
+                    <ul class="sub-menu">
+                        <li><a href="/trends_by_state_purchase/">Trends by State (Purchase)</a></li>
+                        <li><a href="/trends_by_state_rental/">Trends by State (Rental)</a></li>
+                    </ul>
+                </li>
+                <li><a href="/trends_by_county_purchase/">Trends (By County)</a>
+                    <ul class="sub-menu">
+                        <li><a href="/trends_by_county_purchase/">Trends by County (Purchase)</a></li>
+                        <li><a href="/trends_by_county_rental/">Trends by County (Rental)</a></li>
+                    </ul>
+                </li>
+                <li><a href="/trends_by_zip_purchase">Trends (By Zip)</a>
 
-                                </li>
-                                <li><a href="#">Graphical Visualization</a></li>
-                        </ul>
-                </nav>
-        </header>
-    {% endblock header %}
-    {% block content %}
+                </li>
+                <li><a href="/graphical_visualization">Graphical Visualization</a></li>
+            </ul>
+        </nav>
+    </header>
+    {% endblock header %} {% block content %}
     <p>Coming soon!</p>
     {% endblock content %} {% block footer %} {% endblock footer %}
 
-    <!-- Le javascript
-    ================================================== -->
+    <!-- Le javascript -->
     {# Placed at the end of the document so the pages load faster #} {% block js %}
     <!-- place project specific Javascript in this file -->
     <script src="{% static 'js/lib/jquery-3.2.1.min.js' %}"></script>
