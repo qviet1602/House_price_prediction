@@ -12,15 +12,15 @@
     <script>
         Raven.config('{% sentry_public_dsn %}').install()
     </script>
-    {% endif %} {% block css %}
-    <link href="{% static 'css/normalize.css' %}" rel="stylesheet">
-    <link href="{% static 'css/main.css' %}" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/map.css" />
-    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/graph.css" />
-    <link rel="stylesheet" type="text/css" href="{% static 'css/trends.css' %}" /> {% endblock css %} {% block head_extras %} {% endblock %}
-    <link rel="stylesheet" type="text/css" href="{% static 'css/font-awesome.min.css' %}" />
-    <link rel="stylesheet" type="text/css" href="{% static 'css/slicknav.min.css'%}" />
-    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}" />
+   {% endif %} {% block css %}
+        <link href="{% static 'css/normalize.css' %}" rel="stylesheet">
+        <link href="{% static 'css/main.css' %}" rel="stylesheet">
+        <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/map.css" />
+        <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/graph.css" />
+        <link rel="stylesheet" type="text/css" href="{% static 'css/trends.css' %}" /> {% endblock css %} {% block head_extras %} {% endblock %}
+        <link rel="stylesheet" type="text/css" href="{% static 'css/font-awesome.min.css' %}" />
+        <link rel="stylesheet" type="text/css" href="{% static 'css/slicknav.min.css'%}" />
+        <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}" />
 </head>
 
 <body class="{% block body_classes %}{% endblock body_classes %} ">
@@ -36,23 +36,23 @@
         </a>
         <nav class="header-nav">
             <ul class="main-menu">
-                <li><a href="/map" class="active">Home</a></li>
-                <li><a href="/trends_by_state_purchase/">Trends (By State)</a>
+                <li><a href="/map" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">Home</a></li>
+                <li><a href="/trends_by_state_purchase/" class="{% if request.resolver_match.url_name == 'trends_by_state_purchase' or request.resolver_match.url_name == 'trends_by_state_rental' %}active{% endif %}">Trends (By State)</a>
                     <ul class="sub-menu">
                         <li><a href="/trends_by_state_purchase/">Trends by State (Purchase)</a></li>
                         <li><a href="/trends_by_state_rental/">Trends by State (Rental)</a></li>
                     </ul>
                 </li>
-                <li><a href="/trends_by_county_purchase/">Trends (By County)</a>
+                <li><a href="/trends_by_county_purchase/" class="{% if request.resolver_match.url_name == 'trends_by_county_purchase' or request.resolver_match.url_name == 'trends_by_county_rental' %}active{% endif %}">Trends (By County)</a>
                     <ul class="sub-menu">
                         <li><a href="/trends_by_county_purchase/">Trends by County (Purchase)</a></li>
                         <li><a href="/trends_by_county_rental/">Trends by County (Rental)</a></li>
                     </ul>
                 </li>
-                <li><a href="/trends_by_zip_purchase">Trends (By Zip)</a>
+                <li><a href="/trends_by_zip_purchase" class="{% if request.resolver_match.url_name == 'trends_by_zip_purchase' %}active{% endif %}">Trends (By Zip)</a>
 
                 </li>
-                <li><a href="/graphical_visualization">Graphical Visualization</a></li>
+                <li><a href="/graphical_visualization" class="{% if request.resolver_match.url_name == 'graphical_visualization' %}active{% endif %}">Graphical Visualization</a></li>
             </ul>
         </nav>
     </header>
