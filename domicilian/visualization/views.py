@@ -998,8 +998,9 @@ def similar_counties(all_counties_str, counties_list):
     # Get data for all best counties and aggregate this data into one dataset
     crime_data_query = "select avg(violent_crime), avg(property_crime), zipcode.county_id, county.name from " \
                        "crime_data inner join zipcode on crime_data.zipcode_id = zipcode.id " \
-                       "inner join county on zipcode.county_id = county.id where zipcode.county_id in (" + all_counties_str + ") " \
-                       "group by county.name, zipcode.county_id "
+                       "inner join county on zipcode.county_id = county.id " \
+                       "where zipcode.county_id in (" + all_counties_str + ") " \
+                       "group by county.name, zipcode.county_id"
 
     school_data_query = "select count(*), zipcode.county_id, county.name from school_data " \
                         "inner join zipcode on school_data.zipcode_id = zipcode.id " \
@@ -1148,7 +1149,7 @@ def similar_counties(all_counties_str, counties_list):
         for similar in similars:
             similar_data_dict = {}
             similar_data_dict['name'] = entities[similar]
-            similar_data_dict['id'] = entities_map[each_data_dict['name']]
+            similar_data_dict['id'] = entities_map[similar_data_dict['name']]
             similar_values.append(similar_data_dict)
 
         each_data_dict['similars'] = similar_values
@@ -1310,20 +1311,15 @@ def get_similar_all(request):
         selected_states = request.GET.get('states', 'Arkansas_Ohio_Mississippi')
 
         all_states = selected_states.split("_")
-        best_counties1 = list_best_counties(all_states[0])
-        best_counties2 = list_best_counties(all_states[1])
-        best_counties3 = list_best_counties(all_states[2])
 
         all_counties = []
 
-        for each in best_counties1:
-            all_counties.append(each['id'])
-
-        for each in best_counties2:
-            all_counties.append(each['id'])
-
-        for each in best_counties3:
-            all_counties.append(each['id'])
+        county_id_state_map = {}
+        for each_state in all_states:
+            best_counties = list_best_counties(each_state)
+            for each in best_counties:
+                county_id_state_map[each['id']] = each_state
+                all_counties.append(each['id'])
 
         all_counties_str = ""
 
@@ -1335,26 +1331,26 @@ def get_similar_all(request):
         data = similar_counties(all_counties_str, all_counties)
 
         final_data = dict()
+
+        for each_data in data:
+            county_id = each_data['id']
+            state_name = county_id_state_map[county_id]
+            each_data['state_name'] = state_name
+            similars = each_data['similars']
+            for each_similar in similars:
+                state_name = county_id_state_map[each_similar['id']]
+                each_similar['state_name'] = state_name
+
         final_data['best_counties'] = data
-
-
-        #Safe counties
-        safe_counties1 = list_safe_counties(all_states[0])
-        safe_counties2 = list_safe_counties(all_states[1])
-        safe_counties3 = list_safe_counties(all_states[2])
-
-        print("Len ", len(safe_counties1), len(safe_counties2), len(safe_counties3))
 
         all_counties = []
 
-        for each in safe_counties1:
-            all_counties.append(each['id'])
-
-        for each in safe_counties2:
-            all_counties.append(each['id'])
-
-        for each in safe_counties3:
-            all_counties.append(each['id'])
+        county_id_state_map = {}
+        for each_state in all_states:
+            safe_counties = list_safe_counties(each_state)
+            for each in safe_counties:
+                county_id_state_map[each['id']] = each_state
+                all_counties.append(each['id'])
 
         all_counties_str = ""
 
@@ -1364,24 +1360,26 @@ def get_similar_all(request):
         all_counties_str = all_counties_str[:-1]
 
         data = similar_counties(all_counties_str, all_counties)
+
+        for each_data in data:
+            county_id = each_data['id']
+            state_name = county_id_state_map[county_id]
+            each_data['state_name'] = state_name
+            similars = each_data['similars']
+            for each_similar in similars:
+                state_name = county_id_state_map[each_similar['id']]
+                each_similar['state_name'] = state_name
 
         final_data['safe_counties'] = data
 
-        # Affordable counties
-        affordable_counties1 = list_affordable_counties(all_states[0])
-        affordable_counties2 = list_affordable_counties(all_states[1])
-        affordable_counties3 = list_affordable_counties(all_states[2])
-
         all_counties = []
 
-        for each in affordable_counties1:
-            all_counties.append(each['id'])
-
-        for each in affordable_counties2:
-            all_counties.append(each['id'])
-
-        for each in affordable_counties3:
-            all_counties.append(each['id'])
+        county_id_state_map = {}
+        for each_state in all_states:
+            affordable_counties = list_affordable_counties(each_state)
+            for each in affordable_counties:
+                county_id_state_map[each['id']] = each_state
+                all_counties.append(each['id'])
 
         all_counties_str = ""
 
@@ -1392,24 +1390,26 @@ def get_similar_all(request):
 
         data = similar_counties(all_counties_str, all_counties)
 
+        for each_data in data:
+            county_id = each_data['id']
+            state_name = county_id_state_map[county_id]
+            each_data['state_name'] = state_name
+            similars = each_data['similars']
+            for each_similar in similars:
+                state_name = county_id_state_map[each_similar['id']]
+                each_similar['state_name'] = state_name
+
+
         final_data['affordable_counties'] = data
-
-
-        # best zips
-        best_zips1 = list_best_zips(all_states[0])
-        best_zips2 = list_best_zips(all_states[1])
-        best_zips3 = list_best_zips(all_states[2])
 
         all_zips = []
 
-        for each in best_zips1:
-            all_zips.append(each['id'])
-
-        for each in best_zips2:
-            all_zips.append(each['id'])
-
-        for each in best_zips3:
-            all_zips.append(each['id'])
+        zip_id_state_map = {}
+        for each_state in all_states:
+            best_zips = list_best_zips(each_state)
+            for each in best_zips:
+                zip_id_state_map[each['id']] = each_state
+                all_zips.append(each['id'])
 
         all_zips_str = ""
 
@@ -1418,10 +1418,18 @@ def get_similar_all(request):
 
         all_zips_str = all_zips_str[:-1]
 
-        print("Zip IDs ", all_zips_str)
         data = similar_zips(all_zips_str)
 
         final_data['best_zips'] = data
+
+        for each_data in data:
+            zip_id = each_data['id']
+            state_name = zip_id_state_map[zip_id]
+            each_data['state_name'] = state_name
+            similars = each_data['similars']
+            for each_similar in similars:
+                state_name = zip_id_state_map[each_similar['id']]
+                each_similar['state_name'] = state_name
 
         return JsonResponse(final_data, safe=False)
 
