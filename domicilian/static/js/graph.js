@@ -6,7 +6,8 @@ var rightClickMenuItemHeight = 40;
 var createdNodes = {};
 var totalNodes = 0;
 var colors = d3.schemeCategory10;
-var nodeColors = [colors[0], colors[1], colors[2]];
+var nodeGroups = [0, 1, 2];
+var nodeColors = [colors[1], colors[2], colors[3]];
 
 var svg = d3.select('svg');
 var width = parseInt(svg.style('width'));
@@ -16,57 +17,54 @@ var promises = [
 ];
 var height = parseInt(svg.style('height'))
 
+var graph = {
+  nodes: [],
+  links: []
+};
+
+var simulation = d3.forceSimulation()
+  .force('link', d3.forceLink().id(function (d) { return d.id; }).distance(200))
+  .force('charge', d3.forceManyBody().strength(-30))
+  // .force('center', d3.forceCenter(500, 500))
+
+var links = svg.append('g')
+  .attr('class', 'links');
+
+var nodes = svg.append('g')
+  .attr('class', 'nodes');
+
 Promise.all(promises).then(ready);
 function ready([state_list]) {
-	usStates = state_list;
+  usStates = state_list;
 
-    var menu = svg.append('g')
+  var menu = svg.append('g')
     .attr('class', 'menu');
 
-// Adjust nodes, labels, and lines on scroll to remain in view at all times
-// This allows the user to scroll through the state list without losing their existing nodes
-d3.select(window).on('scroll', function() {
-  removeRightClickMenu();
+  // Adjust nodes, labels, and lines on scroll to remain in view at all times
+  // This allows the user to scroll through the state list without losing their existing nodes
+  d3.select(window).on('scroll', function () {
+    removeRightClickMenu();
+    removeStatBox();
 
-  // Move all state nodes, labels, and lines with scroll
-  var nodes = d3.selectAll('.state .state-node');
-  nodes.each(function(d, i) {
-    var y = d3.select(this).attr('original-y');
+    simulation.restart();
+  })
 
-    d3.select(this).attr('cy', parseInt(y) + window.scrollY)
-    d3.select(this.parentNode).select('.state-node-label').attr('y', parseInt(y) - 30 + window.scrollY);
-    d3.select(this.parentNode).selectAll('line').each(function() {
-      d3.select(this).attr('y1', parseInt(y) + window.scrollY);
-    })
-  });
-
-  // Move all county nodes, labels, and lines with scroll
-  nodes = d3.selectAll('.counties .county-node');
-  nodes.each(function(d, i) {
-    var y = d3.select(this).attr('original-y');
-
-    d3.select(this).attr('cy', parseInt(y) + window.scrollY)
-    d3.select(d3.select(this.parentNode).selectAll('text').nodes()[i % 5]).attr('y', parseInt(y) - 30 + window.scrollY);
-    d3.select(d3.select(this.parentNode).selectAll('line').nodes()[i % 5]).attr('y2', parseInt(y) + window.scrollY);
-  });
-})
-
-    createMenu(menu, usStates);
+  createMenu(menu, usStates);
 }
 
-	/**
- * List of main functions and brief description
- *
- * createMenu() => Displays the list of states on the right side and sets up handlers and interactions
- *                 This is the only function that runs on initial page load
- * createStateNode() => Creates a node for a state at the location the user drags to
- *                      Enables right click menu creation on user right click
- * createRightClickMenu() => Displays right click menu for node
- * createCountyNodes() => Creates county nodes and links them to a given state
- */
+/**
+* List of main functions and brief description
+*
+* createMenu() => Displays the list of states on the right side and sets up handlers and interactions
+*                 This is the only function that runs on initial page load
+* createForceStateNode() => Creates a node for a state at the location the user drags to
+*                      Enables right click menu creation on user right click
+* createRightClickMenu() => Displays right click menu for node
+* createForceCountyNodes() => Creates county nodes and links them to a given state
+*/
 // Create entire right side state menu including clear all button
 function createMenu(menu, usStates) {
-  // "Clear and Start Over" button
+  // 'Clear and Start Over' button
   menu.append('rect')
     .attr('class', 'clear-all hidden')
     .attr('height', rightClickMenuItemHeight)
@@ -82,7 +80,7 @@ function createMenu(menu, usStates) {
       deleteAllNodes();
     });
 
-  // "Clear and Start Over" label
+  // 'Clear and Start Over' label
   menu.append('text')
     .attr('class', 'clear-all-label hidden')
     .attr('y', 30)
@@ -93,7 +91,7 @@ function createMenu(menu, usStates) {
     .attr('font-weight', 'bold')
     .text('Clear and Start Over')
 
-   // State name menu items
+  // State name menu items
   menu.selectAll('.menu-item')
     .data(usStates)
     .enter().append('rect')
@@ -107,7 +105,6 @@ function createMenu(menu, usStates) {
     .attr('stroke-width', 2)
     .call(d3.drag()
       .on('start', menuOnDragStart)
-      .on('drag', menuOnDrag)
       .on('end', menuOnDragEnd))
 
   // State name menu labels
@@ -122,88 +119,23 @@ function createMenu(menu, usStates) {
     .attr('text-anchor', 'middle')
     .attr('font-weight', 'bold')
     .text(function (d) { return d['name'] })
+
   // Menu item drag start function
   function menuOnDragStart(d) {
     removeRightClickMenu();
 
-    if (!createdNodes[d['name']] && totalNodes < 3) {
-      d3.select(this).attr('fill', nodeColors[totalNodes]);
+    if (createdNodes[d['name']] === undefined && totalNodes < 3) {
+      d3.select(this).attr('fill', nodeColors[nodeGroups[0]]);
     }
 
     d3.select(this).classed('active', true);
     d3.select('.' + d['name'] + '-node');
   }
 
-  function menuOnDrag(d) {
-    // console.log('drag: ', d3.event)
-  }
-
   // Menu item drag end function
   function menuOnDragEnd(d) {
     d3.select(this).classed('active', false);
-    createStateNode(d);
-  }
-}
-
-// Create state node with text
-function createStateNode(stateObj, x, y) {
-  // Create node and label for state if one does not already exist
-  if (!createdNodes[stateObj['name']] && totalNodes < 3) {
-    var state = svg.append('g')
-      .attr('class', 'state ' + genClassName(stateObj['name']));
-
-    var yTranslation = d3.select('.menu').attr('y-translation');
-
-    if (!x) {
-      x = d3.event.x;
-    }
-
-    if (!y) {
-      y = d3.event.y - yTranslation;
-    }
-
-    // Create state node
-    state.data([stateObj['name']]).append('circle')
-      .attr('class', 'state-node ' + genClassName(stateObj['name']) + '-node')
-      .attr('r', '20px')
-      .attr('cx', x)
-      .attr('cy', y)
-      .attr('original-y', y - window.scrollY)
-      .attr('fill', nodeColors[totalNodes])
-      .attr('stroke', 'black')
-      .attr('stroke-width', '2')
-      .call(d3.drag()
-        .on('start', nodeOnDragStart)
-        .on('drag', stateNodeOnDrag)
-        .on('end', nodeOnDragEnd))
-      .on('contextmenu', function() {
-        d3.event.preventDefault();
-
-        createRightClickMenu(stateObj['name']);
-      }).on('mouseover', function() {
-        // Prevent stat box display if node is being dragged
-        if (!d3.select(this).attr('class').includes('active')) {
-          displayStats('state', stateObj['name'], '.' + genClassName(stateObj['name']) + '-node') // TODO: Implement this with actual data
-        }
-      });
-
-    // Create label for state node
-    state.append('text')
-      .attr('class', 'state-node-label ' + genClassName(stateObj['name']) + '-label')
-      .attr('y', y - 30)
-      .attr('x', x)
-      .attr('font-size', '17px')
-      .attr('text-anchor', 'middle')
-      .attr('font-weight', 'bold')
-      .text(stateObj['name'])
-
-    // Count number of active state nodes and ensure user cannot add state more than once
-    createdNodes[stateObj['name']] = true;
-    totalNodes++;
-
-    // Enable clear all button
-    d3.select('.clear-all').classed('hidden', false);
-    d3.select('.clear-all-label').classed('hidden', false);
+    createForceStateNode(d);
   }
 }
 
@@ -234,105 +166,253 @@ function dragSimilarStates(stateName) {
   if (totalNodes === 1) {
     d3_event_x = d3.event.x
     d3_event_y = d3.event.y
-    d3.json("/api/similar_states/?state_name=" + stateName)
-        .then(function(data){
-           for (var i = 0; i < data.length; i++) {
-                each_state = data[i]
-                createStateNode(each_state, d3_event_x + i * 100, d3_event_y + window.scrollY + i * 100);
-                d3.select('.' + genClassName(each_state['name']) + '-menu-item').attr('fill', nodeColors[i + 1]);
-           }
+    d3.json('/api/similar_states/?state_name=' + stateName)
+      .then(function (data) {
+        for (var i = 0; i < data.length - 1; i++) {
+          each_state = data[i]
+          createForceStateNode(each_state, d3_event_x + i * 5, d3_event_y + i * 100);
+          d3.select('.' + genClassName(each_state['name']) + '-menu-item').attr('fill', nodeColors[i + 1]);
+        }
 
-            removeRightClickMenu();
-
-    });
+        removeRightClickMenu();
+      });
   }
 }
 
 function showBestCounties(stateName) {
-     d3.json("/api/best_counties/?state_name=" + stateName)
-  .then(function(data){
-    //var countyList = ['County A', 'County B', 'County C', 'County D', 'County E']
-    createCountyNodes(stateName, data, 'county');
-    //createForceCountyNodes(stateName, data)
-  });
+  d3.json('/api/best_counties/?state_name=' + stateName)
+    .then(function (data) {
+      createForceCountyNodes(stateName, data)
+    });
+}
+
+function showBestZipCodes(stateName) {
+  d3.json('/api/best_zips/?state_name=' + stateName)
+    .then(function (data) {
+      createForceCountyNodes(stateName, data, true);
+    });
+}
+
+function showSafeCounties(stateName) {
+  d3.json('/api/safe_counties/?state_name=' + stateName)
+    .then(function (data) {
+      createForceCountyNodes(stateName, data);
+    });
+}
+
+function showAffordableCounties(stateName) {
+  d3.json('/api/affordable/?state_name=' + stateName)
+    .then(function (data) {
+      createForceCountyNodes(stateName, data);
+    });
+}
+
+function showAll(stateName) {
+  d3.json('/api/all_data/?state_name=' + stateName)
+    .then(function (data) {
+      best_counties = data['best_counties']
+      safe_counties = data['safe_counties']
+      affordable_counties = data['affordable_counties']
+      best_zips = data['best_zips']
+
+      createForceCountyNodes(stateName, best_counties);
+      createForceCountyNodes(stateName, safe_counties);
+      createForceCountyNodes(stateName, affordable_counties);
+      createForceCountyNodes(stateName, best_zips);
+    });
+}
+
+// Delete the state node and all children nodes
+function deleteState(stateName) {
+  // Resert color of state menu item
+  d3.select('.' + genClassName(stateName) + '-menu-item').attr('fill', 'rgb(81, 116 ,187)');
+
+  // Remove nodes and links associated with deleted state
+  graph.links = graph.links.filter(function(link) { return link.source.id !== stateName });
+  graph.nodes = graph.nodes.filter(function(node) { return node.id !== stateName && node.state !== stateName });
+
+  var node = nodes.selectAll('.node').data(graph.nodes, function(d) { return d.id });
+  node.exit().remove();
+
+  var link = links.selectAll('.link').data(graph.links, function(d) { return d.index; });
+  link.exit().remove();
+
+  simulation.restart();
+
+  removeRightClickMenu();
+
+  nodeGroups.push(createdNodes[stateName]);
+  delete createdNodes[stateName];
+  totalNodes--;
+
+  // Remove clear all button if no more state nodes exist
+  if (totalNodes === 0) {
+    d3.select('.clear-all').classed('hidden', true);
+    d3.select('.clear-all-label').classed('hidden', true);
+  }
+}
+
+function createForceStateNode(stateObj, x, y) {
+  // Return if the node already exists or there are 3 total nodes
+  if (createdNodes[stateObj['name']] || totalNodes >= 3) {
+    return;
+  }
+
+  var nodeData = { id: stateObj['name'], idx: -1, group: nodeGroups[0], x: x || d3.event.x, y: y || d3.event.y - window.scrollY };
+  graph.nodes.push(nodeData);
+
+  simulation.nodes(graph.nodes)
+    .on('tick', ticked);
+
+  var link = links.selectAll('.link').data(graph.links);
+  var linkEnter = link.enter().append('g')
+    .attr('class', 'link')
+
+  linkEnter.append('line')
+    .attr('stroke', 'black')
+    .attr('stroke-width', function (d) { return Math.sqrt(d.value) })
+
+  link = linkEnter.merge(link);
+  link.exit().remove();
+
+  var node = nodes.selectAll('.node').data(graph.nodes);
+  var nodeEnter = node.enter().append('g')
+    .attr('class', 'node')
+
+  nodeEnter.append('circle')
+    .attr('r', '20px')
+    .attr('fill', function (d) { return nodeColors[d.group] })
+    .attr('stroke', 'black')
+    .attr('stroke-width', '2')
+    .call(d3.drag()
+      .on('start', dragstarted)
+      .on('drag', dragged)
+      .on('end', dragended))
+    .on('contextmenu', function () {
+      d3.event.preventDefault();
+
+      createRightClickMenu(stateObj['name'], d3.select(this));
+      removeStatBox();
+    })
+    .on('mouseover', mouseover)
+  // .on('mouseout', mouseout)
+
+  nodeEnter.append('text')
+    .attr('font-size', '17px')
+    .attr('text-anchor', 'middle')
+    .attr('font-weight', 'bold')
+    .text(function (d) { return d.id })
+
+  node = nodeEnter.merge(node);
+  node.exit().remove();
+
+  simulation.restart();
+
+  createdNodes[stateObj['name']] = nodeGroups[0];
+  nodeGroups.shift();
+  totalNodes++;
+
+  // Enable clear all button
+  d3.select('.clear-all').classed('hidden', false);
+  d3.select('.clear-all-label').classed('hidden', false);
+
+  function ticked() {
+    link.selectAll('line')
+      .attr('x1', function (d) { return d.source.x; })
+      .attr('y1', function (d) { return d.source.y + window.scrollY; })
+      .attr('x2', function (d) { return d.target.x; })
+      .attr('y2', function (d) { return d.target.y + window.scrollY; });
+
+    node.selectAll('circle')
+      .attr('cx', function (d) { return d.x })
+      .attr('cy', function (d) { return d.y + window.scrollY })
+
+    node.selectAll('text')
+      .attr('x', function (d) { return d.x })
+      .attr('y', function (d) { return d.y - 30 + window.scrollY })
+  }
 }
 
 function createForceCountyNodes(stateName, data) {
-    var linkNodes = [{ id: stateName, idx: - 1, group: 0}];
+  for (var i = 0; i < data.length; i++) {
+    each = data[i]
 
-    var color = d3.schemeCategory10;
-    var links = []
-    var width = 500;
-    var height = 500;
-
-    for(var i=0; i <data.length; i++) {
-        each = data[i]
-        linkNodes.push({id: each['name'], idx: each['id'], group: 0})
-        links.push({ source: stateName, target: each['name'], value: 2})
-    }
-
-    var simulation = d3.forceSimulation()
-    .force("link", d3.forceLink().id(function(d) { return d.id; }).distance(200))
-    .force("charge", d3.forceManyBody())
-    .force("center", d3.forceCenter(width / 2, height / 2));
-
-    var link = svg.append("g")
-      .attr("class", "links")
-    .selectAll("line")
-    .data(links)
-    .enter().append("line")
-      .attr("stroke-width", function(d) { return Math.sqrt(d.value); });
-
-  var node = svg.append("g")
-      .attr("class", "nodes")
-    .selectAll("g")
-    .data(linkNodes)
-    .enter().append("g")
-    .on("mouseover", mouseover)
-    .on("mouseout", mouseout)
-
-  var circles = node.append("circle")
-      .attr("r", 15)
-      .attr("fill", function(d) { return color[d.group]; })
-      .call(d3.drag()
-          .on("start", dragstarted)
-          .on("drag", dragged)
-          .on("end", dragended));
-
-  var lables = node.append("text")
-      .text(function(d) {
-        return d.id;
-      })
-      .attr('x', 6)
-      .attr('y', 3);
-
-  node.append("title")
-      .text(function(d) { return d.id; });
-
-  simulation
-      .nodes(linkNodes)
-      .on("tick", ticked);
-
-  simulation.force("link")
-      .links(links);
-
-  function ticked() {
-    link
-        .attr("x1", function(d) { return d.source.x; })
-        .attr("y1", function(d) { return d.source.y; })
-        .attr("x2", function(d) { return d.target.x; })
-        .attr("y2", function(d) { return d.target.y; });
-
-    node
-        .attr("transform", function(d) {
-          return "translate(" + d.x + "," + d.y + ")";
-        })
+    var stateObj = graph.nodes.find(function(node) { return node.id === stateName });
+    graph.nodes.push({ id: each['name'], idx: each['id'], group: createdNodes[stateName], x: stateObj.x - 100 + 50 * i , y: stateObj.y + 100, state: stateName })
+    graph.links.push({ source: stateName, target: each['name'], value: 2 })
   }
 
-  function dragstarted(d) {
+  simulation.force('link')
+    .links(graph.links);
+
+  simulation.nodes(graph.nodes)
+    .on('tick', ticked);
+
+  var link = links.selectAll('.link').data(graph.links);
+  var linkEnter = link.enter().append('g')
+    .attr('class', 'link')
+
+  linkEnter.append('line')
+    .attr('stroke', 'black')
+    .attr('stroke-width', function (d) { return Math.sqrt(d.value) })
+
+  link = linkEnter.merge(link);
+  link.exit().remove();
+
+  var node = nodes.selectAll('.node').data(graph.nodes);
+  var nodeEnter = node.enter().append('g')
+    .attr('class', 'node')
+
+  nodeEnter.append('circle')
+    .attr('r', '15px')
+    .attr('fill', function (d) { return nodeColors[createdNodes[stateName]] })
+    .attr('stroke', 'black')
+    .attr('stroke-width', 2)
+    .call(d3.drag()
+      .on('start', dragstarted)
+      .on('drag', dragged)
+      .on('end', dragended))
+    .on('mouseover', mouseover)
+  // .on('mouseout', mouseout)
+
+  nodeEnter.append('text')
+    .attr('font-size', '15px')
+    .attr('text-anchor', 'middle')
+    .attr('font-weight', 'bold')
+    .text(function (d) { return d.id })
+
+  node = nodeEnter.merge(node);
+  node.exit().remove();
+
+  simulation.restart();
+
+  removeRightClickMenu();
+
+  function ticked() {
+    link.selectAll('line')
+      .attr('x1', function (d) { return d.source.x; })
+      .attr('y1', function (d) { return d.source.y + window.scrollY; })
+      .attr('x2', function (d) { return d.target.x; })
+      .attr('y2', function (d) { return d.target.y + window.scrollY; });
+
+    node.selectAll('circle')
+      .attr('cx', function (d) { return d.x })
+      .attr('cy', function (d) { return d.y + window.scrollY })
+
+    node.selectAll('text')
+      .attr('x', function (d) { return d.x })
+      .attr('y', function (d) { return d.y - 30 + window.scrollY })
+  }
+}
+
+function dragstarted(d) {
   if (!d3.event.active) simulation.alphaTarget(0.3).restart();
   d.fx = d.x;
   d.fy = d.y;
+
+  removeRightClickMenu();
+  removeStatBox();
+  d3.select(this).classed('active', true);
 }
 
 function dragged(d) {
@@ -344,227 +424,62 @@ function dragended(d) {
   if (!d3.event.active) simulation.alphaTarget(0);
   d.fx = null;
   d.fy = null;
+  d3.select(this).classed('active', false);
 }
 
-function mouseover(d, i) {
-  node_type = 'state'
-  node_id = stateName
-  if(i > 0) {
+function mouseover(d) {
+  if (!d3.select('.right-click-menu').empty() || d3.select(this).classed('active')) {
+    return;
+  }
+
+  node_type = 'state';
+  node_id = d['id'];
+  if (d['idx'] > 0) {
     node_type = 'county'
     node_id = d['idx']
   }
 
-  var x = d.x
-  var y = d.y
-   node_data = node_type + "_" + node_id
-    d3.json("/api/node_stats/?node_data=" + node_data)
-      .then(function(data){
-        if (d3.select('.stat-box').empty()) {
-    var statBox = svg.append('g').attr('class', 'stat-box');
+  var x = d.x + 10
+  var y = d.y + window.scrollY + 10
+  node_data = node_type + '_' + node_id
+  d3.json('/api/node_stats/?node_data=' + node_data)
+    .then(function (data) {
+      if (d3.select('.stat-box').empty()) {
+        var statBox = svg.append('g').attr('class', 'stat-box');
 
-    //var node = d3.select(className);
-    //var x = parseInt(node.attr('cx')) + 10;
-    //var y = parseInt(node.attr('cy')) + 10;
+        statBox.append('rect')
+          .attr('class', 'stat-box')
+          .attr('height', '150px')
+          .attr('width', '250px')
+          .attr('x', x)
+          .attr('y', y)
+          .attr('fill', 'rgb(81, 116 ,187)')
+          .attr('stroke', 'rgb(57, 83, 137)')
+          .attr('stroke-width', 2)
 
-    statBox.append('rect')
-      .attr('class', 'stat-box')
-      .attr('height', '150px')
-      .attr('width', '250px')
-      .attr('x', x)
-      .attr('y', y)
-      .attr('fill', 'rgb(81, 116 ,187)')
-      .attr('stroke', 'rgb(57, 83, 137)')
-      .attr('stroke-width', 2)
+        is_affordable = data['is_affordable'] == true ? 'Yes' : 'No',
+          stats = [
+            'Violent Crime: ' + data['violent_crime'],
+            'Property Crime: ' + data['property_crime'],
+            'Best Schools Count: ' + data['num_of_schools'],
+            'Avg Annual Income: ' + data['avg_avg_annual_income'],
+            'Avg Median Income: ' + data['avg_median_annual_income'],
+            'Affordable: ' + is_affordable,
+            'Median Price Prediction: ' + 80000
+          ];
 
-    is_affordable =  data['is_affordable'] == true ? "Yes" : "No",
-    stats = [
-      'Violent Crime: ' + data['violent_crime'],
-      'Property Crime: ' + data['property_crime'],
-      'Best Schools Count: ' + data['num_of_schools'],
-      'Avg Annual Income: ' + data['avg_avg_annual_income'],
-      'Avg Median Income: ' + data['avg_median_annual_income'],
-      'Affordable: ' + is_affordable,
-      'Median Price Prediction: ' + 80000
-    ];
-
-    statBox.selectAll('.stat-line')
-      .data(stats)
-      .enter().append('text')
-      .attr('class', 'stat-line')
-      .attr('y', function(_, i) { return y + 22 + 20 * i })
-      .attr('x', x + 12)
-      .attr('font-size', '15px')
-      .attr('fill', 'white')
-      .attr('text-anchor', 'start')
-      .text(function (d) { return d });
-  }
-     });
-}
-
-function mouseout() {
-  d3.select(this).select("circle").transition()
-      .duration(750)
-      .attr("r", 15);
-}
-
-}
-
-function showBestZipCodes(stateName) {
-  d3.json("/api/best_zips/?state_name=" + stateName)
-  .then(function(data){
-      createCountyNodes(stateName, data, 'zipcode');
-  });
-}
-
-function showSafeCounties(stateName) {
-  d3.json("/api/safe_counties/?state_name=" + stateName)
-  .then(function(data){
-      createCountyNodes(stateName, data, 'county');
-  });
-}
-
-function showAffordableCounties(stateName) {
-  d3.json("/api/affordable/?state_name=" + stateName)
-  .then(function(data){
-      createCountyNodes(stateName, data, 'county');
-  });
-}
-
-function selectAllForAllSimilarStates(stateName) {
-  // Dummy counties for testing
-  // TODO: Retrieve appropriate counties and data
-  var countyList = ['County A', 'County B', 'County C', 'County D', 'County E']
-  createCountyNodes(stateName, countyList);
-}
-
-// TODO: Implement this to handle more than five counties
-function showAll(stateName) {
-  d3.json("/api/all_data/?state_name=" + stateName)
-  .then(function(data){
-      best_counties = data['best_counties']
-      safe_counties = data['safe_counties']
-      affordable_counties = data['affordable_counties']
-      best_zips = data['best_zips']
-
-      createCountyNodes(stateName, best_counties, 'county');
-      createCountyNodes(stateName, safe_counties, 'county');
-      createCountyNodes(stateName, affordable_counties, 'county');
-      createCountyNodes(stateName, best_zips, 'zipcode');
-  });
-}
-
-// Delete the state node and all children nodes
-function deleteState(stateName) {
-  d3.select('.' + genClassName(stateName) + '-menu-item').attr('fill', 'rgb(81, 116 ,187)');
-  d3.select('.' + genClassName(stateName)).remove();
-  removeRightClickMenu();
-
-  delete createdNodes[stateName];
-  totalNodes--;
-
-  // Remove clear all button if no more state nodes exist
-  if (totalNodes === 0) {
-    d3.select('.clear-all').classed('hidden', true);
-    d3.select('.clear-all-label').classed('hidden', true);
-  }
-}
-
-function createCountyNodes(stateName, countyList, node_type) {
-  prefix = ""
-  if(node_type == 'zipcode') {
-    prefix = "s"
-  }
-  // Remove existing county nodes, lines, and labels
-  d3.select('.' + genClassName(stateName) + '-counties').remove();
-
-  var stateNode = d3.select('.' + genClassName(stateName) + '-node');
-  var counties = d3.select('.' + genClassName(stateName)).append('g')
-    .attr('class', 'counties ' + genClassName(stateName) + '-counties');
-
-  // Create lines from state node to county nodes
-  counties.selectAll('.' + genClassName(stateName) + '-county-line')
-    .data(countyList).enter()
-    .append('line')
-    .attr('class', function (d) { return genClassName(stateName) + '-county-line ' + genClassName(prefix + d['name']) + '-county-line' })
-    .attr('stroke', 'black')
-    .attr('stroke-width', 2)
-    .attr('stroke-opacity', 0.3)
-    .attr('x1', stateNode.attr('cx'))
-    .attr('y1', parseInt(stateNode.attr('cy')))
-    .attr('x2', function (_, i) { return parseInt(stateNode.attr('cx')) - 100 + i * 50 })
-    .attr('y2', function () { return parseInt(stateNode.attr('cy')) + 100 })
-
-  // Regenerate state node
-  // This ensure that the line appears beneath it
-  var state = d3.select('.' + genClassName(stateName));
-  var stateNode = d3.select('.' + genClassName(stateName) + '-node');
-  var cx = stateNode.attr('cx');
-  var cy = stateNode.attr('cy');
-  var fill = stateNode.attr('fill');
-  stateNode.remove();
-
-  state.data([stateName]).append('circle')
-    .attr('class', 'state-node ' + genClassName(stateName) + '-node')
-    .attr('r', '20px')
-    .attr('cx', cx)
-    .attr('cy', cy)
-    .attr('original-y', parseInt(cy) - window.scrollY)
-    .attr('fill', fill)
-    .attr('stroke', 'black')
-    .attr('stroke-width', '2')
-    .call(d3.drag()
-      .on('start', nodeOnDragStart)
-      .on('drag', stateNodeOnDrag)
-      .on('end', nodeOnDragEnd))
-    .on('contextmenu', function () {
-      d3.event.preventDefault();
-
-      createRightClickMenu(stateName);
-    }).on('mouseover', function () {
-      // Prevent stat box display if node is being dragged
-      if (!d3.select(this).attr('class').includes('active')) {
-        displayStats('state', stateName, '.' + genClassName(stateName) + '-node') // TODO: Implement this with actual data
+        statBox.selectAll('.stat-line')
+          .data(stats)
+          .enter().append('text')
+          .attr('class', 'stat-line')
+          .attr('y', function (_, i) { return y + 22 + 20 * i })
+          .attr('x', x + 12)
+          .attr('font-size', '15px')
+          .attr('fill', 'white')
+          .attr('text-anchor', 'start')
+          .text(function (d) { return d });
       }
     });
-
-  // Create county nodes
-  counties.selectAll('.' + genClassName(stateName) + '-county-node')
-    .data(countyList).enter()
-    .append('circle')
-    .attr('class', function (d) { return 'county-node ' + genClassName(stateName) + '-county-node ' + genClassName(prefix + d['name']) + '-county-node' })
-    .attr('r', '15px')
-    .attr('cx', function (_, i) { return parseInt(stateNode.attr('cx')) - 100 + i * 50 })
-    .attr('cy', parseInt(stateNode.attr('cy')) + 100)
-    .attr('original-y', parseInt(stateNode.attr('cy')) + 100 - window.scrollY)
-    .attr('fill', stateNode.attr('fill'))
-    .attr('stroke', 'black')
-    .attr('stroke-width', 2)
-    .attr('state', genClassName(stateName))
-    .call(d3.drag()
-      .on('start', nodeOnDragStart)
-      .on('drag', countyNodeOnDrag)
-      .on('end', nodeOnDragEnd))
-    .on('mouseover', function (d) {
-      // Prevent stat box display if node is being dragged
-      if (!d3.select(this).attr('class').includes('active')) {
-        displayStats(node_type, d['id'], '.' + genClassName(stateName) + '-county-node.' + genClassName(prefix + d['name']) + '-county-node') // TODO: Implement this with actual data
-      }
-    });
-
-  // Create county node labels
-  counties.selectAll('.' + genClassName(stateName) + '-county-label')
-    .data(countyList).enter()
-    .append('text')
-    .attr('class', function (d) { return genClassName(stateName) + '-county-label ' + genClassName(prefix + d['name']) + '-county-label' })
-    .attr('x', function (_, i) { return parseInt(stateNode.attr('cx')) - 100 + i * 50 })
-    .attr('y', parseInt(stateNode.attr('cy')) + 70)
-    .attr('font-size', '15px')
-    .attr('text-anchor', 'middle')
-    .attr('font-weight', 'bold')
-    .text(function (d) { return d['name'] });
-
-  // Remove the right click menu if everything is successful
-  removeRightClickMenu();
 }
 
 // Node drag start function
@@ -574,109 +489,65 @@ function nodeOnDragStart(d) {
   d3.select(this).classed('active', true);
 }
 
-// Drag function for state nodes, lines, and labels
-function stateNodeOnDrag(stateName) {
-  var stateLineClass = '.' + genClassName(stateName) + '-county-line';
-  d3.selectAll(stateLineClass)
-    .attr('x1', d3.event.x)
-    .attr('y1', d3.event.y)
-
-  d3.select(this)
-    .attr('cx', d3.event.x)
-    .attr('cy', d3.event.y)
-
-  var stateLabelClass = '.' + genClassName(stateName) + '-label';
-  d3.select(stateLabelClass)
-    .attr('x', d3.event.x)
-    .attr('y', d3.event.y - 30)
-}
-
-// Drag function for county nodes, lines, and labels
-function countyNodeOnDrag(countyObj) {
-  var stateName = d3.select(this).attr('state');
-
-  var countyLineClass = '.' + stateName + '-county-line' + '.' + genClassName(countyObj['name']) + '-county-line';
-  d3.select(countyLineClass)
-    .attr('x2', d3.event.x)
-    .attr('y2', d3.event.y)
-
-  d3.select(this)
-    .attr('cx', d3.event.x)
-    .attr('cy', d3.event.y)
-
-  var countyLabelClass = '.' + stateName + '-county-label' + '.' + genClassName(countyObj['name']) + '-county-label';
-  d3.select(countyLabelClass)
-    .attr('x', d3.event.x)
-    .attr('y', d3.event.y - 30)
-}
-
-// Node drag end function
-function nodeOnDragEnd(d) {
-  d3.select(this).classed('active', false);
-
-  // Reset original-y value to account for scroll
-  var y = d3.select(this).attr('cy');
-  d3.select(this).attr('original-y', parseInt(y) - window.scrollY);
-}
-
 function displayStats(node_type, node_id, className) {
-    node_data = node_type + "_" + node_id
-    d3.json("/api/node_stats/?node_data=" + node_data)
-      .then(function(data){
-        if (d3.select('.stat-box').empty()) {
-    var statBox = svg.append('g').attr('class', 'stat-box');
+  node_data = node_type + '_' + node_id
+  d3.json('/api/node_stats/?node_data=' + node_data)
+    .then(function (data) {
+      if (d3.select('.stat-box').empty()) {
+        var statBox = svg.append('g').attr('class', 'stat-box');
 
-    var node = d3.select(className);
-    var x = parseInt(node.attr('cx')) + 10;
-    var y = parseInt(node.attr('cy')) + 10;
+        var node = d3.select(className);
+        var x = parseInt(node.attr('cx')) + 10;
+        var y = parseInt(node.attr('cy')) + 10;
 
-    statBox.append('rect')
-      .attr('class', 'stat-box')
-      .attr('height', '150px')
-      .attr('width', '250px')
-      .attr('x', x)
-      .attr('y', y)
-      .attr('fill', 'rgb(81, 116 ,187)')
-      .attr('stroke', 'rgb(57, 83, 137)')
-      .attr('stroke-width', 2)
+        statBox.append('rect')
+          .attr('class', 'stat-box')
+          .attr('height', '150px')
+          .attr('width', '250px')
+          .attr('x', x)
+          .attr('y', y)
+          .attr('fill', 'rgb(81, 116 ,187)')
+          .attr('stroke', 'rgb(57, 83, 137)')
+          .attr('stroke-width', 2)
 
-    is_affordable =  data['is_affordable'] == true ? "Yes" : "No",
-    stats = [
-      'Violent Crime: ' + data['violent_crime'],
-      'Property Crime: ' + data['property_crime'],
-      'Best Schools Count: ' + data['num_of_schools'],
-      'Avg Annual Income: ' + data['avg_avg_annual_income'],
-      'Avg Median Income: ' + data['avg_median_annual_income'],
-      'Affordable: ' + is_affordable,
-      'Median Price Prediction: ' + 80000
-    ];
+        is_affordable = data['is_affordable'] == true ? 'Yes' : 'No',
+          stats = [
+            'Violent Crime: ' + data['violent_crime'],
+            'Property Crime: ' + data['property_crime'],
+            'Best Schools Count: ' + data['num_of_schools'],
+            'Avg Annual Income: ' + data['avg_avg_annual_income'],
+            'Avg Median Income: ' + data['avg_median_annual_income'],
+            'Affordable: ' + is_affordable,
+            'Median Price Prediction: ' + 80000
+          ];
 
-    statBox.selectAll('.stat-line')
-      .data(stats)
-      .enter().append('text')
-      .attr('class', 'stat-line')
-      .attr('y', function(_, i) { return y + 22 + 20 * i })
-      .attr('x', x + 12)
-      .attr('font-size', '15px')
-      .attr('fill', 'white')
-      .attr('text-anchor', 'start')
-      .text(function (d) { return d });
-  }
-     });
-
-
+        statBox.selectAll('.stat-line')
+          .data(stats)
+          .enter().append('text')
+          .attr('class', 'stat-line')
+          .attr('y', function (_, i) { return y + 22 + 20 * i })
+          .attr('x', x + 12)
+          .attr('font-size', '15px')
+          .attr('fill', 'white')
+          .attr('text-anchor', 'start')
+          .text(function (d) { return d });
+      }
+    });
 }
 
 // Create right click menu for state node
-function createRightClickMenu(stateName) {
+function createRightClickMenu(stateName, node) {
   removeRightClickMenu(); // Closes menu if one is currently active
 
   var rightClickMenu = svg.append('g')
     .attr('class', 'right-click-menu')
 
-  // Remove "Drag Similar States" option if > 1 state already exists
+  // Remove 'Drag Similar States' option if > 1 state already exists
   options = totalNodes > 1 ? menuOptions.slice(1) : menuOptions;
   functions = totalNodes > 1 ? menuFunctions.slice(1) : menuFunctions;
+
+  var x = parseInt(node.attr('cx'));
+  var y = parseInt(node.attr('cy'));
 
   rightClickMenu.selectAll('.right-click-menu-item')
     .data(options)
@@ -684,8 +555,8 @@ function createRightClickMenu(stateName) {
     .attr('class', 'right-click-menu-item')
     .attr('height', rightClickMenuItemHeight)
     .attr('width', 210)
-    .attr('y', function (_, i) { return d3.event.y + window.scrollY + i * 40 })
-    .attr('x', d3.event.x)
+    .attr('y', function (_, i) { return y + i * 40 })
+    .attr('x', x)
     .attr('fill', 'rgb(81, 116 ,187)')
     .attr('stroke', 'rgb(57, 83, 137)')
     .attr('stroke-width', 2)
@@ -695,8 +566,8 @@ function createRightClickMenu(stateName) {
     .data(options)
     .enter().append('text')
     .attr('class', 'right-click-menu-item-label')
-    .attr('y', function (d, i) { return d3.event.y + window.scrollY + i * 40 + 25 })
-    .attr('x', d3.event.x + 10)
+    .attr('y', function (d, i) { return y + i * 40 + 25 })
+    .attr('x', x + 10)
     .attr('font-size', '15px')
     .attr('fill', 'white')
     .attr('text-anchor', 'start')
@@ -704,7 +575,7 @@ function createRightClickMenu(stateName) {
 }
 
 // Remove right click menu if user clicks away
-d3.select('.graphical-exploration').on('click', function() {
+d3.select('.graphical-exploration').on('click', function () {
   var rightClickMenu = d3.selectAll('.right-click-menu')
 
   if (!rightClickMenu.empty() && d3.event.target.parentNode.className.baseVal !== 'right-click-menu') {
@@ -713,11 +584,12 @@ d3.select('.graphical-exploration').on('click', function() {
 });
 
 // Remove stat box if user moves mouse outside of node/box
-d3.select('.graphical-exploration').on('mouseover', function() {
+d3.select('.graphical-exploration').on('mouseover', function () {
   var statBox = d3.select('.stat-box');
-  var className = d3.event.target.className.baseVal;
+  var target = d3.event.target;
 
-  if (!statBox.empty() && (!className.includes('stat-box') && !className.includes('state-node') && !className.includes('county-node') && !className.includes('stat-line'))) {
+  // This might need refinement
+  if (!statBox.empty() && (target.nodeName !== 'circle')) {
     removeStatBox();
   }
 });
@@ -734,12 +606,22 @@ function removeStatBox() {
 
 // Delete all nodes, labels, and lines
 function deleteAllNodes() {
-  d3.selectAll('.state').remove();
-
   d3.selectAll('.menu-item')
     .attr('fill', 'rgb(81, 116 ,187)');
 
+  // Remove nodes and links associated with deleted state
+  graph.links = [];
+  graph.nodes = [];
+
+  var node = nodes.selectAll('.node').data(graph.nodes);
+  node.exit().remove();
+
+  var link = links.selectAll('.link').data(graph.links);
+  link.exit().remove();
+  simulation.restart();
+
   createdNodes = {};
+  nodeGroups = [0, 1, 2];
   totalNodes = 0;
 
   d3.select('.clear-all').classed('hidden', true);
@@ -748,5 +630,5 @@ function deleteAllNodes() {
 
 // Makes string lowercase and replaces spaces with dashes for use as classname
 function genClassName(str) {
-  return str.replace(/\s+/g, '-').toLowerCase();
+  return str.trim().replace(/\s+/g, '-').toLowerCase();
 }
