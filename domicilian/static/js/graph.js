@@ -30,6 +30,7 @@ var graph = {
 
 var simulation = d3.forceSimulation()
   .force('link', d3.forceLink().id(function (d) { return d.id; }).distance(200))
+  // .force('link', d3.forceLink().id(function (d) { return d.id; }).distance(100))
   .force('charge', d3.forceManyBody().strength(-30))
   // .force('center', d3.forceCenter(500, 500))
 
@@ -180,6 +181,7 @@ function dragSimilarStates(stateName) {
           each_state = data[i]
           createForceStateNode(each_state, d3_event_x + i * 5, d3_event_y + i * 100);
           d3.select('.' + genClassName(each_state['name']) + '-menu-item').attr('fill', nodeColors[i + 1][2]);
+
         }
 
         removeRightClickMenu();
@@ -243,7 +245,7 @@ function showAffordableCounties(stateName) {
     });
 }
 
-function showAll(stateName) {
+function showAll(stateName, callback) {
   d3.json('/api/all_data/?state_name=' + stateName)
     .then(function (data) {
       best_counties = data['best_counties']
@@ -272,15 +274,29 @@ function showAll(stateName) {
       }
 
       removeRightClickMenu();
+
+      callback();
     });
 }
 
 function selectAllForAllSimilarStates(stateName) {
-  d3.json('/api/similar_all/?states=' + 'Alabama_Alaska_Arizona')
+  var states = Object.keys(createdNodes).map(function(state) { return state });
+  d3.json('/api/similar_all/?states=' + states.join('_'))
     .then(function (data) {
-      console.log('data: ', data);
-
-      // createForceCountyNodes(stateName, countyList);
+      count = 0;
+      // Ignore this I'm tired
+      showAll(states[count], function() {
+        count++
+        showAll(states[count], function() {
+          count++
+          showAll(states[count], function () {
+            connectSimilarCounties(data['affordable_counties']);
+            connectSimilarCounties(data['best_counties']);
+            connectSimilarCounties(data['best_zips']);
+            connectSimilarCounties(data['safe_counties']);
+          });
+        })
+      });
     });
 }
 
@@ -290,7 +306,7 @@ function deleteState(stateName) {
   d3.select('.' + genClassName(stateName) + '-menu-item').attr('fill', 'rgb(81, 116 ,187)');
 
   // Remove nodes and links associated with deleted state
-  graph.links = graph.links.filter(function(link) { return link.source.id !== stateName });
+  graph.links = graph.links.filter(function(link) { return link.source.id !== stateName && link.states.indexOf(stateName) === -1 });
   graph.nodes = graph.nodes.filter(function(node) { return node.id !== stateName && node.state !== stateName });
 
   var node = nodes.selectAll('.node').data(graph.nodes, function(d) { return d.id });
@@ -320,7 +336,7 @@ function deleteState(stateName) {
 
 function createForceStateNode(stateObj, x, y) {
   // Return if the node already exists or there are 3 total nodes
-  if (createdNodes[stateObj['name']] || totalNodes >= 3) {
+  if (createdNodes[stateObj['name']] !== undefined || totalNodes >= 3) {
     return;
   }
 
@@ -400,13 +416,63 @@ function createForceStateNode(stateObj, x, y) {
   }
 }
 
+function connectSimilarCounties(data) {
+  for (var i = 0; i < data.length; i++) {
+    county = data[i];
+    for (var j = 0; j < county.similars.length; j++) {
+      similar = county.similars[j];
+      graph.links.push({ source: county['name'] + '-' + genClassName(county.state_name), target: similar['name'] + '-' + genClassName(similar.state_name), value: 2, states: [county.state_name, similar.state_name] });
+    }
+  }
+
+  simulation.force('link')
+    .links(graph.links);
+
+  simulation.nodes(graph.nodes)
+    .on('tick', ticked);
+
+  var link = links.selectAll('.link').data(graph.links);
+  var linkEnter = link.enter().append('g')
+    .attr('class', 'link')
+
+  linkEnter.append('line')
+    .attr('stroke', 'black')
+    .attr('stroke-dasharray', '10 5')
+    .attr('stroke-width', function (d) { return Math.sqrt(d.value) })
+    .attr('stroke-opacity', 0.7)
+
+  link = linkEnter.merge(link);
+  link.exit().remove();
+
+  var node = nodes.selectAll('.node').data(graph.nodes);
+  node.exit().remove();
+
+  simulation.restart();
+
+  function ticked() {
+    link.selectAll('line')
+      .attr('x1', function (d) { return d.source.x; })
+      .attr('y1', function (d) { return d.source.y + window.scrollY; })
+      .attr('x2', function (d) { return d.target.x; })
+      .attr('y2', function (d) { return d.target.y + window.scrollY; });
+
+    node.selectAll('circle')
+      .attr('cx', function (d) { return d.x })
+      .attr('cy', function (d) { return d.y + window.scrollY })
+
+    node.selectAll('text')
+      .attr('x', function (d) { return d.x })
+      .attr('y', function (d) { return d.y - 30 + window.scrollY })
+  }
+}
+
 function createForceCountyNodes(stateName, data, colorShade) {
   for (var i = 0; i < data.length; i++) {
     each = data[i]
 
     var stateObj = graph.nodes.find(function(node) { return node.id === stateName });
-    graph.nodes.push({ id: each['name'], idx: each['id'], group: createdNodes[stateName], x: stateObj.x - 100 + 50 * i , y: stateObj.y + 100, state: stateName })
-    graph.links.push({ source: stateName, target: each['name'], value: 2 })
+    graph.nodes.push({ id: each['name'].trim() + '-' + genClassName(stateName), name: each['name'], idx: each['id'], group: createdNodes[stateName], x: stateObj.x - 100 + 50 * i , y: stateObj.y + 100, state: stateName })
+    graph.links.push({ source: stateName, target: each['name'].trim() + '-' + genClassName(stateName), value: 2, states: [] })
   }
 
   simulation.force('link')
@@ -447,7 +513,7 @@ function createForceCountyNodes(stateName, data, colorShade) {
     .attr('font-size', '15px')
     .attr('text-anchor', 'middle')
     .attr('font-weight', 'bold')
-    .text(function (d) { return d.id })
+    .text(function (d) { return d.name })
 
   node = nodeEnter.merge(node);
   node.exit().remove();
