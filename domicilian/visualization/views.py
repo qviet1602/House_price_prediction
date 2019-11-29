@@ -718,10 +718,8 @@ def list_best_counties(state_name):
     for each_row in county_data_rows:
         each_data_dict = {}
         each_data_dict["id"] = each_row[0]
-        if each_row[1].rfind('County') != -1:
-            each_data_dict["name"] = each_row[1][:-7]
-        else:
-            each_data_dict["name"] = each_row[1]
+        
+        each_data_dict["name"] = each_row[1]
         data.append(each_data_dict)
 
     data = data[0:5]

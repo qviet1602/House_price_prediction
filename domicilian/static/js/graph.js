@@ -625,7 +625,7 @@ function mouseover(d) {
           .attr('fill', 'rgb(81, 116 ,187)')
           .attr('stroke', 'rgb(57, 83, 137)')
           .attr('stroke-width', 2)
-          
+
             statBox.selectAll('.stat-line')
           .data(stats)
           .enter().append('text')
