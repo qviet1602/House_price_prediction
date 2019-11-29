@@ -350,10 +350,16 @@ function createForceStateNode(stateObj, x, y) {
   var linkEnter = link.enter().append('g')
     .attr('class', 'link')
 
-  linkEnter.append('line')
-    .attr('stroke', 'black')
-    .attr('stroke-width', function (d) { return Math.sqrt(d.value) })
-    .attr('stroke-opacity', 0.3)
+  linkEnter
+    .append("line")
+    .attr("stroke", "black")
+    .attr("stroke-width", function(d) {
+      return Math.sqrt(d.value);
+    })
+    .attr("stroke-opacity", 0.3)
+    .attr("transform", function(d) {
+      return "translate(" + -600 + "," + 0 + ")";
+    });
 
   link = linkEnter.merge(link);
   link.exit().remove();
@@ -362,29 +368,44 @@ function createForceStateNode(stateObj, x, y) {
   var nodeEnter = node.enter().append('g')
     .attr('class', 'node')
 
-  nodeEnter.append('circle')
-    .attr('r', '20px')
-    .attr('fill', function (d) { return nodeColors[d.group][2] })
-    .attr('stroke', 'black')
-    .attr('stroke-width', '2')
-    .call(d3.drag()
-      .on('start', dragstarted)
-      .on('drag', dragged)
-      .on('end', dragended))
-    .on('contextmenu', function () {
+  nodeEnter
+    .append("circle")
+    .attr("r", "20px")
+    .attr("fill", function(d) {
+      return nodeColors[d.group][2];
+    })
+    .attr("stroke", "black")
+    .attr("stroke-width", "2")
+    .call(
+      d3
+        .drag()
+        .on("start", dragstarted)
+        .on("drag", dragged)
+        .on("end", dragended)
+    )
+    .on("contextmenu", function() {
       d3.event.preventDefault();
 
-      createRightClickMenu(stateObj['name'], d3.select(this));
+      createRightClickMenu(stateObj["name"], d3.select(this));
       removeStatBox();
     })
-    .on('mouseover', mouseover)
+    .on("mouseover", mouseover)
+    .attr("transform", function(d) {
+      return "translate(" + -600 + "," + 0 + ")";
+    });
   // .on('mouseout', mouseout)
 
-  nodeEnter.append('text')
-    .attr('font-size', '17px')
-    .attr('text-anchor', 'middle')
-    .attr('font-weight', 'bold')
-    .text(function (d) { return d.id })
+  nodeEnter
+    .append("text")
+    .attr("font-size", "17px")
+    .attr("text-anchor", "middle")
+    .attr("font-weight", "bold")
+    .text(function(d) {
+      return d.id;
+    })
+    .attr("transform", function(d) {
+      return "translate(" + -600 + "," + 0 + ")";
+    });
 
   node = nodeEnter.merge(node);
   node.exit().remove();
@@ -409,10 +430,19 @@ function createForceStateNode(stateObj, x, y) {
     node.selectAll('circle')
       .attr('cx', function (d) { return d.x })
       .attr('cy', function (d) { return d.y + window.scrollY })
+      .attr('transform', function (d) { return "translate(" + -600 + "," + 0 + ")"})
 
-    node.selectAll('text')
-      .attr('x', function (d) { return d.x })
-      .attr('y', function (d) { return d.y - 30 + window.scrollY })
+    node
+      .selectAll("text")
+      .attr("x", function(d) {
+        return d.x;
+      })
+      .attr("y", function(d) {
+        return d.y - 30 + window.scrollY;
+      })
+      .attr("transform", function(d) {
+        return "translate(" + -600 + "," + 0 + ")";
+      });
   }
 }
 
@@ -485,10 +515,16 @@ function createForceCountyNodes(stateName, data, colorShade) {
   var linkEnter = link.enter().append('g')
     .attr('class', 'link')
 
-  linkEnter.append('line')
-    .attr('stroke', 'black')
-    .attr('stroke-width', function (d) { return Math.sqrt(d.value) })
-    .attr('stroke-opacity', 0.3)
+  linkEnter
+    .append("line")
+    .attr("stroke", "black")
+    .attr("stroke-width", function(d) {
+      return Math.sqrt(d.value);
+    })
+    .attr("stroke-opacity", 0.3)
+    .attr("transform", function(d) {
+      return "translate(" + -600 + "," + 0 + ")";
+    });
 
   link = linkEnter.merge(link);
   link.exit().remove();
@@ -497,23 +533,38 @@ function createForceCountyNodes(stateName, data, colorShade) {
   var nodeEnter = node.enter().append('g')
     .attr('class', 'node')
 
-  nodeEnter.append('circle')
-    .attr('r', '15px')
-    .attr('fill', function (d) { return nodeColors[createdNodes[stateName]][colorShade] })
-    .attr('stroke', 'black')
-    .attr('stroke-width', 2)
-    .call(d3.drag()
-      .on('start', dragstarted)
-      .on('drag', dragged)
-      .on('end', dragended))
-    .on('mouseover', mouseover)
+  nodeEnter
+    .append("circle")
+    .attr("r", "15px")
+    .attr("fill", function(d) {
+      return nodeColors[createdNodes[stateName]][colorShade];
+    })
+    .attr("stroke", "black")
+    .attr("stroke-width", 2)
+    .call(
+      d3
+        .drag()
+        .on("start", dragstarted)
+        .on("drag", dragged)
+        .on("end", dragended)
+    )
+    .on("mouseover", mouseover)
+    .attr("transform", function(d) {
+      return "translate(" + -600 + "," + 0 + ")";
+    });
   // .on('mouseout', mouseout)
 
-  nodeEnter.append('text')
-    .attr('font-size', '15px')
-    .attr('text-anchor', 'middle')
-    .attr('font-weight', 'bold')
-    .text(function (d) { return d.name })
+  nodeEnter
+    .append("text")
+    .attr("font-size", "15px")
+    .attr("text-anchor", "middle")
+    .attr("font-weight", "bold")
+    .text(function(d) {
+      return d.name;
+    })
+    .attr("transform", function(d) {
+      return "translate(" + -600 + "," + 0 + ")";
+    });
 
   node = nodeEnter.merge(node);
   node.exit().remove();
@@ -616,26 +667,39 @@ function mouseover(d) {
         if(stats.length != 0) {
         var statBox = svg.append('g').attr('class', 'stat-box');
 
-        statBox.append('rect')
-          .attr('class', 'stat-box')
-          .attr('height', '150px')
-          .attr('width', '250px')
-          .attr('x', x)
-          .attr('y', y)
-          .attr('fill', 'rgb(81, 116 ,187)')
-          .attr('stroke', 'rgb(57, 83, 137)')
-          .attr('stroke-width', 2)
+        statBox
+          .append("rect")
+          .attr("class", "stat-box")
+          .attr("height", "150px")
+          .attr("width", "250px")
+          .attr("x", x)
+          .attr("y", y)
+          .attr("fill", "rgb(81, 116 ,187)")
+          .attr("stroke", "rgb(57, 83, 137)")
+          .attr("stroke-width", 2)
+          .attr("transform", function(d) {
+            return "translate(" + -600 + "," + 0 + ")";
+          });
 
-            statBox.selectAll('.stat-line')
+        statBox
+          .selectAll(".stat-line")
           .data(stats)
-          .enter().append('text')
-          .attr('class', 'stat-line')
-          .attr('y', function (_, i) { return y + 22 + 20 * i })
-          .attr('x', x + 12)
-          .attr('font-size', '15px')
-          .attr('fill', 'white')
-          .attr('text-anchor', 'start')
-          .text(function (d) { return d });
+          .enter()
+          .append("text")
+          .attr("class", "stat-line")
+          .attr("y", function(_, i) {
+            return y + 22 + 20 * i;
+          })
+          .attr("x", x + 12)
+          .attr("font-size", "15px")
+          .attr("fill", "white")
+          .attr("text-anchor", "start")
+          .text(function(d) {
+            return d;
+          })
+          .attr("transform", function(d) {
+            return "translate(" + -600 + "," + 0 + ")";
+          });
         }
 
       }
@@ -709,29 +773,47 @@ function createRightClickMenu(stateName, node) {
   var x = parseInt(node.attr('cx'));
   var y = parseInt(node.attr('cy'));
 
-  rightClickMenu.selectAll('.right-click-menu-item')
+  rightClickMenu
+    .selectAll(".right-click-menu-item")
     .data(options)
-    .enter().append('rect')
-    .attr('class', 'right-click-menu-item')
-    .attr('height', rightClickMenuItemHeight)
-    .attr('width', 210)
-    .attr('y', function (_, i) { return y + i * 40 })
-    .attr('x', x)
-    .attr('fill', 'rgb(81, 116 ,187)')
-    .attr('stroke', 'rgb(57, 83, 137)')
-    .attr('stroke-width', 2)
-    .on('click', function (_, i) { return functions[i](stateName) })
+    .enter()
+    .append("rect")
+    .attr("class", "right-click-menu-item")
+    .attr("height", rightClickMenuItemHeight)
+    .attr("width", 210)
+    .attr("y", function(_, i) {
+      return y + i * 40;
+    })
+    .attr("x", x)
+    .attr("fill", "rgb(81, 116 ,187)")
+    .attr("stroke", "rgb(57, 83, 137)")
+    .attr("stroke-width", 2)
+    .on("click", function(_, i) {
+      return functions[i](stateName);
+    })
+    .attr("transform", function(d) {
+      return "translate(" + -600 + "," + 0 + ")";
+    });
 
-  rightClickMenu.selectAll('.right-click-menu-item-label')
+  rightClickMenu
+    .selectAll(".right-click-menu-item-label")
     .data(options)
-    .enter().append('text')
-    .attr('class', 'right-click-menu-item-label')
-    .attr('y', function (d, i) { return y + i * 40 + 25 })
-    .attr('x', x + 10)
-    .attr('font-size', '15px')
-    .attr('fill', 'white')
-    .attr('text-anchor', 'start')
-    .text(function (d) { return d })
+    .enter()
+    .append("text")
+    .attr("class", "right-click-menu-item-label")
+    .attr("y", function(d, i) {
+      return y + i * 40 + 25;
+    })
+    .attr("x", x + 10)
+    .attr("font-size", "15px")
+    .attr("fill", "white")
+    .attr("text-anchor", "start")
+    .text(function(d) {
+      return d;
+    })
+    .attr("transform", function(d) {
+      return "translate(" + -600 + "," + 0 + ")";
+    });
 }
 
 // Remove right click menu if user clicks away
