@@ -1,5 +1,6 @@
 # Standard Library
 from decimal import Decimal
+from collections import OrderedDict
 
 # Third Party Stuff
 import numpy as np
@@ -472,8 +473,10 @@ def get_node_stats(request):
             violent_crime = crime_data_row[0]
             property_crime = crime_data_row[1]
 
-            statistics["violent_crime"] = round(violent_crime, 2)
-            statistics["property_crime"] = round(property_crime, 2)
+            if violent_crime is not None:
+                statistics["violent_crime"] = round(violent_crime, 2)
+            if property_crime is not None:
+                statistics["property_crime"] = round(property_crime, 2)
 
             schools_query = (
                 "select count(*) from school_data where schooldigger_rating is not null "
@@ -498,17 +501,19 @@ def get_node_stats(request):
 
             avg_avg_annual_income = annual_income_data_row[0]
             avg_median_annual_income = annual_income_data_row[1]
-            statistics["avg_avg_annual_income"] = round(avg_avg_annual_income, 2)
-            statistics["avg_median_annual_income"] = round(avg_median_annual_income, 2)
+            if avg_avg_annual_income is not None:
+                statistics["avg_avg_annual_income"] = round(avg_avg_annual_income, 2)
+                us_avg = Decimal(28555.0)
+                is_affordable = False
+                avg_diff = avg_avg_annual_income - us_avg
 
-            us_avg = Decimal(28555.0)
+                if avg_diff < 0 or avg_diff < 10000:
+                    is_affordable = True
+                statistics["is_affordable"] = is_affordable
+            if avg_median_annual_income is not None:
+                statistics["avg_median_annual_income"] = round(avg_median_annual_income, 2)
 
-            avg_diff = avg_avg_annual_income - us_avg
-            is_affordable = False
-            if avg_diff < 0 or avg_diff < 10000:
-                is_affordable = True
 
-            statistics["is_affordable"] = is_affordable
 
         elif node_type == "county":
             node_id = int(node_id)
@@ -524,8 +529,10 @@ def get_node_stats(request):
             violent_crime = crime_data_row[0]
             property_crime = crime_data_row[1]
 
-            statistics["violent_crime"] = round(violent_crime, 2)
-            statistics["property_crime"] = round(property_crime, 2)
+            if violent_crime is not None:
+                statistics["violent_crime"] = round(violent_crime, 2)
+            if property_crime is not None:
+                statistics["property_crime"] = round(property_crime, 2)
 
             schools_query = (
                 "select count(*) from school_data where schooldigger_rating is not null "
@@ -550,17 +557,19 @@ def get_node_stats(request):
 
             avg_avg_annual_income = annual_income_data_row[0]
             avg_median_annual_income = annual_income_data_row[1]
-            statistics["avg_avg_annual_income"] = round(avg_avg_annual_income, 2)
-            statistics["avg_median_annual_income"] = round(avg_median_annual_income, 2)
 
-            us_avg = Decimal(28555.0)
+            if avg_avg_annual_income is not None:
+                statistics["avg_avg_annual_income"] = round(avg_avg_annual_income, 2)
+                us_avg = Decimal(28555.0)
+                is_affordable = False
+                avg_diff = avg_avg_annual_income - us_avg
+                if avg_diff < 0 or avg_diff < 10000:
+                    is_affordable = True
 
-            avg_diff = avg_avg_annual_income - us_avg
-            is_affordable = False
-            if avg_diff < 0 or avg_diff < 10000:
-                is_affordable = True
+                statistics["is_affordable"] = is_affordable
 
-            statistics["is_affordable"] = is_affordable
+            if avg_median_annual_income is not None:
+                statistics["avg_median_annual_income"] = round(avg_median_annual_income, 2)
 
         elif node_type == "zipcode":
             node_id = int(node_id)
@@ -574,8 +583,10 @@ def get_node_stats(request):
             violent_crime = crime_data_row[0]
             property_crime = crime_data_row[1]
 
-            statistics["violent_crime"] = round(violent_crime, 2)
-            statistics["property_crime"] = round(property_crime, 2)
+            if violent_crime is not None:
+                statistics["violent_crime"] = round(violent_crime, 2)
+            if property_crime is not None:
+                statistics["property_crime"] = round(property_crime, 2)
 
             schools_query = (
                 "select count(*) from school_data where schooldigger_rating is not null "
@@ -597,17 +608,18 @@ def get_node_stats(request):
 
             avg_avg_annual_income = annual_income_data_row[0]
             avg_median_annual_income = annual_income_data_row[1]
-            statistics["avg_avg_annual_income"] = round(avg_avg_annual_income, 2)
-            statistics["avg_median_annual_income"] = round(avg_median_annual_income, 2)
+            if avg_avg_annual_income is not None:
+                statistics["avg_avg_annual_income"] = round(avg_avg_annual_income, 2)
+                us_avg = Decimal(28555.0)
+                is_affordable = False
+                avg_diff = avg_avg_annual_income - us_avg
+                if avg_diff < 0 or avg_diff < 10000:
+                    is_affordable = True
 
-            us_avg = Decimal(28555.0)
+                statistics["is_affordable"] = is_affordable
 
-            avg_diff = avg_avg_annual_income - us_avg
-            is_affordable = False
-            if avg_diff < 0 or avg_diff < 10000:
-                is_affordable = True
-
-            statistics["is_affordable"] = is_affordable
+            if avg_median_annual_income is not None:
+                statistics["avg_median_annual_income"] = round(avg_median_annual_income, 2)
 
         return JsonResponse(statistics, safe=False)
 
@@ -706,7 +718,10 @@ def list_best_counties(state_name):
     for each_row in county_data_rows:
         each_data_dict = {}
         each_data_dict["id"] = each_row[0]
-        each_data_dict["name"] = each_row[1]
+        if each_row[1].rfind('County') != -1:
+            each_data_dict["name"] = each_row[1][:-7]
+        else:
+            each_data_dict["name"] = each_row[1]
         data.append(each_data_dict)
 
     data = data[0:5]
@@ -948,7 +963,7 @@ def get_similar_states(request):
             "order by avg(annual_income.avg_annual_income) asc, avg(annual_income.median_annual_income) asc"
         )
         median_prices_query = (
-            "select list_price, state_id, state.name from state_timeseries "
+            "select index_value, state_id, state.name from state_timeseries "
             "inner join state on state_timeseries.state_id = state.id where year_month = %s and home_type_id = %s"
         )
 
@@ -995,10 +1010,13 @@ def get_similar_states(request):
         states = {}
         for each_key in keys:
             each_data_instance = []
-            crime_data = crime_data_map_by_state[each_key]
-            school_data = school_data_map_by_state[each_key]
-            annual_data = annual_data_map_by_state[each_key]
-            median_price = median_price_map_by_state[each_key]
+            crime_data = crime_data_map_by_state.get(each_key, None)
+            school_data = school_data_map_by_state.get(each_key, None)
+            annual_data = annual_data_map_by_state.get(each_key, None)
+            median_price = median_price_map_by_state.get(each_key, None)
+
+            if crime_data is None or school_data is None or annual_data is None or median_price is None:
+                continue
 
             each_data_instance.append(crime_data[0])
             each_data_instance.append(crime_data[1])
@@ -1061,8 +1079,7 @@ def get_similar_states(request):
 
         return JsonResponse(data, safe=False)
 
-
-def similar_counties(all_counties_str):
+def similar_counties(bucket_data, all_counties_str):
 
     # Get data for all best counties and aggregate this data into one dataset
     crime_data_query = (
@@ -1116,66 +1133,56 @@ def similar_counties(all_counties_str):
 
     # Now merge all this data into one
 
-    crime_data_map = {}
+    crime_data_map = OrderedDict()
 
     for each_row in crime_data_rows:
-        crime_data_map[each_row[3]] = each_row
+        crime_data_map[each_row[2]] = each_row
 
     school_data_map = {}
 
     for each_row in school_data_rows:
-        school_data_map[each_row[2]] = each_row
+        school_data_map[each_row[1]] = each_row
 
     annual_data_map = {}
 
     for each_row in annual_data_rows:
-        annual_data_map[each_row[3]] = each_row
+        annual_data_map[each_row[2]] = each_row
 
     median_data_map = {}
 
     for each_row in median_price_rows:
-        median_data_map[each_row[2]] = each_row
-
-    min_keys_length = len(crime_data_rows)
-    keys = crime_data_map.keys()
-    if len(school_data_rows) < min_keys_length:
-        min_keys_length = len(school_data_rows)
-        keys = school_data_map.keys()
-    if len(annual_data_rows) < min_keys_length:
-        min_keys_length = len(annual_data_rows)
-        keys = annual_data_map.keys()
-    if len(median_price_rows) < min_keys_length:
-        keys = median_data_map.keys()
+        median_data_map[each_row[1]] = each_row
 
     full_dataset = []
     idx = 0
     entities = {}
     entities_map = {}
-    for each_key in keys:
-        each_data_instance = []
-        crime_data = crime_data_map.get(each_key, None)
-        school_data = school_data_map.get(each_key, None)
-        annual_data = annual_data_map.get(each_key, None)
-        median_data = median_data_map.get(each_key, None)
+    for each_bucket in bucket_data.keys():
+        for county_id in bucket_data[each_bucket]:
+            each_data_instance = []
+            crime_data = crime_data_map.get(county_id, None)
+            school_data = school_data_map.get(county_id, None)
+            annual_data = annual_data_map.get(county_id, None)
+            median_data = median_data_map.get(county_id, None)
 
-        if (
-            crime_data is None
-            or school_data is None
-            or annual_data is None
-            or median_data is None
-        ):
-            continue
+            if (
+                crime_data is None
+                or school_data is None
+                or annual_data is None
+                or median_data is None
+            ):
+                continue
 
-        each_data_instance.append(crime_data[0])
-        each_data_instance.append(crime_data[1])
-        each_data_instance.append(school_data[0])
-        each_data_instance.append(annual_data[0])
-        each_data_instance.append(annual_data[1])
-        each_data_instance.append(median_data[0])
-        entities[idx] = each_key
-        entities_map[each_key] = crime_data[2]
-        idx += 1
-        full_dataset.append(each_data_instance)
+            each_data_instance.append(crime_data[0])
+            each_data_instance.append(crime_data[1])
+            each_data_instance.append(school_data[0])
+            each_data_instance.append(annual_data[0])
+            each_data_instance.append(annual_data[1])
+            each_data_instance.append(median_data[0])
+            entities[idx] = county_id
+            entities_map[county_id] = crime_data[3]
+            idx += 1
+            full_dataset.append(each_data_instance)
 
     numpy_dataset = np.array(full_dataset, dtype=np.float)
 
@@ -1198,41 +1205,119 @@ def similar_counties(all_counties_str):
 
         all_idx_similarity_data.append(each_idx_data)
 
-    main_similarities = []
-    count_down = 3
-    for each_row_idx in range(len(all_idx_similarity_data)):
-        each_col = all_idx_similarity_data[each_row_idx]
-        similarites = []
-        for col_idx in range(len(each_col)):
-            if each_row_idx < int(rows / 3):
-                if each_col[col_idx] < int(rows / 3):
-                    continue
-                elif each_col[col_idx] >= int(rows / 3):
-                    similarites.append(each_col[col_idx])
-            elif each_row_idx < 10:
-                if each_col[col_idx] < 2 * int(rows / 3):
-                    continue
-                elif each_col[col_idx] >= 2 * int(rows / 3):
-                    similarites.append(each_col[col_idx])
+    max_indexes = []
+    indexes1 = []
+    indexes2 = []
+    indexes3 = []
 
-        if len(similarites) != 0:
-            if each_row_idx % int(rows / 3) == 0:
-                count_down -= 1
-            if len(similarites[0:count_down]) != 0:
-                main_similarities.append(similarites[0:count_down])
+    for idxes in entities.keys():
+        county_id = entities[idxes]
+        if county_id in bucket_data[0]:
+            indexes1.append(idxes)
+        elif county_id in bucket_data[1]:
+            indexes2.append(idxes)
+        elif county_id in bucket_data[2]:
+            indexes3.append(idxes)
+
+    if len(indexes1) > 0:
+        max_indexes.append(np.max(indexes1))
+    else:
+        max_indexes.append(0)
+
+    if len(indexes2) > 0:
+        max_indexes.append(np.max(indexes2))
+    else:
+        max_indexes.append(0)
+
+    if len(indexes3) > 0:
+        max_indexes.append(np.max(indexes3))
+    else:
+        max_indexes.append(0)
+
+    current_values = []
+    bucket1_data = all_idx_similarity_data[0:max_indexes[0] + 1]
+    bucket2_data = all_idx_similarity_data[max_indexes[0] + 1:max_indexes[1] + 1]
+    if max_indexes[0] != 0:
+
+        vals_1 = np.argwhere((bucket1_data > max_indexes[0]) & (bucket1_data <= max_indexes[1]))
+        similar_values_1 = []
+
+        idx = 0
+        for val_rows in range(vals_1.shape[0]):
+            row_val = vals_1[val_rows, :][0]
+            col_val = vals_1[val_rows, :][1]
+            if row_val == idx:
+                similar_values_1.append(bucket1_data[row_val][col_val])
+                idx += 1
+
+        vals_2 = np.argwhere(bucket1_data > max_indexes[1])
+        similar_values_2 = []
+
+        idx = 0
+
+        for val_rows in range(vals_2.shape[0]):
+            row_val = vals_2[val_rows, :][0]
+            col_val = vals_2[val_rows, :][1]
+            if row_val == idx:
+                similar_values_2.append(bucket1_data[row_val][col_val])
+                idx += 1
+
+        if len(similar_values_1) == len(similar_values_2):
+            for idx in range(len(similar_values_1)):
+                current_values.append([similar_values_1[idx], similar_values_2[idx]])
+        elif len(similar_values_1) == 0:
+            for idx in range(len(similar_values_2)):
+                current_values.append([similar_values_2[idx]])
+        elif len(similar_values_2) == 0:
+            for idx in range(len(similar_values_1)):
+                current_values.append([similar_values_1[idx]])
+        elif len(similar_values_1) < len(similar_values_2):
+            for idx in range(len(similar_values_1)):
+                current_values.append([similar_values_1[idx], similar_values_2[idx]])
+            next_idx = idx
+            while next_idx < len(similar_values_2):
+                current_values.append([similar_values_2[next_idx]])
+                next_idx += 1
+        elif len(similar_values_2) < len(similar_values_1):
+            for idx in range(len(similar_values_2)):
+                current_values.append([similar_values_1[idx], similar_values_2[idx]])
+            next_idx = idx
+            while next_idx < len(similar_values_1):
+                current_values.append([similar_values_1[next_idx]])
+                next_idx += 1
+
+    if max_indexes[2] != 0:
+        vals_3 = np.argwhere(bucket2_data > max_indexes[1])
+
+        similar_values_3 = []
+
+        idx = 0
+        for val_rows in range(vals_3.shape[0]):
+            row_val = vals_3[val_rows, :][0]
+            col_val = vals_3[val_rows, :][1]
+            if row_val == idx:
+                similar_values_3.append(bucket2_data[row_val][col_val])
+                idx += 1
+
+        for each in similar_values_3:
+            current_values.append([each])
 
     data = []
-    for each_row in range(len(main_similarities)):
+    for each_row in range(len(current_values)):
         each_data_dict = {}
-        each_data_dict["name"] = entities[each_row]
-        each_data_dict["id"] = entities_map[each_data_dict["name"]]
-        similars = main_similarities[each_row]
+        each_data_dict["id"] = entities[each_row]
+        each_data_dict["name"] = entities_map[each_data_dict["id"]]
+        current_value = current_values[each_row]
+        if len(current_value) == 2:
+            similars = [current_value[0], current_value[1]]
+        else:
+            similars = [current_value[0]]
 
         similar_values = []
         for similar in similars:
             similar_data_dict = {}
-            similar_data_dict["name"] = entities[similar]
-            similar_data_dict["id"] = entities_map[similar_data_dict["name"]]
+            similar_data_dict["id"] = entities[similar]
+            similar_data_dict["name"] = entities_map[similar_data_dict["id"]]
             similar_values.append(similar_data_dict)
 
         each_data_dict["similars"] = similar_values
@@ -1241,7 +1326,7 @@ def similar_counties(all_counties_str):
     return data
 
 
-def similar_zips(all_zips_str):
+def similar_zips(bucket_data, all_zips_str):
 
     # Get data for all best zipcodes and aggregate this data into one dataset
     crime_data_query = (
@@ -1281,49 +1366,43 @@ def similar_zips(all_zips_str):
     crime_data_map = {}
 
     for each_row in crime_data_rows:
-        crime_data_map[each_row[3]] = each_row
+        crime_data_map[each_row[2]] = each_row
 
     school_data_map = {}
 
     for each_row in school_data_rows:
-        school_data_map[each_row[2]] = each_row
+        school_data_map[each_row[1]] = each_row
 
     annual_data_map = {}
 
     for each_row in annual_data_rows:
-        annual_data_map[each_row[3]] = each_row
-
-    min_keys_length = len(crime_data_rows)
-    keys = crime_data_map.keys()
-    if len(school_data_rows) < min_keys_length:
-        min_keys_length = len(school_data_rows)
-        keys = school_data_map.keys()
-    if len(annual_data_rows) < min_keys_length:
-        keys = annual_data_map.keys()
+        annual_data_map[each_row[2]] = each_row
 
     full_dataset = []
     idx = 0
     entities = {}
     entities_map = {}
-    for each_key in keys:
-        each_data_instance = []
-        crime_data = crime_data_map.get(each_key, None)
-        school_data = school_data_map.get(each_key, None)
-        annual_data = annual_data_map.get(each_key, None)
+    for each_bucket in bucket_data.keys():
+        for zip_id in bucket_data[each_bucket]:
 
-        if crime_data is None or school_data is None or annual_data is None:
-            continue
+            each_data_instance = []
+            crime_data = crime_data_map.get(zip_id, None)
+            school_data = school_data_map.get(zip_id, None)
+            annual_data = annual_data_map.get(zip_id, None)
 
-        each_data_instance.append(crime_data[0])
-        each_data_instance.append(crime_data[1])
-        each_data_instance.append(school_data[0])
-        each_data_instance.append(annual_data[0])
-        each_data_instance.append(annual_data[1])
-        # each_data_instance.append(median_data[0])
-        entities[idx] = each_key
-        entities_map[each_key] = crime_data[2]
-        idx += 1
-        full_dataset.append(each_data_instance)
+            if crime_data is None or school_data is None or annual_data is None:
+                continue
+
+            each_data_instance.append(crime_data[0])
+            each_data_instance.append(crime_data[1])
+            each_data_instance.append(school_data[0])
+            each_data_instance.append(annual_data[0])
+            each_data_instance.append(annual_data[1])
+            # each_data_instance.append(median_data[0])
+            entities[idx] = zip_id
+            entities_map[zip_id] = crime_data[3]
+            idx += 1
+            full_dataset.append(each_data_instance)
 
     numpy_dataset = np.array(full_dataset, dtype=np.float)
 
@@ -1346,42 +1425,118 @@ def similar_zips(all_zips_str):
 
         all_idx_similarity_data.append(each_idx_data)
 
-    main_similarities = []
-    count_down = 3
-    for each_row_idx in range(len(all_idx_similarity_data)):
-        each_col = all_idx_similarity_data[each_row_idx]
-        similarites = []
-        for col_idx in range(len(each_col)):
-            if each_row_idx == col_idx:
-                continue
-            if each_row_idx < 5:
-                if each_col[col_idx] < int(rows / 3):
-                    continue
-                elif each_col[col_idx] >= int(rows / 3):
-                    similarites.append(each_col[col_idx])
-            elif each_row_idx < 10:
-                if each_col[col_idx] < 2 * int(rows / 3):
-                    continue
-                elif each_col[col_idx] >= 2 * int(rows / 3):
-                    similarites.append(each_col[col_idx])
+    max_indexes = []
+    indexes1 = []
+    indexes2 = []
+    indexes3 = []
 
-        if len(similarites) != 0:
-            if each_row_idx % int(rows / 3) == 0:
-                count_down -= 1
-            main_similarities.append(similarites[0:count_down])
+    for idxes in entities.keys():
+        county_id = entities[idxes]
+        if county_id in bucket_data[0]:
+            indexes1.append(idxes)
+        elif county_id in bucket_data[1]:
+            indexes2.append(idxes)
+        elif county_id in bucket_data[2]:
+            indexes3.append(idxes)
+
+    if len(indexes1) > 0:
+        max_indexes.append(np.max(indexes1))
+    else:
+        max_indexes.append(0)
+
+    if len(indexes2) > 0:
+        max_indexes.append(np.max(indexes2))
+    else:
+        max_indexes.append(0)
+
+    if len(indexes3) > 0:
+        max_indexes.append(np.max(indexes3))
+    else:
+        max_indexes.append(0)
+
+    bucket1_data = all_idx_similarity_data[0:max_indexes[0] + 1]
+    bucket2_data = all_idx_similarity_data[max_indexes[0] + 1:max_indexes[1] + 1]
+
+    vals_1 = np.argwhere((bucket1_data > max_indexes[0]) & (bucket1_data <= max_indexes[1]))
+    similar_values_1 = []
+
+    idx = 0
+    for val_rows in range(vals_1.shape[0]):
+        row_val = vals_1[val_rows, :][0]
+        col_val = vals_1[val_rows, :][1]
+        if row_val == idx:
+            similar_values_1.append(bucket1_data[row_val][col_val])
+            idx += 1
+
+    vals_2 = np.argwhere(bucket1_data > max_indexes[1])
+    similar_values_2 = []
+
+    idx = 0
+
+    for val_rows in range(vals_2.shape[0]):
+        row_val = vals_2[val_rows, :][0]
+        col_val = vals_2[val_rows, :][1]
+        if row_val == idx:
+            similar_values_2.append(bucket1_data[row_val][col_val])
+            idx += 1
+
+    current_values = []
+    if len(similar_values_1) == len(similar_values_2):
+        for idx in range(len(similar_values_1)):
+            current_values.append([similar_values_1[idx], similar_values_2[idx]])
+    elif len(similar_values_1) == 0:
+        for idx in range(len(similar_values_2)):
+            current_values.append([similar_values_2[idx]])
+    elif len(similar_values_2) == 0:
+        for idx in range(len(similar_values_1)):
+            current_values.append([similar_values_1[idx]])
+    elif len(similar_values_1) < len(similar_values_2):
+        for idx in range(len(similar_values_1)):
+            current_values.append([similar_values_1[idx], similar_values_2[idx]])
+        next_idx = idx
+        while next_idx < len(similar_values_2):
+            current_values.append([similar_values_2[next_idx]])
+            next_idx += 1
+    elif len(similar_values_2) < len(similar_values_1):
+        for idx in range(len(similar_values_2)):
+            current_values.append([similar_values_1[idx], similar_values_2[idx]])
+        next_idx = idx
+        while next_idx < len(similar_values_1):
+            current_values.append([similar_values_1[next_idx]])
+            next_idx += 1
+
+    if max_indexes[2] != 0:
+        vals_3 = np.argwhere(bucket2_data > max_indexes[1])
+
+        similar_values_3 = []
+
+        idx = 0
+        for val_rows in range(vals_3.shape[0]):
+            row_val = vals_3[val_rows, :][0]
+            col_val = vals_3[val_rows, :][1]
+            if row_val == idx:
+                similar_values_3.append(bucket2_data[row_val][col_val])
+                idx += 1
+
+        for each in similar_values_3:
+            current_values.append([each])
 
     data = []
-    for each_row in range(len(main_similarities)):
+    for each_row in range(len(current_values)):
         each_data_dict = {}
-        each_data_dict["name"] = entities[each_row]
-        each_data_dict["id"] = entities_map[each_data_dict["name"]]
-        similars = main_similarities[each_row]
+        each_data_dict["id"] = entities[each_row]
+        each_data_dict["name"] = entities_map[each_data_dict["id"]]
+        current_value = current_values[each_row]
+        if len(current_value) == 2:
+            similars = [current_value[0], current_value[1]]
+        else:
+            similars = [current_value[0]]
 
         similar_values = []
         for similar in similars:
             similar_data_dict = {}
-            similar_data_dict["name"] = entities[similar]
-            similar_data_dict["id"] = entities_map[similar_data_dict["name"]]
+            similar_data_dict["id"] = entities[similar]
+            similar_data_dict["name"] = entities_map[similar_data_dict["id"]]
             similar_values.append(similar_data_dict)
 
         each_data_dict["similars"] = similar_values
@@ -1396,18 +1551,26 @@ def similar_zips(all_zips_str):
 @permission_classes([])
 def get_similar_all(request):
     if request.method == "GET":
-        selected_states = request.GET.get("states", "Arkansas_Ohio_Mississippi")
+        selected_states = request.GET.get("states", "Alabama_Texas_Kentucky")
 
         all_states = selected_states.split("_")
 
         all_counties = []
 
         county_id_state_map = {}
+        bucket_data = {}
+        index = 0
         for each_state in all_states:
             best_counties = list_best_counties(each_state)
+            each_bucket_ids = []
             for each in best_counties:
                 county_id_state_map[each["id"]] = each_state
                 all_counties.append(each["id"])
+                each_bucket_ids.append(each['id'])
+
+            bucket_data[index] = each_bucket_ids
+
+            index += 1
 
         all_counties_str = ""
 
@@ -1416,7 +1579,7 @@ def get_similar_all(request):
 
         all_counties_str = all_counties_str[:-1]
 
-        data = similar_counties(all_counties_str)
+        data = similar_counties(bucket_data, all_counties_str)
 
         final_data = dict()
 
@@ -1431,14 +1594,23 @@ def get_similar_all(request):
 
         final_data["best_counties"] = data
 
+
         all_counties = []
 
         county_id_state_map = {}
+        bucket_data = {}
+        index = 0
         for each_state in all_states:
-            safe_counties = list_safe_counties(each_state)
-            for each in safe_counties:
+            best_counties = list_safe_counties(each_state)
+            each_bucket_ids = []
+            for each in best_counties:
                 county_id_state_map[each["id"]] = each_state
                 all_counties.append(each["id"])
+                each_bucket_ids.append(each['id'])
+
+            bucket_data[index] = each_bucket_ids
+
+            index += 1
 
         all_counties_str = ""
 
@@ -1447,7 +1619,7 @@ def get_similar_all(request):
 
         all_counties_str = all_counties_str[:-1]
 
-        data = similar_counties(all_counties_str)
+        data = similar_counties(bucket_data, all_counties_str)
 
         for each_data in data:
             county_id = each_data["id"]
@@ -1463,11 +1635,19 @@ def get_similar_all(request):
         all_counties = []
 
         county_id_state_map = {}
+        bucket_data = {}
+        index = 0
         for each_state in all_states:
-            affordable_counties = list_affordable_counties(each_state)
-            for each in affordable_counties:
+            best_counties = list_affordable_counties(each_state)
+            each_bucket_ids = []
+            for each in best_counties:
                 county_id_state_map[each["id"]] = each_state
                 all_counties.append(each["id"])
+                each_bucket_ids.append(each['id'])
+
+            bucket_data[index] = each_bucket_ids
+
+            index += 1
 
         all_counties_str = ""
 
@@ -1476,7 +1656,7 @@ def get_similar_all(request):
 
         all_counties_str = all_counties_str[:-1]
 
-        data = similar_counties(all_counties_str)
+        data = similar_counties(bucket_data, all_counties_str)
 
         for each_data in data:
             county_id = each_data["id"]
@@ -1487,16 +1667,22 @@ def get_similar_all(request):
                 state_name = county_id_state_map[each_similar["id"]]
                 each_similar["state_name"] = state_name
 
+
         final_data["affordable_counties"] = data
 
         all_zips = []
-
+        bucket_data = {}
+        index = 0
         zip_id_state_map = {}
         for each_state in all_states:
             best_zips = list_best_zips(each_state)
+            each_bucket_ids = []
             for each in best_zips:
                 zip_id_state_map[each["id"]] = each_state
                 all_zips.append(each["id"])
+                each_bucket_ids.append(each['id'])
+            bucket_data[index] = each_bucket_ids
+            index += 1
 
         all_zips_str = ""
 
@@ -1505,7 +1691,7 @@ def get_similar_all(request):
 
         all_zips_str = all_zips_str[:-1]
 
-        data = similar_zips(all_zips_str)
+        data = similar_zips(bucket_data, all_zips_str)
 
         final_data["best_zips"] = data
 

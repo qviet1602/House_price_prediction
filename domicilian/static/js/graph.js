@@ -579,6 +579,41 @@ function mouseover(d) {
   d3.json('/api/node_stats/?node_data=' + node_data)
     .then(function (data) {
       if (d3.select('.stat-box').empty()) {
+
+        is_affordable = null;
+
+        if(data['is_affordable'] != null) {
+            if(data['is_affordable']) {
+                is_affordable = 'Yes'
+            } else {
+                is_affordable = 'No'
+            }
+        }
+          stats = []
+          if(data['violent_crime'] != null) {
+            stats.push('Violent Crime: ' + data['violent_crime'])
+          }
+          if(data['property_crime'] != null) {
+            stats.push('Property Crime: ' + data['property_crime'])
+          }
+
+          if(data['num_of_schools'] != 0) {
+            stats.push('Best Schools Count: ' + data['num_of_schools'])
+          }
+
+          if(data['avg_avg_annual_income'] != null) {
+            stats.push('Avg Annual Income: ' + data['avg_avg_annual_income'])
+          }
+
+          if(data['avg_median_annual_income'] != null) {
+            stats.push('Avg Median Income: ' + data['avg_median_annual_income'])
+          }
+
+          if(is_affordable != null) {
+            stats.push('Affordable: ' + is_affordable)
+          }
+
+        if(stats.length != 0) {
         var statBox = svg.append('g').attr('class', 'stat-box');
 
         statBox.append('rect')
@@ -590,19 +625,8 @@ function mouseover(d) {
           .attr('fill', 'rgb(81, 116 ,187)')
           .attr('stroke', 'rgb(57, 83, 137)')
           .attr('stroke-width', 2)
-
-        is_affordable = data['is_affordable'] == true ? 'Yes' : 'No',
-          stats = [
-            'Violent Crime: ' + data['violent_crime'],
-            'Property Crime: ' + data['property_crime'],
-            'Best Schools Count: ' + data['num_of_schools'],
-            'Avg Annual Income: ' + data['avg_avg_annual_income'],
-            'Avg Median Income: ' + data['avg_median_annual_income'],
-            'Affordable: ' + is_affordable,
-            'Median Price Prediction: ' + 80000
-          ];
-
-        statBox.selectAll('.stat-line')
+          
+            statBox.selectAll('.stat-line')
           .data(stats)
           .enter().append('text')
           .attr('class', 'stat-line')
@@ -612,6 +636,8 @@ function mouseover(d) {
           .attr('fill', 'white')
           .attr('text-anchor', 'start')
           .text(function (d) { return d });
+        }
+
       }
     });
 }
