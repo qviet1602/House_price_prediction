@@ -87,7 +87,7 @@ function createMenu(menu, usStates) {
     .attr('class', 'clear-all-label hidden')
     .attr('y', 30)
     .attr('x', width - 120)
-    .attr('font-size', '17px')
+    .attr('font-size', '15px')
     .attr('fill', 'white')
     .attr('text-anchor', 'middle')
     .attr('font-weight', 'bold')
