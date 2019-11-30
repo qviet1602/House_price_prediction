@@ -67,9 +67,6 @@ function handleStateClick(d_out) {
 	    }
 	})
 	clicked_state_id = d_out['id']
-	d3.select("#line_chart1").remove();
-	d3.select("#line_chart2").remove();
-	d3.select("#line_chart3").remove();
 
 	var state_promise = [
   		d3.json('/api/state_data_rental/?state_id=' + clicked_state_id),
@@ -86,7 +83,7 @@ function state_data_ready([state_data]) {
 }
 
 function draw_lineChart1(state_data) {
-
+    d3.select("#line_chart1").remove();
 	singleFamilyResidenceRental_data = state_data[0]['singleFamilyResidenceRental']
 	multiFamilyResidenceRental_data = state_data[1]['multiFamilyResidenceRental']
 
@@ -279,6 +276,7 @@ function draw_lineChart1(state_data) {
 }
 
 function draw_barChart1(feature_data) {
+    d3.select("#line_chart2").remove();
     var chart2_svg = d3.select("#chart2_dummy_svg").append("svg");
 	chart2_svg.attr("width", dynamic_trends_div_width)
 		  .attr("id", "line_chart2")
@@ -388,6 +386,7 @@ function draw_barChart1(feature_data) {
 }
 
 function draw_barChart2(feature_data) {
+    d3.select("#line_chart3").remove();
     var chart3_svg = d3.select("#chart3_dummy_svg").append("svg");
 	chart3_svg.attr("width", dynamic_trends_div_width)
 		  .attr("id", "line_chart3")

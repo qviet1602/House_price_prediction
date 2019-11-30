@@ -900,19 +900,30 @@ var stateLocs = {
   "WY": { "lat": 42.755966, "lon": -107.30249 },
 };
 
-if (document.cookie.split('=')[1] == undefined) {
-  var state = "CA"
-} else {
-  var state = document.cookie.split('=')[1]
-};
+var state = "CA";
+var allcookies = document.cookie;
+if(allcookies != null) {
+    cookiearray = allcookies.split(';');
 
+    // Now take key value pair out of this array
+    for(var i=0; i<cookiearray.length; i++) {
+        name = cookiearray[i].split('=')[0];
+        name = name.trim();
+        value = cookiearray[i].split('=')[1];
+        value = value.trim()
+        if(name == 'state') {
+            state = value
+        }
+    }
+}
+console.log("Current State ", state)
 
 // mapid is the id of the div where the map will appear
 var map = L
   .map('mapid')
   .fitBounds(maxBounds)
-//   .setView(new L.LatLng(stateLocs[state].lat, stateLocs[state].lon), 5.5); //testing purposess
-  .setView(new L.LatLng(37.689740802722724, -109.599609375), 5);
+  .setView(new L.LatLng(stateLocs[state].lat, stateLocs[state].lon), 5.5); //testing purposess
+//   .setView(new L.LatLng(37.689740802722724, -109.599609375), 5);
 // .setView([47, 2], 10)
 // .setView([40, -8025], 10);   // center position + zoom
 
