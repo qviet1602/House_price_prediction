@@ -24,7 +24,7 @@ function load_loading_bar() {
                         25).attr("text-anchor", "middle")
                         .attr("font-size", "16px")
                         .attr("font-family", "Helvetica")
-                        .style("fill", "orange")
+                        .style("fill", "red")
                         .style("stroke-width", 3)
                         .text("Loading... Please wait")
 

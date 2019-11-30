@@ -16,23 +16,30 @@ var global_state_data = []
 function load_loading_bar() {
     d3.select("#loading_svg").remove();
     var loading_svg = d3.select("#chart1_dummy_svg").append("svg");
-	loading_svg.attr("width", dynamic_trends_div_width)
-		  .attr("id", "loading_svg")
-		  .attr("height", 50);
+    loading_svg.attr("width", dynamic_trends_div_width)
+                .attr("id", "loading_svg")
+                .attr("height", 50);
 
-    loading_svg.append("text").attr("x", dynamic_trends_div_width / 2).attr("y",
-                        25).attr("text-anchor", "middle")
-                        .attr("font-size", "16px")
-                        .attr("font-family", "Helvetica")
-                        .style("fill", "orange")
-                        .style("stroke-width", 3)
-                        .text("Loading... Please wait")
+    loading_svg
+      .append("text")
+      .attr("x", dynamic_trends_div_width / 2)
+      .attr("y", 25)
+      .attr("text-anchor", "middle")
+      .attr("font-size", "16px")
+      .attr("font-family", "Helvetica")
+      .style("fill", "red")
+      .style("stroke-width", 3)
+      .text("Loading... Please wait");
 
-    loading_svg.append("rect").attr("x", 0).attr("y", 0).attr("width", dynamic_trends_div_width)
-                        .attr("height", 100).style("stroke", "black").style(
-                                        "fill", "green")
-                                        .style("opacity", "0.2")
-                                        .style("stroke-width", 1);
+    loading_svg.append("rect")
+                .attr("x", 0)
+                .attr("y", 0)
+                .attr("width", dynamic_trends_div_width)
+                .attr("height", 100)
+                .style("stroke", "black")
+                .style("fill", "green")
+                .style("opacity", "0.2")
+                .style("stroke-width", 1);
 }
 load_loading_bar();
 function ready([state_list, state_data]) {
