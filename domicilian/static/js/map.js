@@ -83,7 +83,8 @@ function updateMap(us, prices, colorScheme, index) {
     .on('click', function(d) {
       var state = prices.get(d.properties.name)['RegionID'];
       document.cookie = 'state=' + state;
-      window.location.href = "/graphical_visualization/";
+    //   window.location.href = "/graphical_visualization/";
+      window.open("/graphical_visualization/", "_blank");
     })
     .on('mouseover', function() {
       d3.select(this).attr('stroke-width', 3)
