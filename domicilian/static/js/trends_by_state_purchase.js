@@ -67,9 +67,6 @@ function handleStateClick(d_out) {
 	    }
 	})
 	clicked_state_id = d_out['id']
-	d3.select("#line_chart1").remove();
-	d3.select("#line_chart2").remove();
-	d3.select("#line_chart3").remove();
 
 	var state_promise = [
   		d3.json('/api/state_data_purchase/?state_id=' + clicked_state_id),
@@ -86,6 +83,7 @@ function state_data_ready([state_data]) {
 }
 
 function draw_lineChart1(state_data) {
+    d3.select("#line_chart1").remove();
 	condoCoOp_data = state_data[0]['condoCoOp']
 	oneBedroom_data = state_data[1]['oneBedroom']
 	twoBedroom_data = state_data[2]['twoBedroom']
@@ -325,6 +323,7 @@ function draw_lineChart1(state_data) {
 }
 
 function draw_lineChart2(state_data) {
+    d3.select("#line_chart2").remove();
 	fourBedroom_data = state_data[4]['fourBedroom']
 	fivePlusBedroom_data = state_data[5]['fivePlusBedroom']
 	singleFamilyHome_data = state_data[6]['singleFamilyHome']
@@ -543,6 +542,7 @@ function draw_lineChart2(state_data) {
 }
 
 function draw_barChart(state_data) {
+    d3.select("#line_chart3").remove();
     var chart3_svg = d3.select("#chart3_dummy_svg").append("svg");
 	chart3_svg.attr("width", dynamic_trends_div_width)
 		  .attr("id", "line_chart3")
