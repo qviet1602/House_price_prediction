@@ -15,8 +15,8 @@
     {% endif %} {% block css %}
     <link href="{% static 'css/normalize.css' %}" rel="stylesheet">
     <link href="{% static 'css/main.css' %}" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/map.css" />
-    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/graph.css" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/map.css' %}" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/graph.css' %}" />
     <link rel="stylesheet" type="text/css" href="{% static 'css/trends.css' %}" /> {% endblock css %} {% block head_extras %} {% endblock %}
     <link rel="stylesheet" type="text/css" href="{% static 'css/font-awesome.min.css' %}" />
     <link rel="stylesheet" type="text/css" href="{% static 'css/slicknav.min.css'%}" />
