@@ -404,6 +404,18 @@ function createForceStateNode(stateObj, x, y) {
     })
     .on("mouseover", mouseover)
   // .on('mouseout', mouseout)
+    .on('dblclick', function(d) {
+      d.fixed = !d.fixed;
+      var fixed = d3.select(this).classed('fixed');
+      d3.select(this).classed('fixed', !fixed);
+      if (d.fixed) {
+        d.fx = d.x;
+        d.fy = d.y;
+      } else {
+        d.fx = null;
+        d.fy = null;
+      }
+    });
 
   nodeEnter
     .append("text")
@@ -601,8 +613,13 @@ function dragged(d) {
 
 function dragended(d) {
   if (!d3.event.active) simulation.alphaTarget(0);
-  d.fx = null;
-  d.fy = null;
+  if (d.fixed == true) {
+    d.fx = d.x;
+    d.fy = d.y;
+  } else {
+    d.fx = null;
+    d.fy = null;
+  }
   d3.select(this).classed('active', false);
 }
 

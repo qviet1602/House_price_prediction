@@ -27,6 +27,9 @@
   cursor: pointer;
 }
 
+.fixed {
+  fill: red;
+}
 
 /* .links line {
   stroke: #999;
