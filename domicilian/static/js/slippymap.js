@@ -908,9 +908,14 @@ if(allcookies != null) {
     // Now take key value pair out of this array
     for(var i=0; i<cookiearray.length; i++) {
         name = cookiearray[i].split('=')[0];
-        name = name.trim();
+        if(name != null) {
+            name = name.trim();
+        }
+
         value = cookiearray[i].split('=')[1];
-        value = value.trim()
+        if(value != null) {
+            value = value.trim()
+        }
         if(name == 'state') {
             state = value
         }

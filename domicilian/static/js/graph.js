@@ -60,6 +60,29 @@ function ready([state_list]) {
   var legend = svg.append('g')
     .attr('class', 'legend')
 
+  var instructionText = svg.append('g')
+    .attr('class', 'instructions-text')
+  var freezeNodesTip = svg.append('g')
+    .attr('class', 'freeze-nodes-tip')
+  var freezeNodesTip2 = svg.append('g')
+    .attr('class', 'freeze-nodes-tip')
+
+    instructionText
+        .append("text")
+        .attr("x", 52)
+        .attr("y", 600)
+        .text("Tip: Click on any state from the menu on the right to get started");
+    freezeNodesTip
+      .append("text")
+      .attr("x", 52)
+      .attr("y", 660)
+      .text("Tip: You can double-click on nodes to freeze their positions.");
+    freezeNodesTip
+      .append("text")
+      .attr("x", 52)
+      .attr("y", 690)
+      .text("Tip: Freezed nodes have red color boundaries, but can still be dragged by the user");
+
   createLegend(legend);
 }
 
@@ -197,7 +220,6 @@ function dragSimilarStates(stateName) {
           each_state = data[i]
           createForceStateNode(each_state, d3_event_x + i * 5, d3_event_y + i * 100);
           d3.select('.' + genClassName(each_state['name']) + '-menu-item').attr('fill', nodeColors[i + 1][2]);
-
         }
 
         removeRightClickMenu();
@@ -388,7 +410,7 @@ function createForceStateNode(stateObj, x, y) {
       return nodeColors[d.group][2];
     })
     .attr("stroke", "black")
-    .attr("stroke-width", "2")
+    .attr("stroke-width", 4.5)
     .call(
       d3
         .drag()
