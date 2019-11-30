@@ -40,7 +40,8 @@ function ready([state_list, state_data]) {
      	   .attr("dy", ".35em")
            .attr("font-family", "Arial")
            .style("fill", "white")
-    	   .text(function(d) { return d['name']; });
+    	   .text(function(d) { return d['name']; })
+    	   .on("click", handleStateClick);
 
 	//Draw line chart here given this data
         draw_lineChart1(state_data);
@@ -54,13 +55,18 @@ function ready([state_list, state_data]) {
         })
 }
 
-function handleStateClick(d) {
+function handleStateClick(d_out) {
 	all_rectangles = d3.selectAll("rect");
 	all_rectangles.each(function(d, i) {
-		d3.select(this).style("fill", "steelblue");
+	    if(d['name'] != null) {
+	        if(d_out['name'] != null && d['name'] != null && d_out['name'] == d['name']) {
+	            d3.select(this).style("fill", "green")
+	        } else {
+	            d3.select(this).style("fill", "steelblue");
+	        }
+	    }
 	})
-	clicked_state_id = d['id']
-	d3.select(this).style("fill", "green");
+	clicked_state_id = d_out['id']
 	d3.select("#line_chart1").remove();
 	d3.select("#line_chart2").remove();
 	d3.select("#line_chart3").remove();
