@@ -13,7 +13,30 @@ var promises = [
 
 Promise.all(promises).then(ready);
 var global_state_data = []
+function load_loading_bar() {
+    d3.select("#loading_svg").remove();
+    var loading_svg = d3.select("#chart1_dummy_svg").append("svg");
+	loading_svg.attr("width", dynamic_trends_div_width)
+		  .attr("id", "loading_svg")
+		  .attr("height", 50);
+
+    loading_svg.append("text").attr("x", dynamic_trends_div_width / 2).attr("y",
+                        25).attr("text-anchor", "middle")
+                        .attr("font-size", "16px")
+                        .attr("font-family", "Helvetica")
+                        .style("fill", "orange")
+                        .style("stroke-width", 3)
+                        .text("Loading... Please wait")
+
+    loading_svg.append("rect").attr("x", 0).attr("y", 0).attr("width", dynamic_trends_div_width)
+                        .attr("height", 100).style("stroke", "black").style(
+                                        "fill", "green")
+                                        .style("opacity", "0.2")
+                                        .style("stroke-width", 1);
+}
+load_loading_bar();
 function ready([state_list, state_data]) {
+    d3.select("#loading_svg").remove();
 	global_state_data = state_list;
 	var num_states = state_list.length;
 	var total_svg_height = states_bar_height * num_states;
@@ -67,7 +90,10 @@ function handleStateClick(d_out) {
 	    }
 	})
 	clicked_state_id = d_out['id']
-
+	d3.select("#line_chart1").remove();
+	d3.select("#line_chart2").remove();
+	d3.select("#line_chart3").remove();
+    load_loading_bar()
 	var state_promise = [
   		d3.json('/api/county_data_rental/?county_id=' + clicked_state_id),
 	];
@@ -76,6 +102,7 @@ function handleStateClick(d_out) {
 }
 
 function state_data_ready([state_data]) {
+    d3.select("#loading_svg").remove();
 	//Draw line chart here given this data
 	draw_lineChart1(state_data);
 	draw_barChart1(state_data[0]['singleFamilyResidenceRental'])
