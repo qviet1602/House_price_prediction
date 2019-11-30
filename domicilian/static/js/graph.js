@@ -30,7 +30,6 @@ var graph = {
 
 var simulation = d3.forceSimulation()
   .force('link', d3.forceLink().id(function (d) { return d.id; }).distance(200))
-  // .force('link', d3.forceLink().id(function (d) { return d.id; }).distance(100))
   .force('charge', d3.forceManyBody().strength(-30))
   // .force('center', d3.forceCenter(500, 500))
 
@@ -57,6 +56,11 @@ function ready([state_list]) {
   })
 
   createMenu(menu, usStates);
+
+  var legend = svg.append('g')
+    .attr('class', 'legend')
+
+  createLegend(legend);
 }
 
 /**
@@ -97,6 +101,11 @@ function createMenu(menu, usStates) {
     .attr('text-anchor', 'middle')
     .attr('font-weight', 'bold')
     .text('Clear and Start Over')
+    .on('mousedown', function () { d3.select(this).classed('active', true) })
+    .on('mouseup', function () {
+      d3.select(this).classed('active', false);
+      deleteAllNodes();
+    });
 
   // State name menu items
   menu.selectAll('.menu-item')
@@ -126,13 +135,16 @@ function createMenu(menu, usStates) {
     .attr('text-anchor', 'middle')
     .attr('font-weight', 'bold')
     .text(function (d) { return d['name'] })
+    .call(d3.drag()
+      .on('start', menuOnDragStart)
+      .on('end', menuOnDragEnd))
 
   // Menu item drag start function
   function menuOnDragStart(d) {
     removeRightClickMenu();
 
     if (createdNodes[d['name']] === undefined && totalNodes < 3) {
-      d3.select(this).attr('fill', nodeColors[nodeGroups[0]][2]);
+      d3.select('.' + genClassName(d['name']) + '-menu-item').attr('fill', nodeColors[nodeGroups[0]][2]);
     }
 
     d3.select(this).classed('active', true);
@@ -142,7 +154,11 @@ function createMenu(menu, usStates) {
   // Menu item drag end function
   function menuOnDragEnd(d) {
     d3.select(this).classed('active', false);
-    createForceStateNode(d);
+    if (d3.event.x >= 1030) {
+      createForceStateNode(d, d3.event.x - 300);
+    } else {
+      createForceStateNode(d);
+    }
   }
 }
 
@@ -357,9 +373,6 @@ function createForceStateNode(stateObj, x, y) {
       return Math.sqrt(d.value);
     })
     .attr("stroke-opacity", 0.3)
-    .attr("transform", function(d) {
-      return "translate(" + -600 + "," + 0 + ")";
-    });
 
   link = linkEnter.merge(link);
   link.exit().remove();
@@ -390,9 +403,6 @@ function createForceStateNode(stateObj, x, y) {
       removeStatBox();
     })
     .on("mouseover", mouseover)
-    .attr("transform", function(d) {
-      return "translate(" + -600 + "," + 0 + ")";
-    });
   // .on('mouseout', mouseout)
 
   nodeEnter
@@ -403,9 +413,6 @@ function createForceStateNode(stateObj, x, y) {
     .text(function(d) {
       return d.id;
     })
-    .attr("transform", function(d) {
-      return "translate(" + -600 + "," + 0 + ")";
-    });
 
   node = nodeEnter.merge(node);
   node.exit().remove();
@@ -430,7 +437,6 @@ function createForceStateNode(stateObj, x, y) {
     node.selectAll('circle')
       .attr('cx', function (d) { return d.x })
       .attr('cy', function (d) { return d.y + window.scrollY })
-      .attr('transform', function (d) { return "translate(" + -600 + "," + 0 + ")"})
 
     node
       .selectAll("text")
@@ -440,9 +446,6 @@ function createForceStateNode(stateObj, x, y) {
       .attr("y", function(d) {
         return d.y - 30 + window.scrollY;
       })
-      .attr("transform", function(d) {
-        return "translate(" + -600 + "," + 0 + ")";
-      });
   }
 }
 
@@ -522,9 +525,6 @@ function createForceCountyNodes(stateName, data, colorShade) {
       return Math.sqrt(d.value);
     })
     .attr("stroke-opacity", 0.3)
-    .attr("transform", function(d) {
-      return "translate(" + -600 + "," + 0 + ")";
-    });
 
   link = linkEnter.merge(link);
   link.exit().remove();
@@ -549,9 +549,6 @@ function createForceCountyNodes(stateName, data, colorShade) {
         .on("end", dragended)
     )
     .on("mouseover", mouseover)
-    .attr("transform", function(d) {
-      return "translate(" + -600 + "," + 0 + ")";
-    });
   // .on('mouseout', mouseout)
 
   nodeEnter
@@ -562,9 +559,6 @@ function createForceCountyNodes(stateName, data, colorShade) {
     .text(function(d) {
       return d.name;
     })
-    .attr("transform", function(d) {
-      return "translate(" + -600 + "," + 0 + ")";
-    });
 
   node = nodeEnter.merge(node);
   node.exit().remove();
@@ -677,9 +671,6 @@ function mouseover(d) {
           .attr("fill", "rgb(81, 116 ,187)")
           .attr("stroke", "rgb(57, 83, 137)")
           .attr("stroke-width", 2)
-          .attr("transform", function(d) {
-            return "translate(" + -600 + "," + 0 + ")";
-          });
 
         statBox
           .selectAll(".stat-line")
@@ -697,9 +688,6 @@ function mouseover(d) {
           .text(function(d) {
             return d;
           })
-          .attr("transform", function(d) {
-            return "translate(" + -600 + "," + 0 + ")";
-          });
         }
 
       }
@@ -780,7 +768,7 @@ function createRightClickMenu(stateName, node) {
     .append("rect")
     .attr("class", "right-click-menu-item")
     .attr("height", rightClickMenuItemHeight)
-    .attr("width", 210)
+    .attr("width", 225)
     .attr("y", function(_, i) {
       return y + i * 40;
     })
@@ -790,10 +778,8 @@ function createRightClickMenu(stateName, node) {
     .attr("stroke-width", 2)
     .on("click", function(_, i) {
       return functions[i](stateName);
-    })
-    .attr("transform", function(d) {
-      return "translate(" + -600 + "," + 0 + ")";
     });
+
 
   rightClickMenu
     .selectAll(".right-click-menu-item-label")
@@ -811,9 +797,9 @@ function createRightClickMenu(stateName, node) {
     .text(function(d) {
       return d;
     })
-    .attr("transform", function(d) {
-      return "translate(" + -600 + "," + 0 + ")";
-    });
+    .on("click", function (_, i) {
+      return functions[i](stateName);
+    })
 }
 
 // Remove right click menu if user clicks away
@@ -879,4 +865,144 @@ function deleteAllNodes() {
 // Makes string lowercase and replaces spaces with dashes for use as classname
 function genClassName(str) {
   return str.trim().replace(/\s+/g, '-').toLowerCase();
+}
+
+function createLegend(legend) {
+  legend.append('text')
+    .attr('x', 10)
+    .attr('y', 12)
+    .attr('font-weight', 'bold')
+    .text('Legend')
+
+  // Best Counties
+  legend.append('rect')
+    .attr('height', 25)
+    .attr('width', 25)
+    .attr('x', 10)
+    .attr('y', 20)
+    .attr('fill', nodeColors[0][0])
+    .attr('stroke', 'black')
+    .attr('stroke-width', 2)
+
+  legend.append('rect')
+    .attr('height', 25)
+    .attr('width', 25)
+    .attr('x', 40)
+    .attr('y', 20)
+    .attr('fill', nodeColors[1][0])
+    .attr('stroke', 'black')
+    .attr('stroke-width', 2)
+
+  legend.append('rect')
+    .attr('height', 25)
+    .attr('width', 25)
+    .attr('x', 70)
+    .attr('y', 20)
+    .attr('fill', nodeColors[2][0])
+    .attr('stroke', 'black')
+    .attr('stroke-width', 2)
+
+  legend.append('text')
+    .attr('x', 100)
+    .attr('y', 38)
+    .text('Best Counties')
+
+  // Best ZIP Codes
+  legend.append('rect')
+    .attr('height', 25)
+    .attr('width', 25)
+    .attr('x', 10)
+    .attr('y', 50)
+    .attr('fill', nodeColors[0][1])
+    .attr('stroke', 'black')
+    .attr('stroke-width', 2)
+
+  legend.append('rect')
+    .attr('height', 25)
+    .attr('width', 25)
+    .attr('x', 40)
+    .attr('y', 50)
+    .attr('fill', nodeColors[1][1])
+    .attr('stroke', 'black')
+    .attr('stroke-width', 2)
+
+  legend.append('rect')
+    .attr('height', 25)
+    .attr('width', 25)
+    .attr('x', 70)
+    .attr('y', 50)
+    .attr('fill', nodeColors[2][1])
+    .attr('stroke', 'black')
+    .attr('stroke-width', 2)
+
+  legend.append('text')
+    .attr('x', 100)
+    .attr('y', 68)
+    .text('Best ZIP Codes')
+
+  // Safe Counties
+  legend.append('rect')
+    .attr('height', 25)
+    .attr('width', 25)
+    .attr('x', 10)
+    .attr('y', 80)
+    .attr('fill', nodeColors[0][3])
+    .attr('stroke', 'black')
+    .attr('stroke-width', 2)
+
+  legend.append('rect')
+    .attr('height', 25)
+    .attr('width', 25)
+    .attr('x', 40)
+    .attr('y', 80)
+    .attr('fill', nodeColors[1][3])
+    .attr('stroke', 'black')
+    .attr('stroke-width', 2)
+
+  legend.append('rect')
+    .attr('height', 25)
+    .attr('width', 25)
+    .attr('x', 70)
+    .attr('y', 80)
+    .attr('fill', nodeColors[2][3])
+    .attr('stroke', 'black')
+    .attr('stroke-width', 2)
+
+  legend.append('text')
+    .attr('x', 100)
+    .attr('y', 98)
+    .text('Safe Counties')
+
+  // Affordable Counties
+  legend.append('rect')
+    .attr('height', 25)
+    .attr('width', 25)
+    .attr('x', 10)
+    .attr('y', 110)
+    .attr('fill', nodeColors[0][4])
+    .attr('stroke', 'black')
+    .attr('stroke-width', 2)
+
+  legend.append('rect')
+    .attr('height', 25)
+    .attr('width', 25)
+    .attr('x', 40)
+    .attr('y', 110)
+    .attr('fill', nodeColors[1][4])
+    .attr('stroke', 'black')
+    .attr('stroke-width', 2)
+
+  legend.append('rect')
+    .attr('height', 25)
+    .attr('width', 25)
+    .attr('x', 70)
+    .attr('y', 110)
+    .attr('fill', nodeColors[2][4])
+    .attr('stroke', 'black')
+    .attr('stroke-width', 2)
+
+  legend.append('text')
+    .attr('x', 100)
+    .attr('y', 128)
+    .text('Affordable Counties')
 }
