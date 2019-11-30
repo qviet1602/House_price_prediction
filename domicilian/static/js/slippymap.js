@@ -600,9 +600,9 @@ async function plotForRent(rentalListings, county) {
       default: prediction_type = 19; break;
     };
 
-    console.log(prediction_type);
+    // console.log(prediction_type);
     var predicted_price = await getPrediction(county, prediction_type);
-    console.log(predicted_price);
+    // console.log(predicted_price);
 
     rentalJson =
       {
@@ -628,6 +628,7 @@ async function plotForRent(rentalListings, county) {
   })
 
   function onRentals(feature, layer) {
+    console.log("this should be showing")
     rentalsLayer.addLayer(layer);
     window.toggle = false;
     layer.on('mouseover', function () {
