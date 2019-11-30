@@ -404,6 +404,18 @@ function createForceStateNode(stateObj, x, y) {
     })
     .on("mouseover", mouseover)
   // .on('mouseout', mouseout)
+    .on('dblclick', function(d) {
+      d.fixed = !d.fixed;
+      var fixed = d3.select(this).classed('fixed');
+      d3.select(this).classed('fixed', !fixed);
+      if (d.fixed) {
+        d.fx = d.x;
+        d.fy = d.y;
+      } else {
+        d.fx = null;
+        d.fy = null;
+      }
+    });
 
   nodeEnter
     .append("text")
@@ -550,6 +562,18 @@ function createForceCountyNodes(stateName, data, colorShade) {
     )
     .on("mouseover", mouseover)
   // .on('mouseout', mouseout)
+    .on('dblclick', function (d) {
+      d.fixed = !d.fixed;
+      var fixed = d3.select(this).classed('fixed');
+      d3.select(this).classed('fixed', !fixed);
+      if (d.fixed) {
+        d.fx = d.x;
+        d.fy = d.y;
+      } else {
+        d.fx = null;
+        d.fy = null;
+      }
+    });
 
   nodeEnter
     .append("text")
@@ -601,8 +625,13 @@ function dragged(d) {
 
 function dragended(d) {
   if (!d3.event.active) simulation.alphaTarget(0);
-  d.fx = null;
-  d.fy = null;
+  if (d.fixed == true) {
+    d.fx = d.x;
+    d.fy = d.y;
+  } else {
+    d.fx = null;
+    d.fy = null;
+  }
   d3.select(this).classed('active', false);
 }
 
@@ -869,7 +898,7 @@ function genClassName(str) {
 
 function createLegend(legend) {
   legend.append('text')
-    .attr('x', 10)
+    .attr('x', 53)
     .attr('y', 12)
     .attr('font-weight', 'bold')
     .text('Legend')
@@ -878,7 +907,7 @@ function createLegend(legend) {
   legend.append('rect')
     .attr('height', 25)
     .attr('width', 25)
-    .attr('x', 10)
+    .attr('x', 53)
     .attr('y', 20)
     .attr('fill', nodeColors[0][0])
     .attr('stroke', 'black')
@@ -887,7 +916,7 @@ function createLegend(legend) {
   legend.append('rect')
     .attr('height', 25)
     .attr('width', 25)
-    .attr('x', 40)
+    .attr('x', 83)
     .attr('y', 20)
     .attr('fill', nodeColors[1][0])
     .attr('stroke', 'black')
@@ -896,14 +925,14 @@ function createLegend(legend) {
   legend.append('rect')
     .attr('height', 25)
     .attr('width', 25)
-    .attr('x', 70)
+    .attr('x', 113)
     .attr('y', 20)
     .attr('fill', nodeColors[2][0])
     .attr('stroke', 'black')
     .attr('stroke-width', 2)
 
   legend.append('text')
-    .attr('x', 100)
+    .attr('x', 143)
     .attr('y', 38)
     .text('Best Counties')
 
@@ -911,7 +940,7 @@ function createLegend(legend) {
   legend.append('rect')
     .attr('height', 25)
     .attr('width', 25)
-    .attr('x', 10)
+    .attr('x', 53)
     .attr('y', 50)
     .attr('fill', nodeColors[0][1])
     .attr('stroke', 'black')
@@ -920,7 +949,7 @@ function createLegend(legend) {
   legend.append('rect')
     .attr('height', 25)
     .attr('width', 25)
-    .attr('x', 40)
+    .attr('x', 83)
     .attr('y', 50)
     .attr('fill', nodeColors[1][1])
     .attr('stroke', 'black')
@@ -929,14 +958,14 @@ function createLegend(legend) {
   legend.append('rect')
     .attr('height', 25)
     .attr('width', 25)
-    .attr('x', 70)
+    .attr('x', 113)
     .attr('y', 50)
     .attr('fill', nodeColors[2][1])
     .attr('stroke', 'black')
     .attr('stroke-width', 2)
 
   legend.append('text')
-    .attr('x', 100)
+    .attr('x', 143)
     .attr('y', 68)
     .text('Best ZIP Codes')
 
@@ -944,7 +973,7 @@ function createLegend(legend) {
   legend.append('rect')
     .attr('height', 25)
     .attr('width', 25)
-    .attr('x', 10)
+    .attr('x', 53)
     .attr('y', 80)
     .attr('fill', nodeColors[0][3])
     .attr('stroke', 'black')
@@ -953,7 +982,7 @@ function createLegend(legend) {
   legend.append('rect')
     .attr('height', 25)
     .attr('width', 25)
-    .attr('x', 40)
+    .attr('x', 83)
     .attr('y', 80)
     .attr('fill', nodeColors[1][3])
     .attr('stroke', 'black')
@@ -962,14 +991,14 @@ function createLegend(legend) {
   legend.append('rect')
     .attr('height', 25)
     .attr('width', 25)
-    .attr('x', 70)
+    .attr('x', 113)
     .attr('y', 80)
     .attr('fill', nodeColors[2][3])
     .attr('stroke', 'black')
     .attr('stroke-width', 2)
 
   legend.append('text')
-    .attr('x', 100)
+    .attr('x', 143)
     .attr('y', 98)
     .text('Safe Counties')
 
@@ -977,7 +1006,7 @@ function createLegend(legend) {
   legend.append('rect')
     .attr('height', 25)
     .attr('width', 25)
-    .attr('x', 10)
+    .attr('x', 53)
     .attr('y', 110)
     .attr('fill', nodeColors[0][4])
     .attr('stroke', 'black')
@@ -986,7 +1015,7 @@ function createLegend(legend) {
   legend.append('rect')
     .attr('height', 25)
     .attr('width', 25)
-    .attr('x', 40)
+    .attr('x', 83)
     .attr('y', 110)
     .attr('fill', nodeColors[1][4])
     .attr('stroke', 'black')
@@ -995,14 +1024,14 @@ function createLegend(legend) {
   legend.append('rect')
     .attr('height', 25)
     .attr('width', 25)
-    .attr('x', 70)
+    .attr('x', 113)
     .attr('y', 110)
     .attr('fill', nodeColors[2][4])
     .attr('stroke', 'black')
     .attr('stroke-width', 2)
 
   legend.append('text')
-    .attr('x', 100)
+    .attr('x', 143)
     .attr('y', 128)
     .text('Affordable Counties')
 }
