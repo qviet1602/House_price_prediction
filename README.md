@@ -7,7 +7,7 @@ Help people find affordable homes efficiently.
 
 ## Getting up and running
 
-Minimum requirements: **pip, fabric, python3.7, redis & [PostgreSQL 11][install-postgres] with postgis-2.4**, setup is tested on Mac OSX only.
+Minimum requirements: **pip, fabric, python3.6, redis & [PostgreSQL 11][install-postgres] with postgis-2.4**, setup is tested on Mac OSX only.
 
 ```
 brew install postgres python3
