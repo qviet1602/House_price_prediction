@@ -102,7 +102,7 @@ function updateMap(us, prices, colorScheme, index) {
 function updateLegend(color, x, index) {
   var g = svg.append('g')
     .attr('class', 'key')
-    .attr('transform', 'translate(450, 400)')
+    .attr('transform', 'translate(150, 15)')
 
   g.selectAll('rect')
     .data(color.range().map(function(d) {
