@@ -83,8 +83,7 @@ function updateMap(us, prices, colorScheme, index) {
     .on('click', function(d) {
       var state = prices.get(d.properties.name)['RegionID'];
       document.cookie = 'state=' + state;
-
-      // TODO: Click should take user to state county screen
+      window.location.href = "/graphical_visualization/";
     })
     .on('mouseover', function() {
       d3.select(this).attr('stroke-width', 3)
