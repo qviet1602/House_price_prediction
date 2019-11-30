@@ -36,7 +36,7 @@
         </a>
         <nav class="header-nav">
             <ul class="main-menu">
-                <li><a href="/map" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">Home</a></li>
+                <li><a href="/" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">Home</a></li>
                 <li><a href="/trends_by_state_purchase/" class="{% if request.resolver_match.url_name == 'trends_by_state_purchase' or request.resolver_match.url_name == 'trends_by_state_rental' %}active{% endif %}">Trends (By State)</a>
                     <ul class="sub-menu">
                         <li><a href="/trends_by_state_purchase/">Trends by State (Purchase)</a></li>
