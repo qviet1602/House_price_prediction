@@ -9,6 +9,20 @@ var purchasePrices = d3.map();
 var projection = d3.geoAlbersUsa().translate([width/2, 250]).scale([1000])
 var path = d3.geoPath().projection(projection);
 
+var instructionText = svg.append("g").attr("class", "freeze-nodes-tip");
+
+instructionText
+    .append("text")
+    .attr("x", 600)
+    .attr("y", 600)
+    .text("Tip: Click on any state to visualize that state in a new tab");
+
+instructionText
+    .append("text")
+    .attr("x", 400)
+    .attr("y", 630)
+    .text("Tip: In the new detail map view, click to drop a pointer and wait to explore amenities around it and predicted price for the next year");
+
 var promises = [
   d3.json('/static/json/states-10m.json'),
   d3.json('/api/rental_median_prices/'),

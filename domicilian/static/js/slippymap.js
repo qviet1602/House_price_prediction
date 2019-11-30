@@ -295,7 +295,7 @@ async function getPrediction(countyName,type) {
 
     var request_url = api_url
       + '?'
-      + '&county=' + encodeURIComponent(countyName)
+      + '&county_name=' + encodeURIComponent(countyName)
       + '&home_type_id=' + String(type);
 
     var request4 = new XMLHttpRequest();
