@@ -562,6 +562,18 @@ function createForceCountyNodes(stateName, data, colorShade) {
     )
     .on("mouseover", mouseover)
   // .on('mouseout', mouseout)
+    .on('dblclick', function (d) {
+      d.fixed = !d.fixed;
+      var fixed = d3.select(this).classed('fixed');
+      d3.select(this).classed('fixed', !fixed);
+      if (d.fixed) {
+        d.fx = d.x;
+        d.fy = d.y;
+      } else {
+        d.fx = null;
+        d.fy = null;
+      }
+    });
 
   nodeEnter
     .append("text")
