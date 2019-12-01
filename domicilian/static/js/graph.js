@@ -707,6 +707,10 @@ function mouseover(d) {
             stats.push('Affordable: ' + is_affordable)
           }
 
+          if(data['prediction_price'] != null) {
+            stats.push('Predicted Median Price: ' + data['prediction_price'])
+          }
+
         if(stats.length != 0) {
         var statBox = svg.append('g').attr('class', 'stat-box');
 
