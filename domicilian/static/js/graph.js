@@ -58,20 +58,23 @@ function ready([state_list]) {
   createMenu(menu, usStates);
 
   var legend = svg.append('g')
-    .attr('class', 'legend')
+    .attr('class', 'legend');
 
   var instructionText = svg.append('g')
-    .attr('class', 'instructions-text')
+    .attr('class', 'instructions-text');
   var freezeNodesTip = svg.append('g')
-    .attr('class', 'freeze-nodes-tip')
-  var freezeNodesTip2 = svg.append('g')
-    .attr('class', 'freeze-nodes-tip')
+    .attr('class', 'freeze-nodes-tip');
 
     instructionText
         .append("text")
         .attr("x", 52)
         .attr("y", 600)
-        .text("Tip: Click on any state from the menu on the right to get started");
+        .text("Tip: Click on any state name from the menu on the right to get started");
+    instructionText
+        .append("text")
+        .attr("x", 52)
+        .attr("y", 630)
+        .text("Tip: Right-Click on any nodes to visualize different relationships");
     freezeNodesTip
       .append("text")
       .attr("x", 52)
@@ -707,6 +710,10 @@ function mouseover(d) {
 
           if(is_affordable != null) {
             stats.push('Affordable: ' + is_affordable)
+          }
+
+          if(data['prediction_price'] != null) {
+            stats.push('Predicted Median Price: ' + data['prediction_price'])
           }
 
         if(stats.length != 0) {

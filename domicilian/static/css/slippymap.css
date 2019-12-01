@@ -11,7 +11,7 @@
   font-weight: bold;
 }
 
-.value { 
+.value {
   font-size: 125%;
 }
 
@@ -37,7 +37,7 @@ html, body, #map {
   font-size: 250%;
   text-align:left;
    }
-  
+
   .homesForRent {
   display:inline-block;
   border: rgba(0,0,0,0.3);
@@ -75,7 +75,7 @@ html, body, #map {
   color: black;
   text-align:left;
   transition: all 0.15s;
-  font-size: 210%;
+  font-size: 100%;
 }
 
 .leaflet-sidebar {

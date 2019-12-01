@@ -16,6 +16,7 @@ function forRentIcon(feature, latlng) {
     prefix: 'fa',
     extraClasses: 'forrent-icon',
   });
+  // console.log('created icon')
   return L.marker(latlng, { icon: rentMarker })
 }
 
@@ -163,6 +164,7 @@ function plotSchools(schools) {
   data = []
 
   schools.forEach(d => {
+    // console.log(d)
     var education_levels = [];
     d.education_levels.forEach(e => {
       var capped = e.charAt(0).toUpperCase() + e.slice(1);
@@ -265,6 +267,7 @@ async function getForRent(postal) {
         // Success!
         var data = JSON.parse(request2.responseText);
         // console.log(data['schools']);
+        // console.log(data.listings);
         resolve(data.listings)
 
       } else if (request2.status <= 500) {
@@ -273,7 +276,7 @@ async function getForRent(postal) {
         console.log("unable to geocode! Response code: " + request2.status);
         var data = JSON.parse(request2.responseText);
       } else {
-        console.log(request2);
+        // console.log(request2);
         console.log("server error");
       }
     };
@@ -295,7 +298,7 @@ async function getPrediction(countyName,type) {
 
     var request_url = api_url
       + '?'
-      + '&county=' + encodeURIComponent(countyName)
+      + '&county_name=' + encodeURIComponent(countyName)
       + '&home_type_id=' + String(type);
 
     var request4 = new XMLHttpRequest();
@@ -310,13 +313,13 @@ async function getPrediction(countyName,type) {
         // Success!
         var data = JSON.parse(request4.responseText);
         // console.log(data['schools']);
-        console.log(data);
+        // console.log(data);
         resolve(data.predicted_price)
 
       } else if (request4.status <= 500) {
         // We reached our target server, but it returned an error
         // console.log(request4.responseText)
-        console.log("unable to get prediction! Response code: " + request4.status);
+        // console.log("unable to get prediction! Response code: " + request4.status);
         // var data = JSON.parse(request4.responseText);
         resolve('None')
       } else {
@@ -453,7 +456,7 @@ async function getbiz1(lat, lon) {
         // Success!
         var data = JSON.parse(request3.responseText);
         // console.log(data['schools']);
-        console.log(data);
+        // console.log(data);
         resolve(data.businesses)
 
       } else if (request3.status <= 500) {
@@ -504,7 +507,7 @@ async function getbiz2(lat, lon) {
         // Success!
         var data = JSON.parse(request3.responseText);
         // console.log(data['schools']);
-        console.log(data);
+        // console.log(data);
         resolve(data.businesses)
 
       } else if (request3.status <= 500) {
@@ -555,7 +558,7 @@ async function getbiz3(lat, lon) {
         // Success!
         var data = JSON.parse(request3.responseText);
         // console.log(data['schools']);
-        console.log(data);
+        // console.log(data);
         resolve(data.businesses)
 
       } else if (request3.status <= 500) {
@@ -580,62 +583,46 @@ async function getbiz3(lat, lon) {
 // plot rental data
 async function plotForRent(rentalListings, county) {
 
-  data = []
+  var data = [];
 
-  console.log(rentalListings[0])
+  // console.log(rentalListings);
 
-  rentalListings.forEach(async function(d) {
-
-    var rental_type = d.prop_type;
-
-    var prediction_type;
-
-    switch (true) {
-      case (rental_type == 'single_family' || rental_type == 'apartment' && d.beds == 1): prediction_type = 11; break;
-      case (rental_type == 'single_family' || rental_type == 'apartment' && d.beds == 2): prediction_type = 12; break;
-      case (rental_type == 'single_family' || rental_type == 'apartment' && d.beds == 3): prediction_type = 13; break;
-      case (rental_type == 'single_family' || rental_type == 'apartment' && d.beds == 4): prediction_type = 14; break;
-      case (rental_type == 'single_family' || rental_type == 'apartment' && d.beds <= 5): prediction_type = 15; break;
-      case (rental_type == 'condo') : prediction_type = 16; break;
-      default: prediction_type = 19; break;
-    };
-
-    console.log(prediction_type);
-    var predicted_price = await getPrediction(county, prediction_type);
-    console.log(predicted_price);
+  rentalListings.forEach(d => {
 
     rentalJson =
       {
         id: d.listing_id,
         type: "Feature",
         properties: {
-          "Name": d.name,
+          "Address": d.address,
           "Beds": d.beds,
           "Baths": d.baths,
           "Price": d.price,
           "Pets": d.pet_policy,
           "Square Footage": d.sqft,
-          "Address": d.address,
-          "Predicted Price": predicted_price
-
+          // "Predicted Price": d.predicted_price,
         },
         geometry: {
           coordinates: [d.lon, d.lat],
           type: "Point"
         }
       };
+    // console.log(rentalJson);
     data.push(rentalJson);
-  })
+  });
+
+  // console.log(data)
 
   function onRentals(feature, layer) {
     rentalsLayer.addLayer(layer);
     window.toggle = false;
     layer.on('mouseover', function () {
-      layer.bindPopup('<b>' + 'Name:</b> ' + feature.properties.Name + '</br><br>'
+      layer.bindPopup('<b>' + 'Address:</b> ' + feature.properties.Address + '</br><br>'
         + '<b>Beds:</b> ' + feature.properties.Beds + '<br><br>'
         + '<b>Baths:</b> ' + feature.properties.Baths + '<br><br>'
         + '<b>Price:</b> ' + feature.properties.Price + '<br><br>'
-        + '<b>Predicted Price:</b> ' + feature.properties["Predicted Price"]).openPopup();
+        // + '<b>Predicted Price:</b> ' + d.predicted_price
+        ).openPopup();
     });
     layer.on('mouseout', function () {
       layer.closePopup();
@@ -674,6 +661,47 @@ async function plotForRent(rentalListings, county) {
 
 };
 
+async function getPredictionData(listings, listingsType, countyName) {
+
+  return new Promise(function (resolve, reject) {
+
+    var newListings = [];
+
+    listings.forEach(async function(d) {
+
+      var prop_type = d.prop_type;
+
+      var prediction_type;
+
+      switch (true) {
+        case (listingsType == 'sales' && prop_type == 'single_family' || prop_type == 'mobile' && d.beds == 1): prediction_type = 2; break;
+        case (listingsType == 'sales' && prop_type == 'single_family' || prop_type == 'mobile' && d.beds == 2): prediction_type = 3; break;
+        case (listingsType == 'sales' && prop_type == 'single_family' || prop_type == 'mobile' && d.beds == 3): prediction_type = 4; break;
+        case (listingsType == 'sales' && prop_type == 'single_family' || prop_type == 'mobile' && d.beds == 4): prediction_type = 5; break;
+        case (listingsType == 'sales' && prop_type == 'single_family' || prop_type == 'mobile' && d.beds <= 5): prediction_type = 6; break;
+        case (listingsType == 'sales' && prop_type == 'condo') : prediction_type = 1; break;
+        case (listingsType == 'sales') : prediction_type = 10; break;
+        case (listingsType == 'rental' && prop_type == 'single_family' || prop_type == 'apartment' && d.beds == 1): prediction_type = 11; break;
+        case (listingsType == 'rental' && prop_type == 'single_family' || prop_type == 'apartment' && d.beds == 2): prediction_type = 12; break;
+        case (listingsType == 'rental' && prop_type == 'single_family' || prop_type == 'apartment' && d.beds == 3): prediction_type = 13; break;
+        case (listingsType == 'rental' && prop_type == 'single_family' || prop_type == 'apartment' && d.beds == 4): prediction_type = 14; break;
+        case (listingsType == 'rental' && prop_type == 'single_family' || prop_type == 'apartment' && d.beds <= 5): prediction_type = 15; break;
+        case (listingsType == 'rental' && prop_type == 'condo') : prediction_type = 16; break;
+        case (listingsType == 'rental') : prediction_type = 19; break;
+        default: prediction_type = 20; break;
+      };
+
+      // console.log(prediction_type);
+
+      d.predicted_price = await getPrediction(countyName, prediction_type);
+
+      newListings.push(d)
+
+    });
+    resolve(newListings);
+  });
+};
+
 // plot sales data
 function plotForSale(salesListings, county) {
 
@@ -681,35 +709,18 @@ function plotForSale(salesListings, county) {
 
   salesListings.forEach(async function(d) {
 
-    var sale_type = d.prop_type;
-
-    var prediction_type;
-
-    switch (true) {
-      case (sale_type == 'single_family' || sale_type == 'mobile' && d.beds == 1): prediction_type = 2; break;
-      case (sale_type == 'single_family' || sale_type == 'mobile' && d.beds == 2): prediction_type = 3; break;
-      case (sale_type == 'single_family' || sale_type == 'mobile' && d.beds == 3): prediction_type = 4; break;
-      case (sale_type == 'single_family' || sale_type == 'mobile' && d.beds == 4): prediction_type = 5; break;
-      case (sale_type == 'single_family' || sale_type == 'mobile' && d.beds <= 5): prediction_type = 6; break;
-      case (sale_type == 'condo') : prediction_type = 1; break;
-      default: prediction_type = 10; break;
-    };
-
-    var predicted_price = await getPrediction(county, prediction_type);
-
     saleJson =
       {
         id: d.listing_id,
         type: "Feature",
         properties: {
-          "Name": d.address,
+          "Address": d.address,
           "Beds": d.beds,
           "Baths": d.baths,
           "Price": d.price,
-          "Predicted Price": predicted_price,
+          // "Predicted Price": d.predicted_price,
           "Square Footage": d.sqft,
           "Lot Size": d.lot_size,
-          "Address": d.address,
           "Type": d.prop_type,
           "URL": d.rdc_web_url,
         },
@@ -725,11 +736,12 @@ function plotForSale(salesListings, county) {
     salesLayer.addLayer(layer);
     window.toggle = false;
     layer.on('mouseover', function () {
-      layer.bindPopup('<b>' + 'Name:</b> ' + feature.properties.Name + '</br><br>'
+      layer.bindPopup('<b>' + 'Address:</b> ' + feature.properties.Address + '</br><br>'
         + '<b>Beds:</b> ' + feature.properties.Beds + '<br><br>'
         + '<b>Baths:</b> ' + feature.properties.Baths + '<br><br>'
         + '<b>Price:</b> ' + feature.properties.Price + '<br><br>'
-        + '<b>Predicted Price:</b> ' + feature.properties["Predicted Price"]).openPopup();
+        // + '<b>Predicted Price:</b> ' + feature.properties["Predicted Price"]
+        ).openPopup();
     });
     layer.on('mouseout', function () {
       layer.closePopup();
@@ -783,7 +795,7 @@ function plotBiz(businesses) {
           "Location": d.location.display_address.toString(),
           "Yelp Rating": d.rating,
           "Phone": d.display_phone,
-          "Price": d.price,
+          "Price": d.price || 'N/A',
           "Yelp Link": d.url
         },
         geometry: {
@@ -939,13 +951,16 @@ map.on('click', async function (e) {
   var schools = await getSchools(e.latlng.lat, e.latlng.lng);
   plotSchools(schools);
   var addressComponents = await getAddress(e.latlng.lat, e.latlng.lng);
-  console.log(addressComponents);
+  // console.log(addressComponents);
   var county = addressComponents.county;
   var postal_code = addressComponents.postcode;
   var rentals = await getForRent(postal_code);
-  plotForRent(rentals, county);
+  await plotForRent(rentals,county);
+  // plotForRent(await getPredictionData(rentals, 'rental', county), county);
   var sales = await getForSale(postal_code);
+  // plotForSale(await getPredictionData(sales, 'sales', county), county);
   plotForSale(sales, county);
+
 
   //I know this is messy but it's 1:30 AM and I had too much caffeine.
   var bizList1 = await getbiz1(e.latlng.lat, e.latlng.lng);
@@ -965,14 +980,14 @@ var sidebar = L.control.sidebar({ container: 'sidebar' })
 // add panels dynamically to the sidebar
 sidebar
   .addPanel({
-    id: 'Filter Views',
+    id: 'Filter_Views',
     tab: '<i class="fa fa-filter"></i>',
-    title: 'Filter Views',
+    title: 'Filter_Views',
     pane: '<p>Drop a pin on the area that you want to check out, then use the options below to filter what you see on the map. <p/>' +
-      '<p id="forSaleToggle"><button onclick="toggleForSale()" class="homesForSale"><i class="fa fa-home"></i></button><text id="salesInfo" class="buttonInfo">Homes For Sale</text></p>' +
-      '<p id="rentalsToggle"><button onclick="toggleForRent()" class="homesForRent"><i class="fa fa-home"></i></button><text id="rentalsInfo" class="buttonInfo">Homes For Rent</text></p>' +
-      '<p id="schoolsToggle"><button onclick="toggleSchools()" class="schools"><i class="fa fa-graduation-cap"></i></button><text id="schoolsInfo" class="buttonInfo">Schools</text></p>' +
-      '<p id="bizToggle"><button onclick="toggleBiz()" class="businesses"><i class="fa fa-shopping-cart"></i></button><text id="bizInfo" class="buttonInfo">Businesses</text></p>',
+      '<p id="forSaleToggle"><button onclick="toggleForSale()" class="homesForSale"><i class="fa fa-home"></i><text id="salesInfo" class="buttonInfo"> Homes For Sale</text></button></p>' +
+      '<p id="rentalsToggle"><button onclick="toggleForRent()" class="homesForRent"><i class="fa fa-home"></i><text id="rentalsInfo" class="buttonInfo"> Homes For Rent</text></button></p>' +
+      '<p id="schoolsToggle"><button onclick="toggleSchools()" class="schools"><i class="fa fa-graduation-cap"></i><text id="schoolsInfo" class="buttonInfo"> Schools</text></button></p>' +
+      '<p id="bizToggle"><button onclick="toggleBiz()" class="businesses"><i class="fa fa-shopping-cart"></i><text id="bizInfo" class="buttonInfo"> Businesses</text></button></p>',
 
   })
 // be notified when a panel is opened
