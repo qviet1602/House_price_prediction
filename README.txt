@@ -9,6 +9,55 @@ We want to help users find desirable places faster and more efficiently using in
 We've several different visualizations available and live demo hosted at:
 https://domicilian.sanyamkhurana.com/
 
+DIRECTORY STRUCTURE
+============================
+
+Reference from root of the `CODE` repository.
+
+/scripts  -- just for reference
+
+    *.py files contains scripts for parsing/loading data in DB.
+    *.ipynb contains all experiments related to ML algorithm exploration and finally using Random Forest for prediction and loading data in the database.
+
+/provisioner
+
+    Contains ansible script to setup a server and host the application.
+
+/tests
+
+    Contains tests for the application.
+
+/docs
+
+    Contains docs related to API and application in general.
+
+/domicilian
+
+    The main folder for Django. Contains different django apps. This is where our backend rest endpoints and frontend code is there
+
+/domicilian/static
+
+    Contains all static css and js files
+
+/domicilian/templates
+
+    Frontend html files
+
+/domicilian/visualization and /domicilian/median_prices
+
+   Backend rest endpoints
+
+/domicilian/urls.py
+
+  URL mappings
+
+If you have processed the dataset in some ways, include the code you used, and the steps people will need to go through. 
+
+  - Our code to process the datasets are in the scripts directory. Some of the csv files contained comma within the content (mainly neighborhood information), In order to process that we had to write a custom method that splits the data and not use the normal split command.
+  - Users would not need to run these scripts because we have already provided our postgres dump file to load the data on one's local machine
+  - Please do not run these scripts. This is just for information purposes since I removed the data directory in each of the directories in these scripts to reduce our canvas submission size.
+  
+
 INSTALLATION INSTRUCTIONS AND EXECUTION
 =======================================
 
@@ -123,29 +172,3 @@ We've also provided an optional but useful live demo of the code on https://domi
 
 Although, we would've loved to package this app as a docker image to be easily utilized across the system, unfortunately, we were restricted by time constraints, but we've tried our best to set up Fabric and Ansible script for deployment on server available under `provisioner` folder. More info is in README.md file at the root of the repo.
 
-
-OPTIONAL DIRECTORY STRUCTURE
-============================
-
-Reference from root of the `CODE` repository.
-
-/scripts  -- just for reference
-
-    *.py files contains scripts for parsing/loading data in DB.
-    *.ipynb contains all experiments related to ML algorithm exploration and finally using Random Forest for prediction and loading data in the database.
-
-/provisioner
-
-    Contains ansible script to setup a server and host the application.
-
-/tests
-
-    Contains tests for the application.
-
-/docs
-
-    Contains docs related to API and application in general.
-
-/domicilian
-
-    The main folder for Django. Contains different django apps.
