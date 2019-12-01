@@ -85,7 +85,7 @@ __NOTE__: Run the subsequent commands from the root of the repository containing
 - Check out the dump of the database from URL:
   https://drive.google.com/file/d/1yK27L6rLrjOK3BdkgOuzXH3Go87shuoa/view?usp=sharing
 
-- Restore the Dump using the following command:
+- Unzip & Restore the Dump using the following command:
 
     unzip housing_data_final_pg_dump.zip
     psql housing_data < housing_data_final_pg_dump.bak
@@ -102,13 +102,11 @@ __NOTE__: Run the subsequent commands from the root of the repository containing
 
     cp .env.sample .env
 
-- Run Django migrations using:
-
-    python manage.py migrate
-
 - Run the development server with:
 
     python manage.py runserver
+
+We've excluded step to run django migrations, since they are part of the dump that is provided.
 
 The site is now served at localhost:8000
 
