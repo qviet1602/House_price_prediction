@@ -54,8 +54,9 @@ Reference from root of the `CODE` repository.
 If you have processed the dataset in some ways, include the code you used, and the steps people will need to go through.
 
   - Our code to process the datasets are in the scripts directory. Some of the csv files contained comma within the content (mainly neighborhood information), In order to process that we had to write a custom method that splits the data and not use the normal split command.
-  - Users would not need to run these scripts because we have already provided our postgres dump file to load the data on one's local machine
+  - Users would not need to run these scripts because we have already provided our postgres dump file to load the data on one's local machine. Please see "INSTALLATION INSTRUCTIONS AND EXECUTION" below.
   - Please do not run these scripts. This is just for information purposes since I removed the data directory in each of the directories in these scripts to reduce our canvas submission size.
+  - Link to raw data https://drive.google.com/file/d/1I0OL6fubD13JIGc-V_AEmKLPalYyu7_8/view?usp=sharing
 
 
 INSTALLATION INSTRUCTIONS AND EXECUTION
