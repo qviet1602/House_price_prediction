@@ -320,7 +320,7 @@ class PredictedPrices(models.Model):
 
     class Meta:
         managed = True
-        db_table = 'predicted_prices'
+        db_table = "predicted_prices"
 
 
 class SchoolData(models.Model):

@@ -1,1 +1,1 @@
-# median prices 
+# median prices

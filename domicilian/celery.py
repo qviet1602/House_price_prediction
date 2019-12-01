@@ -9,14 +9,15 @@ from dotenv import load_dotenv
 from raven.contrib.celery import register_logger_signal, register_signal
 
 # Set the default Django settings module for the 'celery' program.
-load_dotenv(os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env'))
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings.development')
+load_dotenv(os.path.join(os.path.dirname(os.path.dirname(__file__)), ".env"))
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings.development")
 
 
 class CeleryCustomised(Celery):
-
     def on_configure(self):
-        client = raven.Client(os.getenv('SENTRY_DSN'), environment=os.getenv('SENTRY_ENVIRONMENT'))
+        client = raven.Client(
+            os.getenv("SENTRY_DSN"), environment=os.getenv("SENTRY_ENVIRONMENT")
+        )
 
         # Always ensure you import register_logger_signal, register_signal and not their parent modules
         # register a custom filter to filter out duplicate logs
@@ -26,13 +27,13 @@ class CeleryCustomised(Celery):
         register_signal(client)
 
 
-app = CeleryCustomised('domicilian')
+app = CeleryCustomised("domicilian")
 
 # Using a string here means the worker don't have to serialize
 # the configuration object to child processes.
 # - namespace='CELERY' means all celery-related configuration keys
 #   should have a `CELERY_` prefix.
-app.config_from_object('django.conf:settings', namespace='CELERY')
+app.config_from_object("django.conf:settings", namespace="CELERY")
 
 # Load task modules from all registered Django app configs.
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)

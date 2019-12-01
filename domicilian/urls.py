@@ -28,13 +28,41 @@ urlpatterns = [
     path(
         "about/", TemplateView.as_view(template_name="pages/about.html"), name="about"
     ),
-    path("visualize/", TemplateView.as_view(template_name="pages/graph.html"), name="visualize"),
-    path("trends_by_state_purchase/", TemplateView.as_view(template_name="pages/trends_by_state_purchase.html"), name="trends_by_state_purchase"),
-    path("trends_by_state_rental/", TemplateView.as_view(template_name="pages/trends_by_state_rental.html"), name="trends_by_state_rental"),
-    path("trends_by_county_purchase/", TemplateView.as_view(template_name="pages/trends_by_county_purchase.html"), name="trends_by_county_purchase"),
-    path("trends_by_county_rental/", TemplateView.as_view(template_name="pages/trends_by_county_rental.html"), name="trends_by_county_rental"),
-    path("trends_by_zip_purchase/", TemplateView.as_view(template_name="pages/trends_by_zip_purchase.html"), name="trends_by_zip_purchase"),
-    path("graphical_visualization/", TemplateView.as_view(template_name="pages/slippymap.html"), name="graphical_visualization"),
+    path(
+        "visualize/",
+        TemplateView.as_view(template_name="pages/graph.html"),
+        name="visualize",
+    ),
+    path(
+        "trends_by_state_purchase/",
+        TemplateView.as_view(template_name="pages/trends_by_state_purchase.html"),
+        name="trends_by_state_purchase",
+    ),
+    path(
+        "trends_by_state_rental/",
+        TemplateView.as_view(template_name="pages/trends_by_state_rental.html"),
+        name="trends_by_state_rental",
+    ),
+    path(
+        "trends_by_county_purchase/",
+        TemplateView.as_view(template_name="pages/trends_by_county_purchase.html"),
+        name="trends_by_county_purchase",
+    ),
+    path(
+        "trends_by_county_rental/",
+        TemplateView.as_view(template_name="pages/trends_by_county_rental.html"),
+        name="trends_by_county_rental",
+    ),
+    path(
+        "trends_by_zip_purchase/",
+        TemplateView.as_view(template_name="pages/trends_by_zip_purchase.html"),
+        name="trends_by_zip_purchase",
+    ),
+    path(
+        "graphical_visualization/",
+        TemplateView.as_view(template_name="pages/slippymap.html"),
+        name="graphical_visualization",
+    ),
     path("api/purchase_median_prices/", list_purchase_median_prices),
     path("api/rental_median_prices/", list_rental_median_prices),
     path("api/list_states/", list_states),

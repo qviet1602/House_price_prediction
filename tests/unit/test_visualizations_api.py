@@ -21,7 +21,15 @@ def test_state_median_prices_api(client, mocker):
     assert response.status_code == 200
     results = response.data["results"]
     assert len(results) == 5
-    expected_keys = ('id', 'year_month', 'list_price', 'created_date', 'modified_date', 'state', 'home_type')
+    expected_keys = (
+        "id",
+        "year_month",
+        "list_price",
+        "created_date",
+        "modified_date",
+        "state",
+        "home_type",
+    )
     assert set(expected_keys).issubset(results[0].keys())
 
 
@@ -32,7 +40,7 @@ def test_crime_rate_api(client):
     assert response.status_code == 200
     results = response.data["results"]
     assert len(results) == 1
-    expected_keys = ('county', 'state', 'avg_crime_rate')
+    expected_keys = ("county", "state", "avg_crime_rate")
     assert set(expected_keys).issubset(results[0].keys())
 
 
@@ -43,7 +51,7 @@ def test_affordable_api(client):
     assert response.status_code == 200
     results = response.data["results"]
     assert len(results) == 1
-    expected_keys = ('county', 'state', 'avg_annual_income')
+    expected_keys = ("county", "state", "avg_annual_income")
     assert set(expected_keys).issubset(results[0].keys())
 
 
@@ -51,7 +59,7 @@ def test_predicted_prices_api_with_no_query_param(client):
     url = reverse("predicted-prices")
     response = client.json.get(url)
     assert response.status_code == 400
-    assert response.data['error'] == 'county_name or home_type_id is not provided.'
+    assert response.data["error"] == "county_name or home_type_id is not provided."
 
 
 def test_predicted_prices_api_with_valid_data(client):
@@ -60,7 +68,7 @@ def test_predicted_prices_api_with_valid_data(client):
     url = reverse("predicted-prices") + "?county_name=clayton&home_type_id=3"
     response = client.json.get(url)
     assert response.status_code == 200
-    expected_keys = ('county_id', 'home_type_id', 'predicted_price')
+    expected_keys = ("county_id", "home_type_id", "predicted_price")
     assert set(expected_keys).issubset(response.data.keys())
 
 

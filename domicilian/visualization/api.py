@@ -85,12 +85,16 @@ class PredictedPricesView(APIView):
             # TODO: Make this dynamic when we make this project
             # more dynamic
 
-            county_obj = models.County.objects.filter(name__icontains=county_name).first()
+            county_obj = models.County.objects.filter(
+                name__icontains=county_name
+            ).first()
             if not county_obj:
                 return response.BadRequest({"error": "county_name is not correct."})
             county_id = county_obj.id
 
-            instance = models.PredictedPrices.objects.filter(county_id=county_id, home_type_id=home_type_id).first()
+            instance = models.PredictedPrices.objects.filter(
+                county_id=county_id, home_type_id=home_type_id
+            ).first()
 
             if not instance:
                 return response.NoContent()

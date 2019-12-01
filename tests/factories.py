@@ -26,14 +26,14 @@ def create_user(**kwargs):
 
 
 def create_state(**kwargs):
-    return G(apps.get_model("visualization", 'State'), **kwargs)
+    return G(apps.get_model("visualization", "State"), **kwargs)
 
 
 def create_state_median_prices(**kwargs):
     if not kwargs.get("state"):
         state = create_state()
         kwargs["state_code"] = state
-    return G(apps.get_model("visualization", 'StateMedianPrice'), **kwargs)
+    return G(apps.get_model("visualization", "StateMedianPrice"), **kwargs)
 
 
 def create_county(**kwargs):
