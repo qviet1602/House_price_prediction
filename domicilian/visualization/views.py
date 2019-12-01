@@ -478,6 +478,18 @@ def get_node_stats(request):
             if property_crime is not None:
                 statistics["property_crime"] = round(property_crime, 2)
 
+            prediction_query = (
+                "select avg(y_pred) from predicted_prices where county_id in (select id from county where state_id = %s)"
+            )
+
+            with connection.cursor() as cursor:
+                cursor.execute(prediction_query, [node_id])
+                prediction_data_row = cursor.fetchone()
+
+            if prediction_data_row is not None:
+                prediction_price = prediction_data_row[0]
+                statistics['prediction_price'] = round(prediction_price, 2)
+
             schools_query = (
                 "select count(*) from school_data where schooldigger_rating is not null "
                 "and schooldigger_rating >= 3 and zipcode_id in (select id from zipcode where state_id = %s)"
@@ -534,6 +546,18 @@ def get_node_stats(request):
             if property_crime is not None:
                 statistics["property_crime"] = round(property_crime, 2)
 
+            prediction_query = (
+                "select y_pred from predicted_prices where county_id = %s"
+            )
+
+            with connection.cursor() as cursor:
+                cursor.execute(prediction_query, [node_id])
+                prediction_data_row = cursor.fetchone()
+
+            if prediction_data_row is not None:
+                prediction_price = prediction_data_row[0]
+                statistics['prediction_price'] = round(prediction_price, 2)
+
             schools_query = (
                 "select count(*) from school_data where schooldigger_rating is not null "
                 "and schooldigger_rating >= 3 and zipcode_id in (select id from zipcode where county_id = %s)"
@@ -587,6 +611,18 @@ def get_node_stats(request):
                 statistics["violent_crime"] = round(violent_crime, 2)
             if property_crime is not None:
                 statistics["property_crime"] = round(property_crime, 2)
+
+            prediction_query = (
+                "select avg(y_pred) from predicted_prices where county_id in (select county_id from zipcode where id = %s)"
+            )
+
+            with connection.cursor() as cursor:
+                cursor.execute(prediction_query, [node_id])
+                prediction_data_row = cursor.fetchone()
+
+            if prediction_data_row is not None:
+                prediction_price = prediction_data_row[0]
+                statistics['prediction_price'] = round(prediction_price, 2)
 
             schools_query = (
                 "select count(*) from school_data where schooldigger_rating is not null "
