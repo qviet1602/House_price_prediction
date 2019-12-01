@@ -78,6 +78,9 @@ __NOTE__: Run the subsequent commands from the root of the repository containing
 
     GRANT ALL PRIVILEGES ON DATABASE housing_data TO cse6242;
 
+- Give user SUPERUSER priviliges
+
+    ALTER USER cse6242 WITH SUPERUSER;
 
 - Check out the dump of the database from URL:
   https://drive.google.com/file/d/1yK27L6rLrjOK3BdkgOuzXH3Go87shuoa/view?usp=sharing
@@ -95,7 +98,9 @@ __NOTE__: Run the subsequent commands from the root of the repository containing
 
     (venv) /home/ubuntu/DVA_Final_Project $
 
-- Rename `.env.sample` to `.env`. This file contains all secrets so that they are not in source code and provided separately to all hosted instances including local setup. This strictly follows the 12-factor app style (https://12factor.net/). For demo purposes, it contains fake information so that the demo can be run.
+- Rename or copy `.env.sample` to `.env`. This file contains all secrets so that they are not in source code and provided separately to all hosted instances including local setup. This strictly follows the 12-factor app style (https://12factor.net/). For demo purposes, it contains fake information so that the demo can be run.
+
+    cp .env.sample .env
 
 - Run Django migrations using:
 
