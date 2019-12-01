@@ -51,12 +51,12 @@ Reference from root of the `CODE` repository.
 
   URL mappings
 
-If you have processed the dataset in some ways, include the code you used, and the steps people will need to go through. 
+If you have processed the dataset in some ways, include the code you used, and the steps people will need to go through.
 
   - Our code to process the datasets are in the scripts directory. Some of the csv files contained comma within the content (mainly neighborhood information), In order to process that we had to write a custom method that splits the data and not use the normal split command.
   - Users would not need to run these scripts because we have already provided our postgres dump file to load the data on one's local machine
   - Please do not run these scripts. This is just for information purposes since I removed the data directory in each of the directories in these scripts to reduce our canvas submission size.
-  
+
 
 INSTALLATION INSTRUCTIONS AND EXECUTION
 =======================================
@@ -110,6 +110,11 @@ __NOTE__: Run the subsequent commands from the root of the repository containing
     pip install -r requirements/development.txt
     or pip3 install -r requirements/development.txt depending on the python version your system is on.
     brew install gdal
+
+
+- Optionally if required install python-magic-bin:
+
+    pip install python-magic-bin==0.4.14
 
 - Upgrade priviliges to postgres user by
 
