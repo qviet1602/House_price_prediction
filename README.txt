@@ -32,6 +32,18 @@ Before running the following instructions, make sure you get the following depen
 
 - Ensure a valid version of Py3.x (where 6 <= x <= 7) installed. We've tested this on Python 3.6 and Python 3.7
 
+- Ensure a python3-pip installed on your system.
+
+- Ensure the following packages for Ubuntu based system:
+
+      - libjpeg-dev
+      - libtiff5-dev
+      - zlib1g-dev
+      - libfreetype6-dev
+      - liblcms2-dev
+      - postgresql-client
+      - libpq-dev
+
 __NOTE__: Run the subsequent commands from the root of the repository containing the source code:
 
 - Setup virtualenv with:
