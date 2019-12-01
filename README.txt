@@ -112,11 +112,6 @@ __NOTE__: Run the subsequent commands from the root of the repository containing
     brew install gdal
     pip install python-magic-bin==0.4.14 or pip3 install python-magic-bin==0.4.14 depending on your python version
 
-
-- Optionally if required install python-magic-bin:
-
-    pip install python-magic-bin==0.4.14
-
 - Upgrade priviliges to postgres user by
 
     sudo su postgres
