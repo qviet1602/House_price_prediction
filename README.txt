@@ -138,10 +138,10 @@ Reference from root of the `CODE` repository.
 
     Contains tests for the application.
 
-CODE/docs
+/docs
 
     Contains docs related to API and application in general.
 
-CODE/domicilian
+/domicilian
 
     The main folder for Django. Contains different django apps.
