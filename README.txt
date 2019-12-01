@@ -60,6 +60,7 @@ __NOTE__: Run the subsequent commands from the root of the repository containing
 
     pip install -r requirements/development.txt
     or pip3 install -r requirements/development.txt depending on the python version your system is on.
+    brew install gdal
 
 - Upgrade priviliges to postgres user by
 

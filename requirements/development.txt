@@ -17,6 +17,7 @@ pytest-cov==2.7.1
 django-dynamic-fixture==2.0.0
 flake8-mypy==17.8.0
 pytest-mock==1.10.4
+python-magic-bin==0.4.14
 
 # Versioning
 # -------------------------------------
