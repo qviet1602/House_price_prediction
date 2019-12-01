@@ -58,12 +58,16 @@ __NOTE__: Run the subsequent commands from the root of the repository containing
 
     pip install -r requirements/development.txt
 
-- Create postgres database named `cse6242` with username `cse6242`, password `cse6242`.
+- Create user cse6242 with the following postgres command "CREATE USER cse6242 WITH PASSWORD 'cse6242';"
+- Grant this user privileges by running the following command "GRANT ALL PRIVILEGES ON DATABASE housing_data TO cse6242;"
+- Create postgres database named `housing_data` with username `cse6242`, password `cse6242`.
 
 - Check out the dump of the database from URL:
-
+  https://drive.google.com/file/d/1yK27L6rLrjOK3BdkgOuzXH3Go87shuoa/view?usp=sharing
 
 - Restore the Dump using the following command:
+  unzip housing_data_final_pg_dump.zip
+  psql housing_data < housing_data_final_pg_dump.bak
 
 
 
