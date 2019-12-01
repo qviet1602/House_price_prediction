@@ -16,7 +16,8 @@ Before running the following instructions, make sure you get the following depen
 
 - gdal
         - For macOS:
-            - brew install gdal
+	    - brew update
+            - brew install gdal --HEAD
         - For Ubuntu:
             sudo add-apt-repository -y ppa:ubuntugis/ppa
             sudo apt update
@@ -31,6 +32,7 @@ Before running the following instructions, make sure you get the following depen
 
 
 - Ensure a valid version of Py3.x (where 6 <= x <= 7) installed. We've tested this on Python 3.6 and Python 3.7
+  Run the following command "brew install python3"
 
 - Ensure a python3-pip installed on your system.
 
@@ -57,6 +59,7 @@ __NOTE__: Run the subsequent commands from the root of the repository containing
 - Add dependencies for project:
 
     pip install -r requirements/development.txt
+    or pip3 install -r requirements/development.txt depending on the python version your system is on.
 
 - Upgrade priviliges to postgres user by
 
@@ -88,10 +91,10 @@ __NOTE__: Run the subsequent commands from the root of the repository containing
 - Unzip & Restore the Dump using the following command:
 
     unzip housing_data_final_pg_dump.zip
-    psql housing_data < housing_data_final_pg_dump.bak
+    psql housing_data < housing_data_final.bak
 
 
-- Exist the psql CLI as well as the user postgres by pressing Ctrl + D twice.
+- Exit the psql CLI as well as the user postgres by pressing Ctrl + D twice.
 
 
 - Ensure that you're now on CLI with your main user with venv activated like:
