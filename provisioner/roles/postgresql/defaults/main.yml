@@ -1,0 +1,6 @@
+---
+pg_hstore: False
+pg_gis: False
+pg_db: cse6242
+pg_user: cse6242
+pg_password: cse6242

@@ -1,0 +1,43 @@
+.graphical-exploration {
+    display: block;
+    position: absolute;
+    left: 0;
+    margin-top: 100px;
+    height: 2630px;
+    width: 100%;
+}
+
+.active {
+    stroke-width: 4;
+}
+
+.hidden {
+    /* visibility: hidden; */
+    display: none;
+}
+
+.clear-all,
+.clear-all-label,
+.menu-item,
+.menu-item-label,
+.state-node,
+.county-node,
+.right-click-menu-item,
+.right-click-menu-item-label {
+    cursor: pointer;
+}
+
+.fixed {
+    stroke: red;
+}
+
+
+/* .links line {
+  stroke: #999;
+  stroke-opacity: 0.6;
+}
+
+.nodes circle {
+  stroke: #fff;
+  stroke-width: 1.5px;
+} */

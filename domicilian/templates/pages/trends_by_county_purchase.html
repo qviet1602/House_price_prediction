@@ -1,0 +1,26 @@
+{% extends 'pages/base.html' %} {% block content %}
+<div class="trends_container">
+    <div class="dynamic_trends_div">
+        <div id="page_title">
+            <h3>Trends by County (Purchase) </h3>
+        </div>
+        <div id="chart1">
+            <svg id="chart1_dummy_svg" width="700" height="400"></svg>
+        </div>
+        <div id="chart2">
+            <svg id="chart2_dummy_svg" width="700" height="400"></svg>
+        </div>
+        <div id="chart3">
+            <svg id="chart3_dummy_svg" width="700" height="400"></svg>
+        </div>
+        <div id="chart4">
+            <svg id="chart4_dummy_svg" width="700" height="200"></svg>
+        </div>
+    </div>
+    <div class="states_div"></div>
+</div>
+{% endblock content %} {% block js %}
+<script src="{{ STATIC_URL }}js/lib/d3.v5.min.js"></script>
+<script src="{{ STATIC_URL }}js/lib/d3-scale-chromatic.v1.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/trends_by_county_purchase.js"></script>
+{% endblock js %}

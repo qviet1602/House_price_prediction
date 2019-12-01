@@ -1,0 +1,7 @@
+{% extends 'pages/base.html' %}{% load static i18n %}{% block content %}
+<svg class="graphical-exploration"></svg> {% endblock content %} {% block js %}
+<script src="{% static 'js/lib/d3.v5.min.js' %}"></script>
+<script src="{% static 'js/lib/d3-scale-chromatic.v1.min.js' %}"></script>
+<script src="{% static 'js/lib/topojson.v2.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/graph.js' %}"></script>
+{% endblock js %}
