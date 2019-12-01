@@ -14,7 +14,7 @@ from fabric.api import env
 from fabric.api import local as fabric_local
 from fabric import api as fab
 
-local = partial(fabric_local, shell='/bin/bash')
+local = partial(fabric_local, shell="/bin/bash")
 
 
 HERE = dirname(__file__)
@@ -60,7 +60,7 @@ def add_pre_commit():
         local("pre-commit install")
 
 
-def serve_docs(options=''):
+def serve_docs(options=""):
     """Start a local server to view documentation changes."""
     with fab.lcd(HERE) and virtualenv():
         local("mkdocs serve {}".format(options))

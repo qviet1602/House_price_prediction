@@ -9,6 +9,5 @@ from domicilian.median_prices.views import *
 class MedianPriceViewTestCase(TestCase):
     def test_list_medianprices(self):
         self.factory = RequestFactory()
-        request = self.factory.get('/api/median_prices/')
+        request = self.factory.get("/api/median_prices/")
         list_purchase_median_prices(request)
-
