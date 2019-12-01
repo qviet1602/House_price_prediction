@@ -69,7 +69,12 @@ function ready([state_list]) {
         .append("text")
         .attr("x", 52)
         .attr("y", 600)
-        .text("Tip: Click on any state from the menu on the right to get started");
+        .text("Tip: Click on any state name from the menu on the right to get started");
+    instructionText
+        .append("text")
+        .attr("x", 52)
+        .attr("y", 630)
+        .text("Tip: Right-Click on any nodes to visualize different relationships");
     freezeNodesTip
       .append("text")
       .attr("x", 52)
