@@ -75,7 +75,7 @@ html, body, #map {
   color: black;
   text-align:left;
   transition: all 0.15s;
-  font-size: 89%;
+  font-size: 100%;
 }
 
 .leaflet-sidebar {

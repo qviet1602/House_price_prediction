@@ -795,7 +795,7 @@ function plotBiz(businesses) {
           "Location": d.location.display_address.toString(),
           "Yelp Rating": d.rating,
           "Phone": d.display_phone,
-          "Price": d.price,
+          "Price": d.price || 'N/A',
           "Yelp Link": d.url
         },
         geometry: {
