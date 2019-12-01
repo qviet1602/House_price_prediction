@@ -594,13 +594,12 @@ async function plotForRent(rentalListings, county) {
         id: d.listing_id,
         type: "Feature",
         properties: {
-          "Name": d.name,
+          "Address": d.address,
           "Beds": d.beds,
           "Baths": d.baths,
           "Price": d.price,
           "Pets": d.pet_policy,
           "Square Footage": d.sqft,
-          "Address": d.address,
           // "Predicted Price": d.predicted_price,
         },
         geometry: {
@@ -618,7 +617,7 @@ async function plotForRent(rentalListings, county) {
     rentalsLayer.addLayer(layer);
     window.toggle = false;
     layer.on('mouseover', function () {
-      layer.bindPopup('<b>' + 'Name:</b> ' + feature.properties.Name + '</br><br>'
+      layer.bindPopup('<b>' + 'Address:</b> ' + feature.properties.Address + '</br><br>'
         + '<b>Beds:</b> ' + feature.properties.Beds + '<br><br>'
         + '<b>Baths:</b> ' + feature.properties.Baths + '<br><br>'
         + '<b>Price:</b> ' + feature.properties.Price + '<br><br>'
@@ -715,14 +714,13 @@ function plotForSale(salesListings, county) {
         id: d.listing_id,
         type: "Feature",
         properties: {
-          "Name": d.address,
+          "Address": d.address,
           "Beds": d.beds,
           "Baths": d.baths,
           "Price": d.price,
           // "Predicted Price": d.predicted_price,
           "Square Footage": d.sqft,
           "Lot Size": d.lot_size,
-          "Address": d.address,
           "Type": d.prop_type,
           "URL": d.rdc_web_url,
         },
@@ -738,7 +736,7 @@ function plotForSale(salesListings, county) {
     salesLayer.addLayer(layer);
     window.toggle = false;
     layer.on('mouseover', function () {
-      layer.bindPopup('<b>' + 'Name:</b> ' + feature.properties.Name + '</br><br>'
+      layer.bindPopup('<b>' + 'Address:</b> ' + feature.properties.Address + '</br><br>'
         + '<b>Beds:</b> ' + feature.properties.Beds + '<br><br>'
         + '<b>Baths:</b> ' + feature.properties.Baths + '<br><br>'
         + '<b>Price:</b> ' + feature.properties.Price + '<br><br>'
@@ -986,7 +984,7 @@ sidebar
     tab: '<i class="fa fa-filter"></i>',
     title: 'Filter_Views',
     pane: '<p>Drop a pin on the area that you want to check out, then use the options below to filter what you see on the map. <p/>' +
-      '<p id="forSaleToggle"><button onclick="toggleForSale()" class="homesForSale"><i class="fa fa-home"></i></button><text id="salesInfo" class="buttonInfo">Homes For Sale</text></p>' +
+      '<p id="forSaleToggle"><button onclick="toggleForSale()" class="homesForSale"><i class="fa fa-home"></i><text id="salesInfo" class="buttonInfo">Homes For Sale</text></button></p>' +
       '<p id="rentalsToggle"><button onclick="toggleForRent()" class="homesForRent"><i class="fa fa-home"></i></button><text id="rentalsInfo" class="buttonInfo">Homes For Rent</text></p>' +
       '<p id="schoolsToggle"><button onclick="toggleSchools()" class="schools"><i class="fa fa-graduation-cap"></i></button><text id="schoolsInfo" class="buttonInfo">Schools</text></p>' +
       '<p id="bizToggle"><button onclick="toggleBiz()" class="businesses"><i class="fa fa-shopping-cart"></i></button><text id="bizInfo" class="buttonInfo">Businesses</text></p>',
