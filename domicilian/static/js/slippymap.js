@@ -984,10 +984,10 @@ sidebar
     tab: '<i class="fa fa-filter"></i>',
     title: 'Filter_Views',
     pane: '<p>Drop a pin on the area that you want to check out, then use the options below to filter what you see on the map. <p/>' +
-      '<p id="forSaleToggle"><button onclick="toggleForSale()" class="homesForSale"><i class="fa fa-home"></i><text id="salesInfo" class="buttonInfo">Homes For Sale</text></button></p>' +
-      '<p id="rentalsToggle"><button onclick="toggleForRent()" class="homesForRent"><i class="fa fa-home"></i></button><text id="rentalsInfo" class="buttonInfo">Homes For Rent</text></p>' +
-      '<p id="schoolsToggle"><button onclick="toggleSchools()" class="schools"><i class="fa fa-graduation-cap"></i></button><text id="schoolsInfo" class="buttonInfo">Schools</text></p>' +
-      '<p id="bizToggle"><button onclick="toggleBiz()" class="businesses"><i class="fa fa-shopping-cart"></i></button><text id="bizInfo" class="buttonInfo">Businesses</text></p>',
+      '<p id="forSaleToggle"><button onclick="toggleForSale()" class="homesForSale"><i class="fa fa-home"></i><text id="salesInfo" class="buttonInfo"> Homes For Sale</text></button></p>' +
+      '<p id="rentalsToggle"><button onclick="toggleForRent()" class="homesForRent"><i class="fa fa-home"></i><text id="rentalsInfo" class="buttonInfo"> Homes For Rent</text></button></p>' +
+      '<p id="schoolsToggle"><button onclick="toggleSchools()" class="schools"><i class="fa fa-graduation-cap"></i><text id="schoolsInfo" class="buttonInfo"> Schools</text></button></p>' +
+      '<p id="bizToggle"><button onclick="toggleBiz()" class="businesses"><i class="fa fa-shopping-cart"></i><text id="bizInfo" class="buttonInfo"> Businesses</text></button></p>',
 
   })
 // be notified when a panel is opened
