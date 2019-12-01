@@ -118,3 +118,30 @@ __NOTE__: Since system dependencies (differing based on an operating system like
 We've also provided an optional but useful live demo of the code on https://domicilian.sanyamkhurana.com/
 
 Although, we would've loved to package this app as a docker image to be easily utilized across the system, unfortunately, we were restricted by time constraints, but we've tried our best to set up Fabric and Ansible script for deployment on server available under `provisioner` folder. More info is in README.md file at the root of the repo.
+
+
+OPTIONAL DIRECTORY STRUCTURE
+============================
+
+Reference from root of the `CODE` repository.
+
+/scripts  -- just for reference
+
+    *.py files contains scripts for parsing/loading data in DB.
+    *.ipynb contains all experiments related to ML algorithm exploration and finally using Random Forest for prediction and loading data in the database.
+
+/provisioner
+
+    Contains ansible script to setup a server and host the application.
+
+/tests
+
+    Contains tests for the application.
+
+CODE/docs
+
+    Contains docs related to API and application in general.
+
+CODE/domicilian
+
+    The main folder for Django. Contains different django apps.
