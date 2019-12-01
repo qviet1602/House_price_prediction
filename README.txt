@@ -110,6 +110,7 @@ __NOTE__: Run the subsequent commands from the root of the repository containing
     pip install -r requirements/development.txt
     or pip3 install -r requirements/development.txt depending on the python version your system is on.
     brew install gdal
+    pip install python-magic-bin==0.4.14 or pip3 install python-magic-bin==0.4.14 depending on your python version
 
 
 - Optionally if required install python-magic-bin:
