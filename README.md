@@ -166,64 +166,9 @@ OPTIONAL: In order to run tests for the app, run command `pytest` from root of t
 
 __NOTE__: Since system dependencies (differing based on an operating system like PostgreSQL, gdal, etc.) are hard to set up and control, we realize that it might happen that system dependencies are conflicted causing local setup to fail sometimes and hard to debug. Although we intend to be as clear as possible, and despite testing these instructions several times, we have set up a fallback method in case things don't work as expected.
 
-We've also provided an optional but useful live demo of the code on https://domicilian.sanyamkhurana.com/
-
-Although, we would've loved to package this app as a docker image to be easily utilized across the system, unfortunately, we were restricted by time constraints, but we've tried our best to set up Fabric and Ansible script for deployment on server available under `provisioner` folder. More info is in README.md file at the root of the repo.
-
 
 Minimum requirements: **pip, fabric, python3.6, redis & [PostgreSQL 11][install-postgres] with postgis-2.4**, setup is tested on Mac OSX only.
 
-```
-brew install postgres python3
-[sudo] pip install fabric
-```
-
-[install-postgres]: http://www.gotealeaf.com/blog/how-to-install-postgresql-on-a-mac
-
-In your terminal, type or copy-paste the following:
-
-    git clone git@github.com:skhurana39/domicilian-web.git; cd domicilian-web; fab init
-
-Go grab a cup of coffee, we bake your hot development machine.
-
-Useful commands:
-
-- `fab serve` - start [django server](http://localhost:8000/)
-- `fab deploy_docs` - deploy docs to server
-- `fab test` - run the test locally with ipdb
-
-**NOTE:** Checkout `fabfile.py` for all the options available and what/how they do it.
 
 
-## Deploying Project
 
-The deployment are managed via travis, but for the first time you'll need to set the configuration values on each of the server.
-
-Check out detailed server setup instruction [here](docs/backend/server_config.md).
-
-## How to release domicilian
-
-Execute the following commands:
-
-```
-git checkout master
-fab test
-bumpversion patch  # 'patch' can be replaced with 'minor' or 'major'
-git push origin master
-git push origin master --tags
-git checkout qa
-git rebase master
-git push origin qa
-```
-
-## Contributing
-
-Golden Rule:
-
-> Anything in **master** is always **deployable**.
-
-Avoid working on `master` branch, create a new branch with meaningful name, send pull request asap. Be vocal!
-
-Refer to [CONTRIBUTING.md][contributing]
-
-[contributing]: http://github.com/skhurana39/domicilian-web/tree/master/CONTRIBUTING.md
