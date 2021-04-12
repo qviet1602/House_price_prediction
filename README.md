@@ -1,22 +1,23 @@
-domicilian
+Rental and Home Purchase Recommendations in the US 
 ==============================
 
 ## Description
 
-Domicilian is an app that helps people make informed decisions while finding a home from the daunting task of renting/purchasing homes.
+
 
 It is always a daunting task to search for a new place to rent or buy. Budget and commute restrictions further make it cumbersome to find such places.
 We want to help users find desirable places faster and more efficiently using interactive visualization techniques, which can also help them see nearby amenities. We plan to highlight places where investments are worthwhile according to trends in the market prices to help users make informed decisions.
 
-We've several different visualizations available and live demo hosted at:
-https://domicilian.sanyamkhurana.com/
+Domicilian is an app that helps people make informed decisions while finding a home from the daunting task of renting/purchasing homes.
+
 
 ## Directory Structure
 Reference from root of the `CODE` repository.
 
 /scripts  -- just for reference
-    *.py files contains scripts for parsing/loading data in DB.
-    *.ipynb contains all experiments related to ML algorithm exploration and finally using Random Forest for prediction and loading data in the database.
+- *.py files contains scripts for parsing/loading data in DB.
+- 
+    
 
 /provisioner: Contains ansible script to setup a server and host the application.
 
