@@ -15,13 +15,10 @@ https://domicilian.sanyamkhurana.com/
 Reference from root of the `CODE` repository.
 
 /scripts  -- just for reference
-
     *.py files contains scripts for parsing/loading data in DB.
     *.ipynb contains all experiments related to ML algorithm exploration and finally using Random Forest for prediction and loading data in the database.
 
-/provisioner
-
-    Contains ansible script to setup a server and host the application.
+/provisioner: Contains ansible script to setup a server and host the application.
 
 /tests: Contains tests for the application.
 
