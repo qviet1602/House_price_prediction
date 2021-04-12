@@ -23,33 +23,19 @@ Reference from root of the `CODE` repository.
 
     Contains ansible script to setup a server and host the application.
 
-/tests
+/tests: Contains tests for the application.
 
-    Contains tests for the application.
+/docs: Contains docs related to API and application in general.
 
-/docs
+/domicilian: The main folder for Django. Contains different django apps. This is where our backend rest endpoints and frontend code is there
 
-    Contains docs related to API and application in general.
+/domicilian/static: Contains all static css and js files
 
-/domicilian
+/domicilian/templates: Frontend html files
 
-    The main folder for Django. Contains different django apps. This is where our backend rest endpoints and frontend code is there
+/domicilian/visualization and /domicilian/median_prices: Backend rest endpoints
 
-/domicilian/static
-
-    Contains all static css and js files
-
-/domicilian/templates
-
-    Frontend html files
-
-/domicilian/visualization and /domicilian/median_prices
-
-   Backend rest endpoints
-
-/domicilian/urls.py
-
-  URL mappings
+/domicilian/urls.py: URL mappings
 
 If you have processed the dataset in some ways, include the code you used, and the steps people will need to go through.
 
